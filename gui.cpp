@@ -1,9 +1,10 @@
+// TODO think about a way where the widget might not arbitrarily draw to the
+//      screen (basically bounding box drawn in offset mode)
 #include <SDL2/SDL.h>
 #include <memory>
 #include <vector>
 #include <iostream>
 #include <exception>
-#include <functional>
 
 #include "font_atlas.hpp"
 #include "draw_context.hpp"
@@ -14,55 +15,6 @@ SDL_Rect pad_box(SDL_Rect box, int padding)
 {
     return { box.x + padding, box.y + padding, box.w - 2 * padding, box.h - 2 * padding };
 }
-
-bool within_rect(int32_t x, int32_t y, SDL_Rect const & r)
-{
-    return x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h;
-}
-
-struct button : widget
-{
-    button(std::string text, std::function<void()> callback)
-        : _pressed(false)
-        , _text(text)
-        , _callback(callback)
-    {
-    }
-
-    void on_draw(draw_context & dc) const
-    {
-        std::cout << _pressed << std::endl;
-        dc.draw_button_box(_box, _pressed);
-        if (!_text.empty())
-        {
-            dc.draw_button_text(_box, _text);
-        }
-    }
-
-    void on_mouse_event(mouse_event const & e)
-    {
-        //std::cout << "mouse event " << within_rect(e.x, e.y, _box) << ' ' << _box.x << ' ' << _box.y << std::endl;
-        bool hit = within_rect(e.x, e.y, _box);
-        bool old_pressed = _pressed;
-        _pressed = hit && e.type == mouse_event::button_type::DOWN;
-        if (hit && old_pressed == true && !_pressed)
-            _callback();
-
-        // TODO
-        mark_dirty();
-    }
-
-    void on_key_event(key_event const & e)
-    {
-    }
-
-    private:
-
-    bool _pressed;
-    std::string _text;
-    std::function<void()> _callback;
-};
-
 
 typedef std::shared_ptr<widget> widget_ptr;
 
