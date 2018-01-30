@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "geometry.hpp"
+
 color_widget::color_widget()
     : _color_src(rand())
 {
@@ -21,9 +23,12 @@ void color_widget::on_draw(draw_context & dc) const
 
 void color_widget::on_mouse_event(mouse_event const & e)
 {
-    std::cout << "mouse event" << std::endl;
-    recolor();
-    mark_dirty();
+    if (within_rect(e.x, e.y, box()))
+    {
+        std::cout << "mouse event" << std::endl;
+        recolor();
+        mark_dirty();
+    }
 }
 
 void color_widget::on_key_event(key_event const & e)
