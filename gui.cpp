@@ -9,6 +9,7 @@
 #include "font_atlas.hpp"
 #include "draw_context.hpp"
 #include "widget.hpp"
+#include "button.hpp"
 #include "color_widget.hpp"
 
 SDL_Rect pad_box(SDL_Rect box, int padding)
@@ -26,7 +27,49 @@ struct container : widget
         mark_dirty();
     }
 
+    void on_draw(draw_context & dc) const override
+    {
+        for (auto cptr : _children)
+            cptr->on_draw(dc);
+    }
+
+    void on_mouse_event(mouse_event const & me) override
+    {
+        // TODO need logic to capture mouse moves outside of a widget
+        for (auto cptr : _children)
+        {
+            cptr->on_mouse_event(me);
+        }
+        mark_dirty();
+    }
+
+    void on_key_event(key_event const & ke) override
+    {
+        // TODO need notion of focus
+    }
+
+    void apply_layout(SDL_Rect box)
+    {
+        std::size_t const n = _children.size();
+
+        if (n > 0)
+        {
+            // evenly split box
+            int const width = box.w / n;
+            int xoffset = 0;
+
+            for (auto cptr : _children)
+            {
+                cptr->apply_layout({box.x + xoffset, box.y, width, box.h });
+                xoffset += width;
+            }
+
+            this->width = width;
+        }
+    }
+
     protected:
+    int width;
 
     std::vector<widget_ptr> _children;
 };
@@ -36,8 +79,18 @@ void event_loop(SDL_Window * window)
     font_atlas fa("/usr/share/fonts/TTF/DejaVuSans.ttf", 15);
     draw_context dc(window, fa);
 
-    //button main_widget("Click me!", [](){ std::cout << "click" << std::endl;});
-    color_widget main_widget;
+    //button b("Click me!", [](){ std::cout << "click" << std::endl;});
+    //color_widget cw;
+    container main_widget
+        { std::make_shared<color_widget>()
+        , std::make_shared<color_widget>()
+        , std::make_shared<color_widget>()
+        , std::make_shared<color_widget>()
+        , std::make_shared<button>("Click me!", [](){ std::cout << "click" << std::endl;})
+        , std::make_shared<color_widget>()
+        , std::make_shared<color_widget>()
+        , std::make_shared<color_widget>()
+        };
 
     main_widget.apply_layout(pad_box({0, 0, dc.width(), dc.height()}, 200));
 
