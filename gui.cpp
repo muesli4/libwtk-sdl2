@@ -1,5 +1,9 @@
 // TODO think about a way where the widget might not arbitrarily draw to the
 //      screen (basically bounding box drawn in offset mode)
+//
+// TODO 2-dimensional focus map to navigate gui elements with a remote:
+//      NEXT_X, NEXT_Y, PREV_X, PREV_Y, NEXT, PREV
+//
 #include <SDL2/SDL.h>
 #include <memory>
 #include <vector>
@@ -16,8 +20,6 @@ SDL_Rect pad_box(SDL_Rect box, int padding)
 {
     return { box.x + padding, box.y + padding, box.w - 2 * padding, box.h - 2 * padding };
 }
-
-typedef std::shared_ptr<widget> widget_ptr;
 
 struct container : widget
 {
