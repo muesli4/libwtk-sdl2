@@ -34,4 +34,5 @@ void button::on_mouse_event(mouse_event const & e)
 
 void button::on_key_event(key_event const & e)
 {
+    // TODO enter?
 }

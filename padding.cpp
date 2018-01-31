@@ -28,9 +28,9 @@ void padding::on_key_event(key_event const & ke)
     _wptr->on_key_event(ke);
 }
 
-void padding::apply_layout(SDL_Rect box)
+void padding::apply_layout_to_children()
 {
-    _wptr->apply_layout({ box.x + _pad_x, box.y + _pad_y, box.w - _pad_x, box.h - _pad_y });
+    _wptr->apply_layout({ _box.x + _pad_x, _box.y + _pad_y, _box.w - 2 * _pad_x, _box.h - 2 * _pad_y });
 }
 
 std::shared_ptr<padding> pad(int pad_x, int pad_y, widget_ptr wptr)

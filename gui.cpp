@@ -4,6 +4,13 @@
 // TODO 2-dimensional focus map to navigate gui elements with a remote:
 //      NEXT_X, NEXT_Y, PREV_X, PREV_Y, NEXT, PREV
 //
+
+
+// - Out of consistency widgets should not react to MOUSEUP events when they
+//   haven't been activted by a MOUSEDOWN event in their area before. However,
+//   They might very well react to events that are not in their area if the
+//   mouse went down in their area before.
+
 #include <SDL2/SDL.h>
 #include <memory>
 #include <vector>
@@ -14,12 +21,21 @@
 #include "draw_context.hpp"
 #include "widget.hpp"
 #include "button.hpp"
+#include "padding.hpp"
 #include "color_widget.hpp"
 
 SDL_Rect pad_box(SDL_Rect box, int padding)
 {
     return { box.x + padding, box.y + padding, box.w - 2 * padding, box.h - 2 * padding };
 }
+
+struct widget_child_descriptor
+{
+    // determines which widgets get size (currently only the highest priority
+    // gets size, since widgets don't tell their required size)
+    int priority;
+    widget_ptr wptr;
+};
 
 struct container : widget
 {
@@ -50,28 +66,28 @@ struct container : widget
         // TODO need notion of focus
     }
 
-    void apply_layout(SDL_Rect box)
+    void apply_layout_to_children() override
     {
         std::size_t const n = _children.size();
 
         if (n > 0)
         {
             // evenly split box
-            int const width = box.w / n;
-            int xoffset = 0;
+            int const child_width = _box.w / n;
+            int xoffset = _box.x;
 
             for (auto cptr : _children)
             {
-                cptr->apply_layout({box.x + xoffset, box.y, width, box.h });
-                xoffset += width;
+                cptr->apply_layout({ xoffset, _box.y, child_width, _box.h });
+                xoffset += child_width;
             }
 
-            this->width = width;
         }
+
+        // TODO set assigned box (this should be done in widget)
     }
 
     protected:
-    int width;
 
     std::vector<widget_ptr> _children;
 };
@@ -81,17 +97,13 @@ void event_loop(SDL_Window * window)
     font_atlas fa("/usr/share/fonts/TTF/DejaVuSans.ttf", 15);
     draw_context dc(window, fa);
 
-    //button b("Click me!", [](){ std::cout << "click" << std::endl;});
     //color_widget cw;
     container main_widget
         { std::make_shared<color_widget>()
-        , std::make_shared<color_widget>()
-        , std::make_shared<color_widget>()
-        , std::make_shared<color_widget>()
-        , std::make_shared<button>("Click me!", [](){ std::cout << "click" << std::endl;})
-        , std::make_shared<color_widget>()
-        , std::make_shared<color_widget>()
-        , std::make_shared<color_widget>()
+        , pad(10, std::make_shared<color_widget>())
+        , pad(20, 80, std::make_shared<color_widget>())
+        , pad(10, std::make_shared<button>("Click me!", [](){ std::cout << "click1" << std::endl;}))
+        , pad(10, std::make_shared<button>("Click me!", [](){ std::cout << "click2" << std::endl;}))
         };
 
     main_widget.apply_layout(pad_box({0, 0, dc.width(), dc.height()}, 200));
@@ -108,9 +120,7 @@ void event_loop(SDL_Window * window)
             break;
         else if (ev.type == SDL_MOUSEBUTTONDOWN || ev.type == SDL_MOUSEBUTTONUP)
         {
-            mouse_event me { ev.button.type == SDL_MOUSEBUTTONDOWN ? mouse_event::button_type::DOWN : mouse_event::button_type::UP, ev.button.x, ev.button.y };
-
-            main_widget.on_mouse_event(me);
+            main_widget.on_mouse_event(mouse_event_from_sdl(ev.button));
         }
         else if (ev.type == SDL_KEYDOWN)
             main_widget.on_key_event(key_event());

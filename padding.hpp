@@ -15,8 +15,8 @@ struct padding : widget
 
     void on_key_event(key_event const & ke) override;
 
-    void apply_layout(SDL_Rect box);
-    
+    void apply_layout_to_children() override;
+
     private:
     int _pad_x;
     int _pad_y;
