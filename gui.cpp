@@ -57,11 +57,6 @@ struct container : widget
         mark_dirty();
     }
 
-    void on_key_event(key_event const & ke) override
-    {
-        // TODO need notion of focus
-    }
-
     void apply_layout_to_children() override
     {
         std::size_t const n = _children.size();
@@ -79,8 +74,6 @@ struct container : widget
             }
 
         }
-
-        // TODO set assigned box (this should be done in widget)
     }
 
     protected:
@@ -129,8 +122,21 @@ void event_loop(SDL_Window * window)
 
             if ((keysym.mod & KMOD_CTRL) && keysym.sym == SDLK_q)
                 break;
+            else if (keysym.sym == SDLK_TAB)
+            {
+                if (keysym.mod & KMOD_SHIFT)
+                {
+                    sc.navigate_selection(navigation_type::NEXT, &main_widget);
+                }
+                else
+                {
+                    sc.navigate_selection(navigation_type::PREV, &main_widget);
+                }
+            }
+            else if (keysym.sym == SDLK_RETURN)
+                sc.dispatch_activation();
             else
-                main_widget.on_key_event(key_event());
+                sc.dispatch_key_event(key_event());
         }
 
         // render
