@@ -3,9 +3,9 @@
 
 #include <functional>
 
-#include "widget.hpp"
+#include "selectable.hpp"
 
-struct button : widget
+struct button : selectable
 {
     button(std::string text, std::function<void()> callback);
 
@@ -13,8 +13,6 @@ struct button : widget
     void on_mouse_event(mouse_event const & e) override;
     void on_key_event(key_event const & e) override;
     void on_activate() override;
-    widget * find_selectable() override;
-    widget * navigate_selectable(navigation_type nt) override;
     ~button() override;
 
     private:

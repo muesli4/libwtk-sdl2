@@ -49,20 +49,6 @@ void color_widget::on_activate()
     mark_dirty();
 }
 
-widget * color_widget::find_selectable()
-{
-    // TODO create selectable base class
-    return this;
-}
-
-widget * color_widget::navigate_selectable(navigation_type nt)
-{
-    if (_parent == nullptr)
-        return nullptr;
-    else
-        return _parent->navigate_selectable_from_children(nt, this, _box.x + _box.w / 2, _box.y + _box.h / 2);
-}
-
 void color_widget::recolor()
 {
     _color_src = rand();

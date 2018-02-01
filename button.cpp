@@ -39,20 +39,6 @@ void button::on_activate()
     _callback();
 }
 
-widget * button::find_selectable()
-{
-    // TODO create selectable base class
-    return this;
-}
-
-widget * button::navigate_selectable(navigation_type nt)
-{
-    if (_parent == nullptr)
-        return nullptr;
-    else
-        return _parent->navigate_selectable_from_children(nt, this, _box.x + _box.w / 2, _box.y + _box.h / 2);
-}
-
 button::~button()
 {
 }

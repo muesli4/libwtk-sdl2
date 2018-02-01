@@ -1,9 +1,9 @@
 #ifndef COLOR_WIDGET_HPP
 #define COLOR_WIDGET_HPP
 
-#include "widget.hpp"
+#include "selectable.hpp"
 
-struct color_widget : widget
+struct color_widget : selectable
 {
     color_widget();
 
@@ -11,8 +11,6 @@ struct color_widget : widget
     void on_mouse_event(mouse_event const & e) override;
     void on_key_event(key_event const & e) override;
     void on_activate() override;
-    widget * find_selectable() override;
-    widget * navigate_selectable(navigation_type nt) override;
 
     ~color_widget() override;
 

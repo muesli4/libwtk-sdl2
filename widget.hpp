@@ -7,6 +7,7 @@
 #include "mouse_event.hpp"
 #include "key_event.hpp"
 #include "selection_context.hpp"
+#include "geometry.hpp"
 
 
 enum class navigation_type { NEXT_X, NEXT_Y, PREV_X, PREV_Y, NEXT, PREV };
@@ -60,7 +61,7 @@ struct widget
     // navigation types (i.e. 2-dimensional).
     //
     // Only containers should implement this.
-    virtual widget * navigate_selectable_from_children(navigation_type nt, widget * w, int center_x, int center_y);
+    virtual widget * navigate_selectable_from_children(navigation_type nt, widget * w, point center);
 
     virtual ~widget();
 
@@ -69,6 +70,7 @@ struct widget
     bool _dirty;
 
     protected:
+
 
     widget * _parent;
 

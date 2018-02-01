@@ -65,7 +65,7 @@ widget * widget::navigate_selectable(navigation_type nt)
     return nullptr;
 }
 
-widget * widget::navigate_selectable_from_children(navigation_type nt, widget * w, int center_x, int center_y)
+widget * widget::navigate_selectable_from_children(navigation_type nt, widget * w, point center)
 {
     return nullptr;
 }

@@ -93,24 +93,11 @@ struct container : widget
         return nullptr;
     }
 
-    /*
-    widget * navigate_selectable(navigation_type nt) const override
-    {
-        if (nt == navigation_type::NEXT || nt == navigation_type::NEXT_X)
-        {
-
-        }
-        else if (nt == navigation_type::NEXT || nt == navigation_type::NEXT_X)
-        {
-        }
-    }
-    */
-
-    widget * navigate_selectable_from_children(navigation_type nt, widget * w, int center_x, int center_y) override
+    widget * navigate_selectable_from_children(navigation_type nt, widget * w, point center) override
     {
         if (nt == navigation_type::NEXT_Y || nt == navigation_type::PREV_Y)
         {
-            return navigate_upwards(nt, center_x, center_y);
+            return navigate_upwards(nt, center);
         }
         else
         {
@@ -130,7 +117,7 @@ struct container : widget
 
             if (it == end || it < begin)
             {
-                return navigate_upwards(nt, _box.x + _box.w / 2, _box.y + _box.h / 2);
+                return navigate_upwards(nt, rect_center(_box));
             }
             else
             {
@@ -145,12 +132,12 @@ struct container : widget
 
     protected:
 
-    widget * navigate_upwards(navigation_type nt, int center_x, int center_y)
+    widget * navigate_upwards(navigation_type nt, point center)
     {
         if (_parent == nullptr)
             return nullptr;
         else
-            return _parent->navigate_selectable_from_children(nt, this, center_x, center_y);
+            return _parent->navigate_selectable_from_children(nt, this, center);
     }
 
 
@@ -161,15 +148,15 @@ void event_loop(SDL_Window * window)
 {
     //color_widget cw;
     container main_widget
-        {// std::make_shared<color_widget>()
-        //, pad(10, std::make_shared<color_widget>())
-         pad(20, 80, std::make_shared<color_widget>())
+        { std::make_shared<color_widget>()
+        , pad(10, std::make_shared<color_widget>())
+        ,  pad(20, 80, std::make_shared<color_widget>())
         , pad(10, std::make_shared<button>("Button 1", [](){ std::cout << "click1" << std::endl;}))
-        //, std::make_shared<container, std::initializer_list<widget_ptr>>(
-        //        { pad(10, std::make_shared<button>("Button 2", [](){ std::cout << "click2" << std::endl;}))
-        //        , pad(10, std::make_shared<button>("Button 3", [](){ std::cout << "click3" << std::endl;}))
-        //        , pad(10, std::make_shared<button>("Button 4", [](){ std::cout << "click4" << std::endl;}))
-        //        })
+        , std::make_shared<container, std::initializer_list<widget_ptr>>(
+                { pad(10, std::make_shared<button>("Button 2", [](){ std::cout << "click2" << std::endl;}))
+                , pad(10, std::make_shared<button>("Button 3", [](){ std::cout << "click3" << std::endl;}))
+                , pad(10, std::make_shared<button>("Button 4", [](){ std::cout << "click4" << std::endl;}))
+                })
         };
 
     // setup necessary contexts (as in local to a window or other unit of management)
@@ -203,12 +190,24 @@ void event_loop(SDL_Window * window)
             {
                 if (keysym.mod & KMOD_SHIFT)
                 {
-                    //sc.navigate_selection(navigation_type::PREV, &main_widget);
+                    sc.navigate_selection(navigation_type::PREV, &main_widget);
                 }
                 else
                 {
                     sc.navigate_selection(navigation_type::NEXT, &main_widget);
                 }
+            }
+            else if (keysym.mod & KMOD_SHIFT)
+            {
+                navigation_type nt;
+                switch (keysym.sym)
+                {
+                    case SDLK_UP:    nt = navigation_type::PREV_Y; break;
+                    case SDLK_DOWN:  nt = navigation_type::NEXT_Y; break;
+                    case SDLK_LEFT:  nt = navigation_type::PREV_X; break;
+                    case SDLK_RIGHT: nt = navigation_type::NEXT_X; break;
+                }
+                sc.navigate_selection(nt, &main_widget);
             }
             else if (keysym.sym == SDLK_RETURN)
                 sc.dispatch_activation();
