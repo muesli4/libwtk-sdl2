@@ -19,7 +19,9 @@ struct selection_context
 
     // Runs the selected widget's activation event (this may happen when
     // pressing the return key).
-    void activate_selected_widget();
+    void dispatch_activation();
+
+    void dispatch_key_event(key_event const & ke);
 
     bool is_selected_widget(widget * w);
 

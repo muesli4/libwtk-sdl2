@@ -12,11 +12,19 @@ void selection_context::select_widget(widget * w)
     _selected_widget = w;
 }
 
-void selection_context::activate_selected_widget()
+void selection_context::dispatch_activation()
 {
     if (_selected_widget != nullptr)
     {
         _selected_widget->on_activate();
+    }
+}
+
+void selection_context::dispatch_key_event(key_event const & ke)
+{
+    if (_selected_widget != nullptr)
+    {
+        _selected_widget->on_key_event(ke);
     }
 }
 
