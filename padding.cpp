@@ -34,9 +34,9 @@ void padding::apply_layout_to_children()
     _wptr->apply_layout({ _box.x + _pad_x, _box.y + _pad_y, _box.w - 2 * _pad_x, _box.h - 2 * _pad_y });
 }
 
-widget * padding::find_selectable()
+widget * padding::find_selectable(navigation_type nt)
 {
-    return _wptr->find_selectable();
+    return _wptr->find_selectable(nt);
 }
 
 widget * padding::navigate_selectable_from_children(navigation_type nt, widget * w, point center)

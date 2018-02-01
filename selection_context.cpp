@@ -5,7 +5,7 @@
 
 selection_context::selection_context(widget * w)
     // Set to first selectable widget.
-    : _selected_widget(w == nullptr ? w : w->find_selectable())
+    : _selected_widget(w == nullptr ? w : w->find_selectable(navigation_type::NEXT))
 {
     select_helper();
 }
@@ -53,7 +53,7 @@ void selection_context::navigate_selection(navigation_type nt, widget * main_wid
     if (_selected_widget == nullptr)
     {
         // select first selectable
-        _selected_widget = main_widget->find_selectable();
+        _selected_widget = main_widget->find_selectable(nt);
     }
     else
     {

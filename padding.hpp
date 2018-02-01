@@ -17,7 +17,7 @@ struct padding : widget
 
     void apply_layout_to_children() override;
 
-    widget * find_selectable() override;
+    widget * find_selectable(navigation_type nt) override;
     widget * navigate_selectable_from_children(navigation_type nt, widget * w, point center) override;
 
     ~padding() override;

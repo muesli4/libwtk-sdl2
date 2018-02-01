@@ -43,10 +43,10 @@ struct widget
     // does not have box already. Otherwise no space is allocated.
     virtual void apply_layout_to_children();
 
-    // Should return the first selectable widget. If a widget is selectable it
-    // should return itself. Containers should return the first selectable child
-    // widget.
-    virtual widget * find_selectable();
+    // Should return the first selectable widget according to the navigation
+    // type. If a widget is selectable it should return itself. Containers
+    // should return the first selectable child widget.
+    virtual widget * find_selectable(navigation_type nt);
 
     // Perform a navigation request from this widget as source.
     //
@@ -71,6 +71,9 @@ struct widget
 
     protected:
 
+    // Helper to continue a navigation in a parent once the current widget is
+    // exhausted.
+    widget * navigate_selectable_parent(navigation_type nt, point center);
 
     widget * _parent;
 

@@ -5,7 +5,7 @@
 
 struct selectable : widget
 {
-    widget * find_selectable() override;
+    widget * find_selectable(navigation_type nt) override;
     widget * navigate_selectable(navigation_type nt) override;
 
     ~selectable() override;

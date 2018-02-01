@@ -20,6 +20,7 @@
 #include "button.hpp"
 #include "padding.hpp"
 #include "color_widget.hpp"
+#include "box.hpp"
 
 SDL_Rect pad_box(SDL_Rect box, int padding)
 {
@@ -34,130 +35,22 @@ struct widget_child_descriptor
     widget_ptr wptr;
 };
 
-struct container : widget
-{
-    container(std::initializer_list<widget_ptr> ws)
-        : _children(ws)
-    {
-        for (auto cptr : _children)
-            cptr->set_parent(this);
-
-        mark_dirty();
-    }
-
-    void on_draw(draw_context & dc, selection_context const & sc) const override
-    {
-        for (auto cptr : _children)
-            cptr->on_draw(dc, sc);
-    }
-
-    void on_mouse_event(mouse_event const & me) override
-    {
-        // TODO need logic to capture mouse moves outside of a widget
-        for (auto cptr : _children)
-        {
-            cptr->on_mouse_event(me);
-        }
-        mark_dirty();
-    }
-
-    void apply_layout_to_children() override
-    {
-        std::size_t const n = _children.size();
-
-        if (n > 0)
-        {
-            // evenly split box
-            int const child_width = _box.w / n;
-            int xoffset = _box.x;
-
-            for (auto cptr : _children)
-            {
-                cptr->apply_layout({ xoffset, _box.y, child_width, _box.h });
-                xoffset += child_width;
-            }
-
-        }
-    }
-
-    widget * find_selectable() override
-    {
-        for (auto cptr : _children)
-        {
-            auto w = cptr->find_selectable();
-            if (w != nullptr)
-            {
-                return w;
-            }
-        }
-        return nullptr;
-    }
-
-    widget * navigate_selectable_from_children(navigation_type nt, widget * w, point center) override
-    {
-        if (nt == navigation_type::NEXT_Y || nt == navigation_type::PREV_Y)
-        {
-            return navigate_upwards(nt, center);
-        }
-        else
-        {
-            auto begin = _children.begin();
-            auto end = _children.end();
-            auto it = std::find_if(begin, end, [w](widget_ptr wptr){ return wptr.get() == w; });
-
-            if (nt == navigation_type::NEXT || nt == navigation_type::NEXT_X)
-            {
-                it++;
-            }
-            else if (nt == navigation_type::PREV || nt == navigation_type::PREV_X)
-            {
-                it--;
-            }
-
-
-            if (it == end || it < begin)
-            {
-                return navigate_upwards(nt, rect_center(_box));
-            }
-            else
-            {
-                return (*it)->find_selectable();
-            }
-        }
-    }
-
-    ~container() override
-    {
-    }
-
-    protected:
-
-    widget * navigate_upwards(navigation_type nt, point center)
-    {
-        if (_parent == nullptr)
-            return nullptr;
-        else
-            return _parent->navigate_selectable_from_children(nt, this, center);
-    }
-
-
-    std::vector<widget_ptr> _children;
-};
-
 void event_loop(SDL_Window * window)
 {
     //color_widget cw;
-    container main_widget
+    box main_widget(
+        box::orientation::HORIZONTAL,
         { std::make_shared<color_widget>()
         , pad(10, std::make_shared<color_widget>())
         ,  pad(20, 80, std::make_shared<color_widget>())
         , pad(10, std::make_shared<button>("Button 1", [](){ std::cout << "click1" << std::endl;}))
-        , std::make_shared<container, std::initializer_list<widget_ptr>>(
+        , std::make_shared<box, box::orientation, std::initializer_list<widget_ptr>>(
+                box::orientation::VERTICAL,
                 { pad(10, std::make_shared<button>("Button 2", [](){ std::cout << "click2" << std::endl;}))
                 , pad(10, std::make_shared<button>("Button 3", [](){ std::cout << "click3" << std::endl;}))
                 , pad(10, std::make_shared<button>("Button 4", [](){ std::cout << "click4" << std::endl;}))
                 })
-        };
+        });
 
     // setup necessary contexts (as in local to a window or other unit of management)
     selection_context sc;
@@ -206,6 +99,7 @@ void event_loop(SDL_Window * window)
                     case SDLK_DOWN:  nt = navigation_type::NEXT_Y; break;
                     case SDLK_LEFT:  nt = navigation_type::PREV_X; break;
                     case SDLK_RIGHT: nt = navigation_type::NEXT_X; break;
+                    default: goto render;
                 }
                 sc.navigate_selection(nt, &main_widget);
             }
@@ -214,7 +108,7 @@ void event_loop(SDL_Window * window)
             else
                 sc.dispatch_key_event(key_event());
         }
-
+render:
         // render
         main_widget.draw_when_dirty(dc, sc);
         dc.present();

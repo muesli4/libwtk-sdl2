@@ -55,7 +55,7 @@ void widget::apply_layout_to_children()
 {
 }
 
-widget * widget::find_selectable()
+widget * widget::find_selectable(navigation_type nt)
 {
     return nullptr;
 }
@@ -72,4 +72,12 @@ widget * widget::navigate_selectable_from_children(navigation_type nt, widget * 
 
 widget::~widget()
 {
+}
+
+widget * widget::navigate_selectable_parent(navigation_type nt, point center)
+{
+    if (_parent == nullptr)
+        return nullptr;
+    else
+        return _parent->navigate_selectable_from_children(nt, this, center);
 }

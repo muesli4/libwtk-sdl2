@@ -1,16 +1,13 @@
 #include "selectable.hpp"
 
-widget * selectable::find_selectable()
+widget * selectable::find_selectable(navigation_type nt)
 {
     return this;
 }
 
 widget * selectable::navigate_selectable(navigation_type nt)
 {
-    if (_parent == nullptr)
-        return nullptr;
-    else
-        return _parent->navigate_selectable_from_children(nt, this, rect_center(_box));
+    return navigate_selectable_parent(nt, rect_center(_box));
 }
 
 selectable::~selectable()
