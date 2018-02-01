@@ -3,7 +3,7 @@
 #include "box.hpp"
 
 box::box(orientation o, std::initializer_list<widget_ptr> ws)
-    : linear_container(ws)
+    : container(ws)
     , _o(o)
 {
 }

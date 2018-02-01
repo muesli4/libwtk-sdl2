@@ -1,6 +1,6 @@
-#include "linear_container.hpp"
+#include "container.hpp"
 
-linear_container::linear_container(std::initializer_list<widget_ptr> ws)
+container::container(std::initializer_list<widget_ptr> ws)
     : _children(ws)
 {
     for (auto cptr : _children)
@@ -9,13 +9,13 @@ linear_container::linear_container(std::initializer_list<widget_ptr> ws)
     mark_dirty();
 }
 
-void linear_container::on_draw(draw_context & dc, selection_context const & sc) const
+void container::on_draw(draw_context & dc, selection_context const & sc) const
 {
     for (auto cptr : _children)
         cptr->on_draw(dc, sc);
 }
 
-void linear_container::on_mouse_event(mouse_event const & me)
+void container::on_mouse_event(mouse_event const & me)
 {
     // TODO need logic to capture mouse moves outside of a widget
     for (auto cptr : _children)
@@ -25,7 +25,7 @@ void linear_container::on_mouse_event(mouse_event const & me)
     mark_dirty();
 }
 
-linear_container::~linear_container()
+container::~container()
 {
 }
 

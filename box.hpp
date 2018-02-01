@@ -1,9 +1,9 @@
 #ifndef BOX_HPP
 #define BOX_HPP
 
-#include "linear_container.hpp"
+#include "container.hpp"
 
-struct box : linear_container
+struct box : container
 {
     enum class orientation { VERTICAL, HORIZONTAL };
 
