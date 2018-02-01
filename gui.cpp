@@ -1,10 +1,5 @@
 // TODO think about a way where the widget might not arbitrarily draw to the
 //      screen (basically bounding box drawn in offset mode)
-//
-// TODO 2-dimensional focus map to navigate gui elements with a remote:
-//      NEXT_X, NEXT_Y, PREV_X, PREV_Y, NEXT, PREV
-//
-
 
 // - Out of consistency widgets should not react to MOUSEUP events when they
 //   haven't been activted by a MOUSEDOWN event in their area before. However,
@@ -19,6 +14,7 @@
 
 #include "font_atlas.hpp"
 #include "draw_context.hpp"
+#include "selection_context.hpp"
 #include "widget.hpp"
 #include "button.hpp"
 #include "padding.hpp"
@@ -94,17 +90,22 @@ struct container : widget
 
 void event_loop(SDL_Window * window)
 {
-    font_atlas fa("/usr/share/fonts/TTF/DejaVuSans.ttf", 15);
-    draw_context dc(window, fa);
-
     //color_widget cw;
     container main_widget
         { std::make_shared<color_widget>()
         , pad(10, std::make_shared<color_widget>())
         , pad(20, 80, std::make_shared<color_widget>())
-        , pad(10, std::make_shared<button>("Click me!", [](){ std::cout << "click1" << std::endl;}))
-        , pad(10, std::make_shared<button>("Click me!", [](){ std::cout << "click2" << std::endl;}))
+        , pad(10, std::make_shared<button>("Button 1", [](){ std::cout << "click1" << std::endl;}))
+        , std::make_shared<container, std::initializer_list<widget_ptr>>(
+                { pad(10, std::make_shared<button>("Button 2", [](){ std::cout << "click2" << std::endl;}))
+                , pad(10, std::make_shared<button>("Button 3", [](){ std::cout << "click3" << std::endl;}))
+                })
         };
+
+    // setup necessary contexts (as in local to a window or other unit of management)
+    selection_context sc;
+    font_atlas fa("/usr/share/fonts/TTF/DejaVuSans.ttf", 15);
+    draw_context dc(window, fa);
 
     main_widget.apply_layout(pad_box({0, 0, dc.width(), dc.height()}, 200));
 
@@ -123,7 +124,14 @@ void event_loop(SDL_Window * window)
             main_widget.on_mouse_event(mouse_event_from_sdl(ev.button));
         }
         else if (ev.type == SDL_KEYDOWN)
-            main_widget.on_key_event(key_event());
+        {
+            auto const & keysym = ev.key.keysym;
+
+            if ((keysym.mod & KMOD_CTRL) && keysym.sym == SDLK_q)
+                break;
+            else
+                main_widget.on_key_event(key_event());
+        }
 
         // render
         main_widget.draw_when_dirty(dc);

@@ -31,6 +31,11 @@ SDL_Rect const & widget::box() const
     return _box;
 }
 
+void widget::set_parent(widget * parent)
+{
+    _parent = parent;
+}
+
 void widget::apply_layout(SDL_Rect box)
 {
     _box = box;
@@ -39,5 +44,20 @@ void widget::apply_layout(SDL_Rect box)
 
 void widget::apply_layout_to_children()
 {
+}
+
+widget * widget::find_selectable()
+{
+    return nullptr;
+}
+
+widget * widget::navigate_selectable(navigation_type nt)
+{
+    return nullptr;
+}
+
+widget * widget::navigate_selectable_from_children(navigation_type nt, widget * w, int center_x, int center_y)
+{
+    return nullptr;
 }
 
