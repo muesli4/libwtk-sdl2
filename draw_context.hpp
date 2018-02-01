@@ -46,7 +46,7 @@ struct draw_context
 
     void blit(SDL_Surface * s, const SDL_Rect * srcrect, const SDL_Rect * dstrect);
 
-    void draw_button_box(SDL_Rect box, bool activated);
+    void draw_button_box(SDL_Rect box, bool activated, bool selected);
 
     void draw_button_text(SDL_Rect box, std::string const & text);
 

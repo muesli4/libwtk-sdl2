@@ -1,7 +1,9 @@
 #ifndef SELECTION_CONTEXT_HPP
 #define SELECTION_CONTEXT_HPP
 
-#include "widget.hpp"
+#include "key_event.hpp"
+enum class navigation_type;
+struct widget;
 
 // TODO work with shared_ptr (in case a selected widget gets removed)
 //
@@ -17,13 +19,15 @@ struct selection_context
     // Manually select a widget.
     void select_widget(widget * w);
 
+    void unselect_widget();
+
     // Runs the selected widget's activation event (this may happen when
     // pressing the return key).
     void dispatch_activation();
 
     void dispatch_key_event(key_event const & ke);
 
-    bool is_selected_widget(widget * w);
+    bool is_selected_widget(widget const * w) const;
 
     // Performs a selection action from the currently selected widgets position.
     // If no such widget exists, it will perform the action starting from the
@@ -33,6 +37,9 @@ struct selection_context
     void navigate_selection(navigation_type nt, widget * main_widget);
 
     private:
+
+    void unselect_helper();
+    void select_helper();
 
     widget * _selected_widget;
 };

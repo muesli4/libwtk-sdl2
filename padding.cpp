@@ -9,13 +9,14 @@ padding::padding(int pad_x, int pad_y, widget_ptr wptr)
     , _pad_y(pad_y)
     , _wptr(wptr)
 {
+    wptr->set_parent(this);
 }
 
-void padding::on_draw(draw_context & dc) const
+void padding::on_draw(draw_context & dc, selection_context const & sc) const
 {
     // we don't have to draw the background because either the parent widget
     // will or someone else is responsible when we're the root widget
-    _wptr->on_draw(dc);
+    _wptr->on_draw(dc, sc);
 }
 
 void padding::on_mouse_event(mouse_event const & me)
@@ -33,6 +34,16 @@ void padding::apply_layout_to_children()
     _wptr->apply_layout({ _box.x + _pad_x, _box.y + _pad_y, _box.w - 2 * _pad_x, _box.h - 2 * _pad_y });
 }
 
+widget * padding::find_selectable()
+{
+    return _wptr->find_selectable();
+}
+
+widget * padding::navigate_selectable_from_children(navigation_type nt, widget * w, int center_x, int center_y)
+{
+    return _parent->navigate_selectable_from_children(nt, this, center_x, center_y);
+}
+
 std::shared_ptr<padding> pad(int pad_x, int pad_y, widget_ptr wptr)
 {
     return std::make_shared<padding>(pad_x, pad_y, wptr);
@@ -41,4 +52,8 @@ std::shared_ptr<padding> pad(int pad_x, int pad_y, widget_ptr wptr)
 std::shared_ptr<padding> pad(int pad, widget_ptr wptr)
 {
     return std::make_shared<padding>(pad, wptr);
+}
+
+padding::~padding()
+{
 }

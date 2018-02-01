@@ -9,13 +9,18 @@ struct padding : widget
     padding(int pad, widget_ptr wptr);
     padding(int pad_x, int pad_y, widget_ptr wptr);
 
-    void on_draw(draw_context & dc) const override;
+    void on_draw(draw_context & dc, selection_context const & sc) const override;
 
     void on_mouse_event(mouse_event const & me) override;
 
     void on_key_event(key_event const & ke) override;
 
     void apply_layout_to_children() override;
+
+    widget * find_selectable() override;
+    widget * navigate_selectable_from_children(navigation_type nt, widget * w, int center_x, int center_y) override;
+
+    ~padding() override;
 
     private:
     int _pad_x;

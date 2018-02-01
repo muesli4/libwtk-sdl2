@@ -1,5 +1,11 @@
 #include "widget.hpp"
 
+widget::widget()
+    : _dirty(true)
+    , _parent(nullptr)
+{
+}
+
 void widget::on_mouse_event(mouse_event const & e)
 {
 }
@@ -12,11 +18,11 @@ void widget::on_activate()
 {
 }
 
-void widget::draw_when_dirty(draw_context & dc)
+void widget::draw_when_dirty(draw_context & dc, selection_context const & sc)
 {
     if (_dirty)
     {
-        on_draw(dc);
+        on_draw(dc, sc);
         _dirty = false;
     }
 }
@@ -24,6 +30,9 @@ void widget::draw_when_dirty(draw_context & dc)
 void widget::mark_dirty()
 {
     _dirty = true;
+    // TODO add handler for parent to ignore (e.g. when widget is not visible)
+    if (_parent != nullptr)
+        _parent->mark_dirty();
 }
 
 SDL_Rect const & widget::box() const
@@ -61,3 +70,6 @@ widget * widget::navigate_selectable_from_children(navigation_type nt, widget * 
     return nullptr;
 }
 
+widget::~widget()
+{
+}

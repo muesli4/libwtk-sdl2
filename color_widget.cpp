@@ -9,7 +9,7 @@ color_widget::color_widget()
 {
 }
 
-void color_widget::on_draw(draw_context & dc) const
+void color_widget::on_draw(draw_context & dc, selection_context const & sc) const
 {
     SDL_Color c =
         { *reinterpret_cast<Uint8 const *>(&_color_src)
@@ -19,6 +19,11 @@ void color_widget::on_draw(draw_context & dc) const
         };
     dc.set_color(c);
     dc.draw_rect_filled(box());
+    if (sc.is_selected_widget(this))
+    {
+        dc.set_color({255, 255, 255, 0});
+        dc.draw_rect(box());
+    }
 }
 
 void color_widget::on_mouse_event(mouse_event const & e)
@@ -38,7 +43,31 @@ void color_widget::on_key_event(key_event const & e)
     mark_dirty();
 }
 
+void color_widget::on_activate()
+{
+    recolor();
+    mark_dirty();
+}
+
+widget * color_widget::find_selectable()
+{
+    // TODO create selectable base class
+    return this;
+}
+
+widget * color_widget::navigate_selectable(navigation_type nt)
+{
+    if (_parent == nullptr)
+        return nullptr;
+    else
+        return _parent->navigate_selectable_from_children(nt, this, _box.x + _box.w / 2, _box.y + _box.h / 2);
+}
+
 void color_widget::recolor()
 {
     _color_src = rand();
+}
+
+color_widget::~color_widget()
+{
 }

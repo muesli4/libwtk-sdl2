@@ -30,7 +30,7 @@ void draw_context::draw_rect_filled(SDL_Rect r)
 
 void draw_context::draw_rect(SDL_Rect r)
 {
-    SDL_RenderFillRect(_renderer, &r);
+    SDL_RenderDrawRect(_renderer, &r);
 }
 
 void draw_context::blit(SDL_Surface * s, const SDL_Rect * srcrect, const SDL_Rect * dstrect)
@@ -41,11 +41,14 @@ void draw_context::blit(SDL_Surface * s, const SDL_Rect * srcrect, const SDL_Rec
     SDL_DestroyTexture(tex);
 }
 
-void draw_context::draw_button_box(SDL_Rect box, bool activated)
+void draw_context::draw_button_box(SDL_Rect box, bool activated, bool selected)
 {
     set_color(activated ? _theme.button_selected_bg_color : _theme.button_bg_color);
     SDL_RenderFillRect(_renderer, &box);
-    set_color(_theme.button_frame_color);
+    if (selected)
+        set_color(_theme.button_selected_bg_color);
+    else
+        set_color(_theme.button_frame_color);
     SDL_RenderDrawRect(_renderer, &box);
 }
 
