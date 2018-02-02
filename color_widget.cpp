@@ -26,9 +26,9 @@ void color_widget::on_draw(draw_context & dc, selection_context const & sc) cons
     }
 }
 
-void color_widget::on_mouse_event(mouse_event const & e)
+void color_widget::on_mouse_up_event(mouse_up_event const & e)
 {
-    if (within_rect(e.x, e.y, box()))
+    if (within_rect(e.position, box()))
     {
         std::cout << "mouse event" << std::endl;
         recolor();

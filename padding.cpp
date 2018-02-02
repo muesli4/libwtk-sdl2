@@ -19,9 +19,14 @@ void padding::on_draw(draw_context & dc, selection_context const & sc) const
     _wptr->on_draw(dc, sc);
 }
 
-void padding::on_mouse_event(mouse_event const & me)
+void padding::on_mouse_down_event(mouse_down_event const & me)
 {
-    _wptr->on_mouse_event(me);
+    _wptr->on_mouse_down_event(me);
+}
+
+void padding::on_mouse_up_event(mouse_up_event const & me)
+{
+    _wptr->on_mouse_up_event(me);
 }
 
 void padding::on_key_event(key_event const & ke)

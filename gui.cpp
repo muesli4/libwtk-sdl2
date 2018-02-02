@@ -21,6 +21,7 @@
 #include "padding.hpp"
 #include "color_widget.hpp"
 #include "box.hpp"
+#include "swipe_area.hpp"
 
 SDL_Rect pad_box(SDL_Rect box, int padding)
 {
@@ -35,9 +36,105 @@ struct widget_child_descriptor
     widget_ptr wptr;
 };
 
+/*
+struct table : container
+{
+    struct entry
+    {
+        SDL_Rect placement;
+        widget_ptr wptr;
+    };
+
+    table(std::initializer_list<entry> es)
+    {
+    }
+
+    std::vector<std::vector<widget_ptr>> _table_fragments;
+
+};
+*/
+
+#include <optional>
+
+struct swipe_detector
+{
+    swipe_detector(int press_threshold, double dir_unambig_factor);
+
+    void mouse_down(point p);
+    mouse_up_event mouse_up(point p);
+
+    private:
+
+    int _press_threshold;
+    double _dir_unambig_factor;
+    std::optional<point> _opt_down_pos;
+};
+
+swipe_detector::swipe_detector(int press_threshold, double dir_unambig_factor)
+    : _press_threshold(press_threshold)
+    , _dir_unambig_factor(dir_unambig_factor)
+{
+}
+
+void swipe_detector::mouse_down(point p)
+{
+    _opt_down_pos = p;
+}
+
+mouse_up_event swipe_detector::mouse_up(point p)
+{
+    if (_opt_down_pos.has_value())
+    {
+        auto down_p = _opt_down_pos.value();
+        _opt_down_pos.reset();
+        auto swipe_vec = down_p - p;
+        auto abs_swipe_vec = abs(swipe_vec);
+
+        swipe_action act;
+
+        // vertical swipe
+        if (abs_swipe_vec.h * _dir_unambig_factor >= abs_swipe_vec.w)
+        {
+            if (swipe_vec.h < 0)
+            {
+                act = swipe_action::UP;
+            }
+            else
+            {
+                act = swipe_action::DOWN;
+            }
+        }
+        // horizontal swipe
+        else if (abs_swipe_vec.w * _dir_unambig_factor >= abs_swipe_vec.h)
+        {
+            if (swipe_vec.w > 0)
+            {
+                act = swipe_action::RIGHT;
+            }
+            else
+            {
+                act = swipe_action::LEFT;
+            }
+        }
+        else
+        {
+            goto out;
+        }
+
+        if (_press_threshold < abs_swipe_vec.w || _press_threshold < abs_swipe_vec.h)
+        {
+            swipe_event se { .position = down_p, .length = swipe_vec, .action = act };
+            return mouse_up_event {p, std::optional<swipe_event>(se)};
+        }
+    }
+out:
+    return { p, std::nullopt };
+}
+
 void event_loop(SDL_Window * window)
 {
     //color_widget cw;
+    /*
     box main_widget(
         box::orientation::HORIZONTAL,
         { std::make_shared<color_widget>()
@@ -51,11 +148,15 @@ void event_loop(SDL_Window * window)
                 , pad(10, std::make_shared<button>("Button 4", [](){ std::cout << "click4" << std::endl;}))
                 })
         });
+    */
+
+    swipe_area main_widget([](swipe_action act){ std::cout << "swipe: " << (int)act << std::endl; }, [](){ std::cout << "press" << std::endl; } );
 
     // setup necessary contexts (as in local to a window or other unit of management)
     selection_context sc;
     font_atlas fa("/usr/share/fonts/TTF/DejaVuSans.ttf", 15);
     draw_context dc(window, fa);
+    swipe_detector sd(30, 0.3);
 
     main_widget.apply_layout(pad_box({0, 0, dc.width(), dc.height()}, 200));
 
@@ -69,9 +170,24 @@ void event_loop(SDL_Window * window)
         // event handling
         if (ev.type == SDL_QUIT)
             break;
-        else if (ev.type == SDL_MOUSEBUTTONDOWN || ev.type == SDL_MOUSEBUTTONUP)
+        else if (ev.type == SDL_MOUSEBUTTONDOWN)
         {
-            main_widget.on_mouse_event(mouse_event_from_sdl(ev.button));
+            point p { ev.button.x, ev.button.y };
+            main_widget.on_mouse_down_event({p});
+            sd.mouse_down(p);
+            
+        }
+        else if (ev.type == SDL_MOUSEBUTTONUP)
+        {
+            // TODO always send a mouse down event
+            //      depending on various things send either a swipe_event
+            //      or a mouse up event
+            // TODO on second thought that is probably a bad idea
+            //
+            // TODO alternative: embed swipe_event as an optional member in mouse_event
+            //                   but only when letting go of the mouse
+
+            main_widget.on_mouse_up_event(sd.mouse_up({ ev.button.x, ev.button.y }));
         }
         else if (ev.type == SDL_KEYDOWN)
         {

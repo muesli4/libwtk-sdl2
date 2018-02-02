@@ -6,7 +6,11 @@ widget::widget()
 {
 }
 
-void widget::on_mouse_event(mouse_event const & e)
+void widget::on_mouse_down_event(mouse_down_event const & e)
+{
+}
+
+void widget::on_mouse_up_event(mouse_up_event const & e)
 {
 }
 

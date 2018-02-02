@@ -8,7 +8,7 @@ struct color_widget : selectable
     color_widget();
 
     void on_draw(draw_context & dc, selection_context const & sc) const override;
-    void on_mouse_event(mouse_event const & e) override;
+    void on_mouse_up_event(mouse_up_event const & e) override;
     void on_key_event(key_event const & e) override;
     void on_activate() override;
 

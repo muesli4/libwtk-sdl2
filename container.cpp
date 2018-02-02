@@ -15,14 +15,22 @@ void container::on_draw(draw_context & dc, selection_context const & sc) const
         cptr->on_draw(dc, sc);
 }
 
-void container::on_mouse_event(mouse_event const & me)
+void container::on_mouse_down_event(mouse_down_event const & me)
 {
     // TODO need logic to capture mouse moves outside of a widget
     for (auto cptr : _children)
     {
-        cptr->on_mouse_event(me);
+        cptr->on_mouse_down_event(me);
     }
-    mark_dirty();
+}
+
+void container::on_mouse_up_event(mouse_up_event const & me)
+{
+    // TODO need logic to capture mouse moves outside of a widget
+    for (auto cptr : _children)
+    {
+        cptr->on_mouse_up_event(me);
+    }
 }
 
 container::~container()

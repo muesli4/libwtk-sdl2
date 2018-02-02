@@ -1,19 +1,26 @@
 #ifndef MOUSE_EVENT_HPP
 #define MOUSE_EVENT_HPP
 
+#include <optional>
+
 #include <SDL2/SDL.h>
 
-struct mouse_event
-{
-    enum class button_type { UP, DOWN };
+#include "geometry.hpp"
+#include "swipe_event.hpp"
 
-    button_type type;
-    int32_t x;
-    int32_t y;
+struct mouse_down_event
+{
+    point position;
 };
 
-// TODO move then we can remove SDL2 include
-mouse_event mouse_event_from_sdl(SDL_MouseButtonEvent const & mbe);
+struct mouse_up_event
+{
+    point position;
+
+    // If the event loop decides the drag could be interpreted as a swipe the
+    // widget may decide to interpret it that way.
+    std::optional<swipe_event> opt_swipe_event;
+};
 
 #endif
 

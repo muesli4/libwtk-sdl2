@@ -18,15 +18,26 @@ void button::on_draw(draw_context & dc, selection_context const & sc) const
     }
 }
 
-void button::on_mouse_event(mouse_event const & e)
+void button::on_mouse_down_event(mouse_down_event const & e)
 {
-    bool hit = within_rect(e.x, e.y, _box);
-    bool old_pressed = _pressed;
-    _pressed = hit && e.type == mouse_event::button_type::DOWN;
-    if (hit && old_pressed == true && !_pressed)
-        _callback();
+    bool hit = within_rect(e.position, _box);
+    if (hit != _pressed)
+    {
+        _pressed = hit;
+        mark_dirty();
+    }
+}
 
-    mark_dirty();
+void button::on_mouse_up_event(mouse_up_event const & e)
+{
+    if (_pressed)
+    {
+        bool hit = within_rect(e.position, _box);
+        if (hit)
+            _callback();
+        _pressed = false;
+        mark_dirty();
+    }
 }
 
 void button::on_key_event(key_event const & e)

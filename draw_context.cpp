@@ -43,12 +43,9 @@ void draw_context::blit(SDL_Surface * s, const SDL_Rect * srcrect, const SDL_Rec
 
 void draw_context::draw_button_box(SDL_Rect box, bool activated, bool selected)
 {
-    set_color(activated ? _theme.button_selected_bg_color : _theme.button_bg_color);
+    set_color(activated ? _theme.button_pressed_bg_color : (selected ? _theme.button_selected_bg_color : _theme.button_bg_color));
     SDL_RenderFillRect(_renderer, &box);
-    if (selected)
-        set_color(_theme.button_selected_bg_color);
-    else
-        set_color(_theme.button_frame_color);
+    set_color(_theme.button_frame_color);
     SDL_RenderDrawRect(_renderer, &box);
 }
 
