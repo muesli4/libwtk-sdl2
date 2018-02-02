@@ -22,6 +22,7 @@
 #include "color_widget.hpp"
 #include "box.hpp"
 #include "swipe_area.hpp"
+#include "swipe_detector.hpp"
 
 SDL_Rect pad_box(SDL_Rect box, int padding)
 {
@@ -54,82 +55,6 @@ struct table : container
 };
 */
 
-#include <optional>
-
-struct swipe_detector
-{
-    swipe_detector(int press_threshold, double dir_unambig_factor);
-
-    void mouse_down(point p);
-    mouse_up_event mouse_up(point p);
-
-    private:
-
-    int _press_threshold;
-    double _dir_unambig_factor;
-    std::optional<point> _opt_down_pos;
-};
-
-swipe_detector::swipe_detector(int press_threshold, double dir_unambig_factor)
-    : _press_threshold(press_threshold)
-    , _dir_unambig_factor(dir_unambig_factor)
-{
-}
-
-void swipe_detector::mouse_down(point p)
-{
-    _opt_down_pos = p;
-}
-
-mouse_up_event swipe_detector::mouse_up(point p)
-{
-    if (_opt_down_pos.has_value())
-    {
-        auto down_p = _opt_down_pos.value();
-        _opt_down_pos.reset();
-        auto swipe_vec = down_p - p;
-        auto abs_swipe_vec = abs(swipe_vec);
-
-        swipe_action act;
-
-        // vertical swipe
-        if (abs_swipe_vec.h * _dir_unambig_factor >= abs_swipe_vec.w)
-        {
-            if (swipe_vec.h < 0)
-            {
-                act = swipe_action::UP;
-            }
-            else
-            {
-                act = swipe_action::DOWN;
-            }
-        }
-        // horizontal swipe
-        else if (abs_swipe_vec.w * _dir_unambig_factor >= abs_swipe_vec.h)
-        {
-            if (swipe_vec.w > 0)
-            {
-                act = swipe_action::RIGHT;
-            }
-            else
-            {
-                act = swipe_action::LEFT;
-            }
-        }
-        else
-        {
-            goto out;
-        }
-
-        if (_press_threshold < abs_swipe_vec.w || _press_threshold < abs_swipe_vec.h)
-        {
-            swipe_event se { .position = down_p, .length = swipe_vec, .action = act };
-            return mouse_up_event {p, std::optional<swipe_event>(se)};
-        }
-    }
-out:
-    return { p, std::nullopt };
-}
 
 void event_loop(SDL_Window * window)
 {
@@ -175,18 +100,10 @@ void event_loop(SDL_Window * window)
             point p { ev.button.x, ev.button.y };
             main_widget.on_mouse_down_event({p});
             sd.mouse_down(p);
-            
         }
         else if (ev.type == SDL_MOUSEBUTTONUP)
         {
-            // TODO always send a mouse down event
-            //      depending on various things send either a swipe_event
-            //      or a mouse up event
-            // TODO on second thought that is probably a bad idea
-            //
-            // TODO alternative: embed swipe_event as an optional member in mouse_event
-            //                   but only when letting go of the mouse
-
+            point p { ev.button.x, ev.button.y };
             main_widget.on_mouse_up_event(sd.mouse_up({ ev.button.x, ev.button.y }));
         }
         else if (ev.type == SDL_KEYDOWN)
