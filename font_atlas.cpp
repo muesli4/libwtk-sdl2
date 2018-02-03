@@ -223,14 +223,14 @@ SDL_Surface * font_atlas::word(std::string w)
     }
 }
 
-unsigned int font_atlas::height()
+unsigned int font_atlas::height() const
 {
-    return TTF_FontHeight(_font);
+    return TTF_FontHeight(const_cast<TTF_Font *>(_font));
 }
 
-int font_atlas::font_line_skip()
+int font_atlas::font_line_skip() const
 {
-    return TTF_FontLineSkip(_font);
+    return TTF_FontLineSkip(const_cast<TTF_Font *>(_font));
 }
 
 void font_atlas::clear()

@@ -20,9 +20,9 @@ struct font_atlas
     // render a text with an optional width specification
     std::unique_ptr<SDL_Surface, void(*)(SDL_Surface *)> text(std::string, int max_line_width = -1);
 
-    unsigned int height();
+    unsigned int height() const;
 
-    int font_line_skip();
+    int font_line_skip() const;
 
     void clear();
 
