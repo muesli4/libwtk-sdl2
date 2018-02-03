@@ -46,7 +46,7 @@ widget * padding::find_selectable(navigation_type nt)
 
 widget * padding::navigate_selectable_from_children(navigation_type nt, widget * w, point center)
 {
-    return _parent->navigate_selectable_from_children(nt, this, center);
+    return navigate_selectable_parent(nt, center);
 }
 
 std::shared_ptr<padding> pad(int pad_x, int pad_y, widget_ptr wptr)
