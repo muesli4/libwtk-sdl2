@@ -107,26 +107,34 @@ widget * box::navigate_selectable_from_children(navigation_type nt, widget * w, 
     }
     else
     {
-        auto begin = _children.begin();
-        auto end = _children.end();
+        auto const begin = _children.begin();
+        auto const end = _children.end();
+
+        // locate widget in container
         auto it = std::find_if(begin, end, [w](widget_ptr const & wptr){ return wptr.get() == w; });
 
-        if (is_forward(nt)) //nt == navigation_type::NEXT || nt == navigation_type::NEXT_X)
+        // find first selectable widget of all navigationally consecutive widgets
+        while (true)
         {
-            it++;
-        }
-        else //if (nt == navigation_type::PREV || nt == navigation_type::PREV_X)
-        {
-            it--;
-        }
+            if (is_forward(nt))
+            {
+                it++;
+            }
+            else
+            {
+                it--;
+            }
 
-        if (it == end || it < begin)
-        {
-            return navigate_selectable_parent(nt, rect_center(_box));
-        }
-        else
-        {
-            return (*it)->find_selectable(nt);
+            if (it == end || it < begin)
+            {
+                return navigate_selectable_parent(nt, rect_center(_box));
+            }
+            else
+            {
+                auto result = (*it)->find_selectable(nt);
+                if (result != nullptr)
+                    return result;
+            }
         }
     }
 }
