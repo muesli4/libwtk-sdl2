@@ -26,6 +26,7 @@
 #include "swipe_area.hpp"
 #include "swipe_detector.hpp"
 #include "list_view.hpp"
+#include "notebook.hpp"
 
 SDL_Rect pad_box(SDL_Rect box, int padding)
 {
@@ -65,18 +66,24 @@ void event_loop(SDL_Window * window)
 
     std::vector<std::string> test_values{"a", "b", "c", "d", "test1", "test2", "a very long string this is indeed", "foo", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a"};
 
+    auto nb = std::make_shared<notebook, std::initializer_list<widget_ptr>>
+        ({ std::make_shared<color_widget>()
+         , std::make_shared<swipe_area>([](swipe_action act){ std::cout << "swipe = " << (int)act << std::endl; }, [](){ std::cout << "press" << std::endl; })
+         });
+
     //color_widget cw;
     box main_widget(
         box::orientation::HORIZONTAL,
         { std::make_shared<list_view>(dc, 0, 2, 4, test_values, [](){ std::cout << "press list_view" << std::endl; })
+        , nb
         // std::make_shared<color_widget>()
         //, pad(20, 80, std::make_shared<color_widget>())
         , std::make_shared<button>("Button 1", [](){ std::cout << "click1" << std::endl;})
         , std::make_shared<box, box::orientation, std::initializer_list<widget_ptr>>(
                 box::orientation::VERTICAL,
-                { std::make_shared<button>("Button 2", [](){ std::cout << "click2" << std::endl;})
-                , std::make_shared<button>("Button 3", [](){ std::cout << "click3" << std::endl;})
-                , std::make_shared<swipe_area>([](swipe_action act){ std::cout << "swipe: " << (int)act << std::endl; }, [](){ std::cout << "press" << std::endl; })
+                { std::make_shared<button>("Color", [nb](){ nb->set_page(0); })
+                , pad(10, std::make_shared<button>("Filler!", [](){}))
+                , std::make_shared<button>("Swipe", [nb](){ nb->set_page(1); })
                 })
         });
 
