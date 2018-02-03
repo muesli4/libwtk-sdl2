@@ -50,9 +50,11 @@ struct draw_context
 
     void draw_button_box(SDL_Rect box, bool activated, bool selected);
 
-    void draw_button_text(SDL_Rect box, std::string const & text);
+    void draw_button_text(std::string const & text, SDL_Rect abs_rect);
 
     void draw_entry_box(SDL_Rect box);
+
+    void draw_entry_text(std::string text, SDL_Rect abs_rect, int texture_x_offset = 0, int texture_y_offset = 0);
 
     void draw_background(SDL_Rect box);
 

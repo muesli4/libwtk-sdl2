@@ -14,7 +14,7 @@ void button::on_draw(draw_context & dc, selection_context const & sc) const
     dc.draw_button_box(_box, _pressed, sc.is_selected_widget(this));
     if (!_text.empty())
     {
-        dc.draw_button_text(_box, _text);
+        dc.draw_button_text(_text, _box);
     }
 }
 

@@ -1,5 +1,7 @@
 #include "draw_context.hpp"
 
+#include "sdl_util.hpp"
+
 draw_context::draw_context(SDL_Window * w, font_atlas & fa)
     : _fa(fa)
 {
@@ -49,12 +51,13 @@ void draw_context::draw_button_box(SDL_Rect box, bool activated, bool selected)
     SDL_RenderDrawRect(_renderer, &box);
 }
 
-void draw_context::draw_button_text(SDL_Rect box, std::string const & text)
+void draw_context::draw_button_text(std::string const & text, SDL_Rect abs_rect)
 {
     auto text_surf_ptr = _fa.text(text);
     SDL_SetSurfaceColorMod(text_surf_ptr.get(), _theme.button_fg_color.r, _theme.button_fg_color.g, _theme.button_fg_color.b);
-    // center text in box
-    SDL_Rect target_rect = {box.x + (box.w - text_surf_ptr->w) / 2, box.y + (box.h - text_surf_ptr->h) / 2, text_surf_ptr->w, text_surf_ptr->h};
+
+    // center text in abs_rect
+    SDL_Rect target_rect = {abs_rect.x + (abs_rect.w - text_surf_ptr->w) / 2, abs_rect.y + (abs_rect.h - text_surf_ptr->h) / 2, text_surf_ptr->w, text_surf_ptr->h};
 
     blit(text_surf_ptr.get(), nullptr, &target_rect);
 }
@@ -65,6 +68,27 @@ void draw_context::draw_entry_box(SDL_Rect box)
     SDL_RenderFillRect(_renderer, &box);
     set_color(_theme.entry_frame_color);
     SDL_RenderDrawRect(_renderer, &box);
+}
+
+void draw_context::draw_entry_text(std::string text, SDL_Rect abs_rect, int texture_x_offset, int texture_y_offset)
+{
+    int const width = abs_rect.w - texture_x_offset;
+    int const height = abs_rect.h - texture_y_offset;
+
+    if (width != 0 && height != 0)
+    {
+        auto text_surf_ptr = _fa.text(text);
+
+        // don't overstep texture boundaries
+        SDL_Rect source_rect { texture_x_offset, texture_y_offset, std::min(text_surf_ptr->w, width), std::min(text_surf_ptr->h, height) };
+
+        // avoid automatic stretch of blitting
+        SDL_Rect target_rect { abs_rect.x, abs_rect.y, source_rect.w, source_rect.h };
+
+        // TODO entry text color
+        SDL_SetSurfaceColorMod(text_surf_ptr.get(), 0, 0, 0);
+        blit(text_surf_ptr.get(), &source_rect, &target_rect);
+    }
 }
 
 void draw_context::draw_background(SDL_Rect box)
