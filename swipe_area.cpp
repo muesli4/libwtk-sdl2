@@ -20,7 +20,10 @@ void swipe_area::on_mouse_up_event(mouse_up_event const & e)
 {
     if (e.opt_swipe_event.has_value())
     {
-        _swipe_callback(e.opt_swipe_event.value().action);
+        auto se = e.opt_swipe_event.value();
+
+        if (within_rect(se.position, _box))
+            _swipe_callback(se.action);
     }
     else if (within_rect(e.position, _box))
     {
