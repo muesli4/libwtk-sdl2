@@ -113,3 +113,13 @@ int draw_context::height()
     return _height;
 }
 
+int draw_context::font_line_skip() const
+{
+    return _fa.font_line_skip();
+}
+
+unsigned int draw_context::font_height() const
+{
+    return _fa.font_height();
+}
+

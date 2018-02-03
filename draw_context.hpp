@@ -65,9 +65,11 @@ struct draw_context
     void set_color(SDL_Color c);
     void set_color_alpha(SDL_Color c);
 
-
     int width();
     int height();
+
+    int font_line_skip() const;
+    unsigned int font_height() const;
 
     private:
 

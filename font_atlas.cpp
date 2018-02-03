@@ -202,7 +202,7 @@ std::unique_ptr<SDL_Surface, void(*)(SDL_Surface *)> font_atlas::text(std::strin
     }
 
     if (result == nullptr)
-        result = SDL_CreateRGBSurfaceWithFormat(0, 0, height(), 32, SDL_PIXELFORMAT_RGBA32);
+        result = SDL_CreateRGBSurfaceWithFormat(0, 0, font_height(), 32, SDL_PIXELFORMAT_RGBA32);
     return std::unique_ptr<SDL_Surface, void(*)(SDL_Surface*)>(result, [](SDL_Surface * s){ SDL_FreeSurface(s); });
 }
 
@@ -223,7 +223,7 @@ SDL_Surface * font_atlas::word(std::string w)
     }
 }
 
-unsigned int font_atlas::height() const
+unsigned int font_atlas::font_height() const
 {
     return TTF_FontHeight(const_cast<TTF_Font *>(_font));
 }
