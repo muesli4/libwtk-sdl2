@@ -8,6 +8,9 @@ struct selectable : widget
     widget * find_selectable(navigation_type nt) override;
     widget * navigate_selectable(navigation_type nt) override;
 
+    void on_select() override;
+    void on_unselect() override;
+
     ~selectable() override;
 };
 

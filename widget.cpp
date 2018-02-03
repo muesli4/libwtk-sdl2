@@ -85,3 +85,12 @@ widget * widget::navigate_selectable_parent(navigation_type nt, point center)
     else
         return _parent->navigate_selectable_from_children(nt, this, center);
 }
+
+void widget::on_select()
+{
+}
+
+void widget::on_unselect()
+{
+}
+

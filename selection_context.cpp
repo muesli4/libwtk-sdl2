@@ -57,8 +57,7 @@ void selection_context::navigate_selection(navigation_type nt, widget * main_wid
     }
     else
     {
-        // TODO inform the old widget it has been unselected instead
-        _selected_widget->mark_dirty();
+        _selected_widget->on_unselect();
         _selected_widget = _selected_widget->navigate_selectable(nt);
     }
     select_helper();
@@ -68,8 +67,7 @@ void selection_context::unselect_helper()
 {
     if (_selected_widget != nullptr)
     {
-        // TODO inform the new widget it has been unselected instead
-        _selected_widget->mark_dirty();
+        _selected_widget->on_unselect();
     }
 }
 
@@ -77,7 +75,6 @@ void selection_context::select_helper()
 {
     if (_selected_widget != nullptr)
     {
-        // TODO inform the new widget it has been selected instead
-        _selected_widget->mark_dirty();
+        _selected_widget->on_select();
     }
 }

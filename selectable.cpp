@@ -14,3 +14,12 @@ selectable::~selectable()
 {
 }
 
+void selectable::on_select()
+{
+    mark_dirty();
+}
+
+void selectable::on_unselect()
+{
+    mark_dirty();
+}

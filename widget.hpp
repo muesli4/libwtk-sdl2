@@ -65,6 +65,9 @@ struct widget
     // Only containers should implement this.
     virtual widget * navigate_selectable_from_children(navigation_type nt, widget * w, point center);
 
+    virtual void on_select();
+    virtual void on_unselect();
+
     virtual ~widget();
 
     private:
