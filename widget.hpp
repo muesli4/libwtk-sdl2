@@ -60,7 +60,8 @@ struct widget
     // When a child widget has exhausted its selectable widgets it may ask its
     // parent for the next widget according to the navigation. The coordinates
     // of the widget are provided to get a more accurate result for some
-    // navigation types (i.e. 2-dimensional).
+    // navigation types (i.e. 2-dimensional). The widget passed has to be the
+    // direct child, otherwise the parent is not able to find it.
     //
     // Only containers should implement this.
     virtual widget * navigate_selectable_from_children(navigation_type nt, widget * w, point center);

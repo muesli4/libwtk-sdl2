@@ -71,6 +71,7 @@ widget * widget::navigate_selectable(navigation_type nt)
 
 widget * widget::navigate_selectable_from_children(navigation_type nt, widget * w, point center)
 {
+    // TODO is this really correct? better default implementation with navigate_selectable_parent
     return nullptr;
 }
 
