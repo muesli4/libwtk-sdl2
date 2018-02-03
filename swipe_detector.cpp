@@ -17,7 +17,7 @@ mouse_up_event swipe_detector::mouse_up(point p)
     {
         auto down_p = _opt_down_pos.value();
         _opt_down_pos.reset();
-        auto swipe_vec = down_p - p;
+        auto swipe_vec = p - down_p;
         auto abs_swipe_vec = abs(swipe_vec);
 
         swipe_action act;
