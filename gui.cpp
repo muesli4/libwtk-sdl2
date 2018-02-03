@@ -1,6 +1,8 @@
 // TODO think about a way where the widget might not arbitrarily draw to the
 //      screen (basically bounding box drawn in offset mode)
 
+// TODO add mouse move event
+
 // - Out of consistency widgets should not react to MOUSEUP events when they
 //   haven't been activted by a MOUSEDOWN event in their area before. However,
 //   They might very well react to events that are not in their area if the
@@ -11,7 +13,7 @@
 #include <vector>
 #include <iostream>
 #include <exception>
-#include <algorithm>
+#include <optional>
 
 #include "font_atlas.hpp"
 #include "draw_context.hpp"
@@ -23,6 +25,7 @@
 #include "box.hpp"
 #include "swipe_area.hpp"
 #include "swipe_detector.hpp"
+#include "list_view.hpp"
 
 SDL_Rect pad_box(SDL_Rect box, int padding)
 {
@@ -55,32 +58,31 @@ struct table : container
 };
 */
 
-
 void event_loop(SDL_Window * window)
 {
+    font_atlas fa("/usr/share/fonts/TTF/DejaVuSans.ttf", 15);
+    draw_context dc(window, fa);
+
+    std::vector<std::string> test_values{"a", "b", "c", "d", "test1", "test2", "a very long string this is indeed", "foo", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a"};
+
     //color_widget cw;
-    /*
     box main_widget(
         box::orientation::HORIZONTAL,
-        { std::make_shared<color_widget>()
-        , pad(10, std::make_shared<color_widget>())
-        ,  pad(20, 80, std::make_shared<color_widget>())
-        , pad(10, std::make_shared<button>("Button 1", [](){ std::cout << "click1" << std::endl;}))
+        { std::make_shared<list_view>(dc, 0, 2, 4, test_values, [](){ std::cout << "press list_view" << std::endl; })
+        // std::make_shared<color_widget>()
+        //, pad(20, 80, std::make_shared<color_widget>())
+        , std::make_shared<button>("Button 1", [](){ std::cout << "click1" << std::endl;})
         , std::make_shared<box, box::orientation, std::initializer_list<widget_ptr>>(
                 box::orientation::VERTICAL,
-                { pad(10, std::make_shared<button>("Button 2", [](){ std::cout << "click2" << std::endl;}))
-                , pad(10, std::make_shared<button>("Button 3", [](){ std::cout << "click3" << std::endl;}))
-                , pad(10, std::make_shared<button>("Button 4", [](){ std::cout << "click4" << std::endl;}))
+                { std::make_shared<button>("Button 2", [](){ std::cout << "click2" << std::endl;})
+                , std::make_shared<button>("Button 3", [](){ std::cout << "click3" << std::endl;})
+                , std::make_shared<swipe_area>([](swipe_action act){ std::cout << "swipe: " << (int)act << std::endl; }, [](){ std::cout << "press" << std::endl; })
                 })
         });
-    */
 
-    swipe_area main_widget([](swipe_action act){ std::cout << "swipe: " << (int)act << std::endl; }, [](){ std::cout << "press" << std::endl; } );
 
     // setup necessary contexts (as in local to a window or other unit of management)
     selection_context sc;
-    font_atlas fa("/usr/share/fonts/TTF/DejaVuSans.ttf", 15);
-    draw_context dc(window, fa);
     swipe_detector sd(30, 0.3);
 
     main_widget.apply_layout(pad_box({0, 0, dc.width(), dc.height()}, 200));
@@ -103,7 +105,6 @@ void event_loop(SDL_Window * window)
         }
         else if (ev.type == SDL_MOUSEBUTTONUP)
         {
-            point p { ev.button.x, ev.button.y };
             main_widget.on_mouse_up_event(sd.mouse_up({ ev.button.x, ev.button.y }));
         }
         else if (ev.type == SDL_KEYDOWN)
