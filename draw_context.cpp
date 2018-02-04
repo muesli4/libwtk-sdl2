@@ -39,7 +39,8 @@ void draw_context::blit(SDL_Surface * s, const SDL_Rect * srcrect, const SDL_Rec
 {
     // TODO inefficient
     SDL_Texture * tex = SDL_CreateTextureFromSurface(_renderer, s);
-    SDL_RenderCopyEx(_renderer, tex, srcrect, dstrect, 0, nullptr, SDL_FLIP_NONE);
+    //SDL_RenderCopyEx(_renderer, tex, srcrect, dstrect, 0, nullptr, SDL_FLIP_NONE);
+    SDL_RenderCopy(_renderer, tex, srcrect, dstrect);
     SDL_DestroyTexture(tex);
 }
 
@@ -72,15 +73,18 @@ void draw_context::draw_entry_box(SDL_Rect box)
 
 void draw_context::draw_entry_text(std::string text, SDL_Rect abs_rect, int texture_x_offset, int texture_y_offset)
 {
-    int const width = abs_rect.w - texture_x_offset;
-    int const height = abs_rect.h - texture_y_offset;
+    int const clipped_width = abs_rect.w - texture_x_offset;
+    int const clipped_height = abs_rect.h - texture_y_offset;
 
-    if (width != 0 && height != 0)
+    if (clipped_width >= 0 && clipped_height >= 0)
     {
         auto text_surf_ptr = _fa.text(text);
 
+        int const avail_width = text_surf_ptr->w - texture_x_offset;
+        int const avail_height = text_surf_ptr->h - texture_y_offset;
+
         // don't overstep texture boundaries
-        SDL_Rect source_rect { texture_x_offset, texture_y_offset, std::min(text_surf_ptr->w, width), std::min(text_surf_ptr->h, height) };
+        SDL_Rect source_rect { texture_x_offset, texture_y_offset, std::min(avail_width, clipped_width), std::min(avail_height, clipped_height) };
 
         // avoid automatic stretch of blitting
         SDL_Rect target_rect { abs_rect.x, abs_rect.y, source_rect.w, source_rect.h };
