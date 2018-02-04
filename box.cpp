@@ -43,13 +43,13 @@ void box::apply_layout_to_children()
 
 widget * box::find_selectable(navigation_type nt)
 {
-    // TODO add point
     if (is_orthogonal(nt, _o))
     {
         // get middle
         if (!_children.empty())
             return _children[_children.size() / 2]->find_selectable(nt);
     }
+    // TODO add point
     else
     {
 
