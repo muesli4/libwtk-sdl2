@@ -218,7 +218,7 @@ vec font_atlas::text_size(std::string t, int max_line_width)
     if (max_line_width == -1)
     {
         int w, h;
-        // TODO check error
+        // TODO probably better to prerender here, since it has to been done in any case
         if (TTF_SizeUTF8(_font, t.c_str(), &w, &h) == -1)
         {
             // TODO handle error properly
@@ -284,6 +284,7 @@ int font_atlas::text_minimum_width(std::string t)
     for (auto word : words)
     {
         int width;
+        // TODO probably better to prerender here, since it has to been done in any case
         if (TTF_SizeUTF8(_font, word.c_str(), &width, nullptr) == -1)
             return -1;
         max_width = std::max(max_width, width);
@@ -294,6 +295,7 @@ int font_atlas::text_minimum_width(std::string t)
 SDL_Surface * font_atlas::word(std::string w)
 {
     // FIXME: temporary solution - do not use too much memory, although with words caching it's not as bad as before
+    // TODO add use count? would it cause ui lag?
     if (_prerendered.size() > 40000)
         clear();
 

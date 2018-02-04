@@ -19,6 +19,7 @@ struct font_atlas
     font_atlas(std::string font_path, int ptsize);
     ~font_atlas();
 
+    // TODO use a texture instead of the surface (although clearing it will be a bit more expensive)
     // render a text with an optional width specification
     std::unique_ptr<SDL_Surface, void(*)(SDL_Surface *)> text(std::string t, int max_line_width = -1);
 
