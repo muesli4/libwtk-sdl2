@@ -7,6 +7,8 @@
 
 #include <SDL2/SDL_ttf.h>
 
+#include "geometry.hpp"
+
 struct font_not_found : std::runtime_error
 {
     font_not_found(std::string);
@@ -18,7 +20,10 @@ struct font_atlas
     ~font_atlas();
 
     // render a text with an optional width specification
-    std::unique_ptr<SDL_Surface, void(*)(SDL_Surface *)> text(std::string, int max_line_width = -1);
+    std::unique_ptr<SDL_Surface, void(*)(SDL_Surface *)> text(std::string t, int max_line_width = -1);
+
+    vec text_size(std::string t, int max_line_width = -1);
+    int text_minimum_width(std::string t);
 
     unsigned int font_height() const;
 

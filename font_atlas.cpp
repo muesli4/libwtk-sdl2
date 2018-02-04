@@ -101,31 +101,38 @@ int font_atlas::get_word_right_kerning(std::string const & word)
     return TTF_GetFontKerningSizeGlyphs(_font, ' ', get_first_ucs4(word));
 }
 
+std::vector<std::string> split_words(std::string t)
+{
+    std::vector<std::string> words;
+
+    std::size_t pos;
+    std::size_t last_pos = 0;
+    while ((pos = t.find(' ', last_pos)) != std::string::npos)
+    {
+        std::string const & w = t.substr(last_pos, pos - last_pos);
+        // ignore multiple spaces
+        if (!w.empty())
+        {
+            words.push_back(w);
+        }
+        last_pos = pos + 1;
+    }
+    {
+        std::string const & w = t.substr(last_pos);
+        if (!w.empty())
+            words.push_back(w);
+    }
+
+    return words;
+}
+
 std::unique_ptr<SDL_Surface, void(*)(SDL_Surface *)> font_atlas::text(std::string t, int max_line_width)
 {
     SDL_Surface * result = nullptr;
 
     if (!t.empty())
     {
-        std::vector<std::string> words;
-
-        std::size_t pos;
-        std::size_t last_pos = 0;
-        while ((pos = t.find(' ', last_pos)) != std::string::npos)
-        {
-            std::string const & w = t.substr(last_pos, pos - last_pos);
-            // ignore multiple spaces
-            if (!w.empty())
-            {
-                words.push_back(w);
-            }
-            last_pos = pos + 1;
-        }
-        {
-            std::string const & w = t.substr(last_pos);
-            if (!w.empty())
-                words.push_back(w);
-        }
+        auto words = split_words(t);
 
         std::vector<SDL_Surface *> surfaces;
 
@@ -204,6 +211,84 @@ std::unique_ptr<SDL_Surface, void(*)(SDL_Surface *)> font_atlas::text(std::strin
     if (result == nullptr)
         result = SDL_CreateRGBSurfaceWithFormat(0, 0, font_height(), 32, SDL_PIXELFORMAT_RGBA32);
     return std::unique_ptr<SDL_Surface, void(*)(SDL_Surface*)>(result, [](SDL_Surface * s){ SDL_FreeSurface(s); });
+}
+
+vec font_atlas::text_size(std::string t, int max_line_width)
+{
+    if (max_line_width == -1)
+    {
+        int w, h;
+        // TODO check error
+        if (TTF_SizeUTF8(_font, t.c_str(), &w, &h) == -1)
+        {
+            // TODO handle error properly
+            return { -1, -1 };
+        }
+        else
+        {
+            return { w, h };
+        }
+    }
+    else
+    {
+        int actual_max_width = 0;
+
+        auto words = split_words(t);
+
+        int current_line_word_widths = 0;
+        int current_line_num_words = 0;
+        int lines = 1;
+
+        for (auto w : words)
+        {
+            auto surf = word(w);
+
+            if (surf->w + current_line_word_widths >= max_line_width)
+            {
+                if (surf->w >= max_line_width)
+                {
+                    // TODO word does not fit:
+                    //      can resurn failure
+                    //      or try to do word splitting
+                    return { -1, -1 };
+                }
+                else
+                {
+                    actual_max_width = std::max(current_line_word_widths + std::max(0, current_line_num_words - 1) * _space_advance, actual_max_width);
+                    current_line_word_widths = surf->w;
+                    current_line_num_words = 1;
+                    lines += 1;
+                }
+            }
+            else
+            {
+                current_line_word_widths += surf->w;
+                current_line_num_words += 1;
+            }
+        }
+
+        if (current_line_word_widths != 0)
+        {
+            actual_max_width = std::max(current_line_word_widths + std::max(0, current_line_num_words - 1) * _space_advance, actual_max_width);
+            lines += 1;
+        }
+        
+        return { actual_max_width, lines * font_line_skip() };
+    }
+}
+
+int font_atlas::text_minimum_width(std::string t)
+{
+    int max_width = 0;
+    auto words = split_words(t);
+    for (auto word : words)
+    {
+        int width;
+        if (TTF_SizeUTF8(_font, word.c_str(), &width, nullptr) == -1)
+            return -1;
+        max_width = std::max(max_width, width);
+    }
+    return max_width;
 }
 
 SDL_Surface * font_atlas::word(std::string w)
