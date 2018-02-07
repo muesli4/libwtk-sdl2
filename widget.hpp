@@ -46,6 +46,7 @@ struct widget
     virtual void on_draw(draw_context & dc, selection_context const & sc) const = 0;
     virtual void on_mouse_up_event(mouse_up_event const & e);
     virtual void on_mouse_down_event(mouse_down_event const & e);
+    virtual void on_mouse_move_event(mouse_move_event const & e);
     virtual void on_key_event(key_event const & e);
 
     // A widget may get activated by other means (e.g., infrared remote or

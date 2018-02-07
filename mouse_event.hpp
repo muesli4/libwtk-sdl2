@@ -22,5 +22,12 @@ struct mouse_up_event
     std::optional<swipe_event> opt_swipe_event;
 };
 
+struct mouse_move_event
+{
+    // TODO add optional button of down position then it is not necessary to
+    // keep such state in the individual widgets
+    point position;
+};
+
 #endif
 
