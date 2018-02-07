@@ -8,6 +8,7 @@ widget::widget()
 
 void widget::on_mouse_down_event(mouse_down_event const & e)
 {
+    // Default implementation: Events are ignored.
 }
 
 void widget::on_mouse_up_event(mouse_up_event const & e)

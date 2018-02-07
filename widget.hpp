@@ -12,13 +12,16 @@
 #include "geometry.hpp"
 #include "layout_info.hpp"
 
+// Describes how a widget tree might be navigated. A navigation without
+// 2-dimensional context should reach all seletable widgets, whereas one with
+// context should preferably hit locally adjacent widgets.
 enum class navigation_type { NEXT_X, NEXT_Y, PREV_X, PREV_Y, NEXT, PREV };
 
 struct widget;
 
 typedef std::shared_ptr<widget> widget_ptr;
 
-/*
+/* TODO add improved layout
 enum class allocation_type { CONSTANT, WIDTH_FOR_HEIGHT };
 
 struct size_hint
@@ -52,10 +55,19 @@ struct widget
     void draw_when_dirty(draw_context & dc, selection_context const & sc);
     void mark_dirty();
 
+    // Get the widget's assigned bounding box.
     SDL_Rect const & get_box() const;
-    void set_layout_info(layout_info const & li);
+
+    // Get the layout information associated with the widgets context. This is
+    // meant for font settings or available area to help with widget layout and
+    // drawing.
     layout_info const & get_layout_info() const;
 
+    // Should not be set manually if you do not know what you're doing.
+    void set_layout_info(layout_info const & li);
+
+    // Should not be set manually. Containers are responsible for linking their
+    // children to them.
     void set_parent(widget * parent);
 
     // Return child widgets in Z-order. Should be implemented by containers.
@@ -97,7 +109,6 @@ struct widget
     // This should return the approximate size the widget will require in its
     // minimal state. Any containers are responsible to follow these constraints
     // as best as possible. It is however in no way guaranteed.
-    //virtual size_hint get_size_hint() = 0;
     virtual vec min_size_hint() const = 0;
 
     virtual ~widget();
