@@ -66,3 +66,8 @@ void blit_preserve_ar(SDL_Surface * source, SDL_Surface * dest, SDL_Rect const *
     }
 }
 
+SDL_Rect pad_rect(SDL_Rect box, int padding)
+{
+    return { box.x + padding, box.y + padding, box.w - 2 * padding, box.h - 2 * padding };
+}
+
