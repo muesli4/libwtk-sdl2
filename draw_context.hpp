@@ -36,25 +36,6 @@ struct color_theme
     SDL_Color active_color;
 };
 
-struct layout_info
-{
-    layout_info(font_atlas & fa);
-
-    // fonts
-    vec text_size(std::string t, int max_line_width = -1) const;
-    int text_minimum_width(std::string t) const;
-    unsigned int font_height() const;
-    int font_line_skip() const;
-
-    // theme
-
-    private:
-
-    mutable std::reference_wrapper<font_atlas> _fa;
-};
-
-
-
 /*
 struct theme
 {

@@ -8,6 +8,7 @@
 #include "draw_context.hpp"
 #include "selection_context.hpp"
 #include "swipe_detector.hpp"
+#include "layout_info.hpp"
 
 struct widget;
 

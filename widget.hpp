@@ -10,6 +10,7 @@
 #include "key_event.hpp"
 #include "selection_context.hpp"
 #include "geometry.hpp"
+#include "layout_info.hpp"
 
 enum class navigation_type { NEXT_X, NEXT_Y, PREV_X, PREV_Y, NEXT, PREV };
 
@@ -17,6 +18,7 @@ struct widget;
 
 typedef std::shared_ptr<widget> widget_ptr;
 
+/*
 enum class allocation_type { CONSTANT, WIDTH_FOR_HEIGHT };
 
 struct size_hint
@@ -32,6 +34,7 @@ struct size_hint
         vec constant;
     };
 };
+*/
 
 struct widget
 {
