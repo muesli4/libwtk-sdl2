@@ -17,32 +17,42 @@ void box::apply_layout_to_children()
 
     if (n > 0)
     {
-        int num_expand = std::count_if(std::begin(_children), std::end(_children), [](auto const & c){ return c.expand; });
-
-        if (_o == orientation::HORIZONTAL)
+        if (_children_homogeneous)
         {
-            // evenly split box
-            int const child_width = get_box().w / n;
-            int xoffset = get_box().x;
-
-            for (auto c : _children)
+            if (_o == orientation::HORIZONTAL)
             {
-                c.wptr->apply_layout({ xoffset, get_box().y, child_width, get_box().h });
-                xoffset += child_width;
+                // evenly split box
+                int const child_width = (get_box().w - (n - 1) * _children_spacing) / n;
+                int xoffset = get_box().x;
+
+                for (auto c : _children)
+                {
+                    c.wptr->apply_layout({ xoffset, get_box().y, child_width, get_box().h });
+                    xoffset += child_width + _children_spacing;
+                }
+            }
+            else
+            {
+                int const child_height = (get_box().h - (n - 1) * _children_spacing) / n;
+                std::cout << child_height << std::endl;
+                int yoffset = get_box().y;
+
+                for (auto c : _children)
+                {
+                    c.wptr->apply_layout({ get_box().x, yoffset, get_box().w, child_height });
+                    yoffset += child_height + _children_spacing;
+                }
             }
         }
         else
         {
-            int const child_height = get_box().h / n;
-            int yoffset = get_box().y;
+            int num_expand = std::count_if(std::begin(_children), std::end(_children), [](auto const & c){ return c.expand; });
 
-            for (auto c : _children)
-            {
-                c.wptr->apply_layout({ get_box().x, yoffset, get_box().w, child_height });
-                yoffset += child_height;
-            }
+            // 1. Ask for minimum size of each widget
+            // 2. Calculate difference with available space
+            // 3. Distribute left-over space to widgets with expand property
+            // TODO give expand weight for each widget
         }
-
     }
 }
 

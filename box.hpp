@@ -15,7 +15,7 @@ struct box : container
 
     enum class orientation { VERTICAL, HORIZONTAL };
 
-    box(orientation o, std::vector<child> children, int children_spacing = 0, bool children_homogeneous = false);
+    box(orientation o, std::vector<child> children, int children_spacing = 0, bool children_homogeneous = true);
 
     void apply_layout_to_children() override;
 
@@ -46,7 +46,7 @@ struct box : container
 
 };
 
-widget_ptr hbox(std::vector<box::child> children, int children_spacing = 0, bool children_homogeneous = false);
-widget_ptr vbox(std::vector<box::child> children, int children_spacing = 0, bool children_homogeneous = false);
+widget_ptr hbox(std::vector<box::child> children, int children_spacing = 0, bool children_homogeneous = true);
+widget_ptr vbox(std::vector<box::child> children, int children_spacing = 0, bool children_homogeneous = true);
 
 #endif
