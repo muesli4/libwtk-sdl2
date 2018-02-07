@@ -32,6 +32,7 @@
 #include "swipe_detector.hpp"
 #include "list_view.hpp"
 #include "notebook.hpp"
+#include "label.hpp"
 #include "widget_context.hpp"
 
 /*
@@ -67,12 +68,13 @@ void event_loop(SDL_Window * window)
 
     auto lv = std::make_shared<list_view>(0, 2, 4, test_values, [](){ std::cout << "press list_view" << std::endl; });
 
-    //color_widget cw;
     padding main_widget(20, hbox(
         { { true, vbox({ { true, lv }, { false, nb } }, 20, false) }
-        // std::make_shared<color_widget>()
-        //, pad(20, 80, std::make_shared<color_widget>())
-        , { false, std::make_shared<button>("Button 1", [](){ std::cout << "click1" << std::endl;}) }
+        , { true, std::make_shared<color_widget>() }
+        , { false, vbox( { { false, std::make_shared<button>("Button 1", [](){ std::cout << "click1" << std::endl; }) }
+                         , { false, pad(20, 80, std::make_shared<color_widget>())}
+                         , { true, std::make_shared<label>("This text should hopefully produce a linebreak. Otherwise something is not working correctly.\n\nYou may use Tab and Shift+Tab to focus widgets or use Shift and the corresponding arrow key for a 2-dimensional direction.") }
+                         }, 20, true) }
         , { false, vbox( { { false, std::make_shared<button>("Color", [nb](){ nb->set_page(0); })}
                          , { false, pad(10, std::make_shared<button>("Filler!", [](){}))}
                          , { false, std::make_shared<button>("Swipe", [nb](){ nb->set_page(1); })}

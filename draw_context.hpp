@@ -149,6 +149,8 @@ struct draw_context
     void draw_entry_active_background(SDL_Rect box);
     void draw_entry_position_indicator(SDL_Rect box);
 
+    void draw_label_text(SDL_Rect box, std::string text);
+
     void draw_background(SDL_Rect box);
 
     // low-level drawing TODO move or refactor

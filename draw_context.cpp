@@ -89,6 +89,23 @@ void draw_context::draw_entry_text(std::string text, SDL_Rect abs_rect, int text
     }
 }
 
+void draw_context::draw_label_text(SDL_Rect box, std::string text)
+{
+    auto text_surf_ptr = _fa.text(text, box.w);
+    SDL_SetSurfaceColorMod(text_surf_ptr.get(), 255, 255, 255);
+
+    int width = std::min(box.w, text_surf_ptr->w);
+    int height = std::min(box.h, text_surf_ptr->h);
+    SDL_Rect source { 0, 0, width, height };
+    SDL_Rect target { box.x, box.y, width, height };
+
+
+    set_color({0, 0, 0});
+    draw_rect_filled(box);
+
+    blit(text_surf_ptr.get(), &source, &target);
+}
+
 void draw_context::draw_background(SDL_Rect box)
 {
     set_color(_theme.bg_color);
