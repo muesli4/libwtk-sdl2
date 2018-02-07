@@ -98,6 +98,21 @@ void widget_context::draw(bool only_when_dirty, bool present)
         _dc.present();
 }
 
+void widget_context::select_widget(widget & w)
+{
+    _sc.select_widget(&w);
+}
+
+void widget_context::unselect_widget()
+{
+    _sc.unselect_widget();
+}
+
+bool widget_context::is_selected_widget(widget const & w)
+{
+    return _sc.is_selected_widget(&w);
+}
+
 void widget_context::set_layout_info(widget * w)
 {
     w->set_layout_info(_layout_info);

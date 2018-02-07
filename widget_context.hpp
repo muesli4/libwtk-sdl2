@@ -29,6 +29,10 @@ struct widget_context
 
     void draw(bool only_when_dirty = true, bool present = true);
 
+    void select_widget(widget & w);
+    void unselect_widget();
+    bool is_selected_widget(widget const & w);
+
     private:
 
     void set_layout_info(widget *);
