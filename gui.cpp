@@ -33,6 +33,7 @@
 #include "list_view.hpp"
 #include "notebook.hpp"
 #include "label.hpp"
+#include "empty.hpp"
 #include "widget_context.hpp"
 
 /*
@@ -76,8 +77,9 @@ void event_loop(SDL_Window * window)
                          , { true, std::make_shared<label>("This text should hopefully produce a linebreak. Otherwise something is not working correctly.\n\nYou may use Tab and Shift+Tab to focus widgets or use Shift and the corresponding arrow key for a 2-dimensional direction.") }
                          }, 20, true) }
         , { false, vbox( { { false, std::make_shared<button>("Color", [nb](){ nb->set_page(0); })}
-                         , { false, pad(10, std::make_shared<button>("Filler!", [](){}))}
                          , { false, std::make_shared<button>("Swipe", [nb](){ nb->set_page(1); })}
+                         , { true, std::make_shared<empty>() }
+                         , { false, std::make_shared<button>("Quit", [](){ SDL_Event ev { .type = SDL_QUIT }; SDL_PushEvent(&ev); })}
                          }
                        , 20, false) }
         }, 20, false));
