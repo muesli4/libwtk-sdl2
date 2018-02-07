@@ -20,6 +20,7 @@ bool within_rect(point p, SDL_Rect const & r);
 
 point rect_center(SDL_Rect const & r);
 
+vec operator+(vec v, vec u);
 point operator+(point p, vec v);
 vec operator-(vec v);
 point operator-(point p, vec v);

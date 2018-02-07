@@ -7,7 +7,7 @@ widget * selectable::find_selectable(navigation_type nt)
 
 widget * selectable::navigate_selectable(navigation_type nt)
 {
-    return navigate_selectable_parent(nt, rect_center(_box));
+    return navigate_selectable_parent(nt, rect_center(get_box()));
 }
 
 selectable::~selectable()

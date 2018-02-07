@@ -31,7 +31,7 @@ void notebook::on_mouse_down_event(mouse_down_event const & e)
 void notebook::apply_layout_to_children()
 {
     for (auto p : _pages)
-        p->apply_layout(_box);
+        p->apply_layout(get_box());
 }
 
 widget * notebook::find_selectable(navigation_type nt)
@@ -72,3 +72,25 @@ void notebook::set_page(std::size_t index)
     mark_dirty();
 }
 
+std::vector<widget *> notebook::get_children()
+{
+    std::vector<widget *> res;
+    for (auto & ptr : _pages)
+    {
+        res.push_back(ptr.get());
+    }
+    return res;
+}
+
+vec notebook::min_size_hint() const
+{
+    vec max_vec;
+    for (auto p : _pages)
+    {
+        vec v = p->min_size_hint();
+        max_vec.w = std::max(max_vec.w, v.w);
+        max_vec.h = std::max(max_vec.h, v.h);
+
+    }
+    return max_vec;
+}

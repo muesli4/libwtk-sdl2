@@ -2,6 +2,31 @@
 
 #include "sdl_util.hpp"
 
+layout_info::layout_info(font_atlas & fa)
+    : _fa(fa)
+{
+}
+
+vec layout_info::text_size(std::string t, int max_line_width) const
+{
+    return _fa.get().text_size(t, max_line_width);
+}
+
+int layout_info::text_minimum_width(std::string t) const
+{
+    return _fa.get().text_minimum_width(t);
+}
+
+unsigned int layout_info::font_height() const
+{
+    return _fa.get().font_height();
+}
+
+int layout_info::font_line_skip() const
+{
+    return _fa.get().font_line_skip();
+}
+
 draw_context::draw_context(SDL_Window * w, font_atlas & fa)
     : _fa(fa)
 {
@@ -12,12 +37,6 @@ draw_context::draw_context(SDL_Window * w, font_atlas & fa)
         _renderer = SDL_CreateRenderer(w, -1, 0);
     if (_renderer == nullptr)
         throw std::runtime_error("Failed to create renderer: " + std::string(SDL_GetError()));
-
-    auto ret = SDL_GetRendererOutputSize(_renderer, &_width, &_height);
-    if (ret != 0)
-    {
-        throw std::runtime_error("Failed to get renderer output size: " + std::string(SDL_GetError()));
-    }
 }
 
 void draw_context::present()
@@ -126,28 +145,8 @@ void draw_context::set_color(SDL_Color c)
 {
     SDL_SetRenderDrawColor(_renderer, c.r, c.g, c.b, 0);
 }
+
 void draw_context::set_color_alpha(SDL_Color c)
 {
     SDL_SetRenderDrawColor(_renderer, c.r, c.g, c.b, c.a);
 }
-
-int draw_context::width()
-{
-    return _width;
-}
-
-int draw_context::height()
-{
-    return _height;
-}
-
-int draw_context::font_line_skip() const
-{
-    return _fa.font_line_skip();
-}
-
-unsigned int draw_context::font_height() const
-{
-    return _fa.font_height();
-}
-

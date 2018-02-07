@@ -3,6 +3,11 @@
 
 // TODO add mouse move event
 
+// TODO should mouse click select selectable widgets? if so, the mouse_down
+//      event will have to go to a unqiue widget. This also makes sense when
+//      considering the fact that widgets should only respond to mouse down
+//      events within their box.
+
 // - Out of consistency widgets should not react to MOUSEUP events when they
 //   haven't been activted by a MOUSEDOWN event in their area before. However,
 //   They might very well react to events that are not in their area if the
@@ -27,19 +32,7 @@
 #include "swipe_detector.hpp"
 #include "list_view.hpp"
 #include "notebook.hpp"
-
-SDL_Rect pad_box(SDL_Rect box, int padding)
-{
-    return { box.x + padding, box.y + padding, box.w - 2 * padding, box.h - 2 * padding };
-}
-
-struct widget_child_descriptor
-{
-    // determines which widgets get size (currently only the highest priority
-    // gets size, since widgets don't tell their required size)
-    int priority;
-    widget_ptr wptr;
-};
+#include "widget_context.hpp"
 
 /*
 struct table : container
@@ -59,44 +52,39 @@ struct table : container
 };
 */
 
+// TODO enable querying minimal widget size
+// TODO find something similar to width-for-height/heigh-for-width
+
 void event_loop(SDL_Window * window)
 {
-    font_atlas fa("/usr/share/fonts/TTF/DejaVuSans.ttf", 15);
-    draw_context dc(window, fa);
-
-    std::vector<std::string> test_values{"a", "b", "c", "d", "test1", "test2", "a very long string this is indeed", "foo", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a"};
+    std::vector<std::string> test_values{"a", "b", "c", "d", "testwdfkosadjflkajskdfjlaskdjflkasdjdfklajsdlkfjasldkdfjflkasddjflkdsjlfkjdsalkkfjdkk", "test1", "test2", "a very long string this is indeed", "foo", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a"};
 
     auto nb = std::make_shared<notebook, std::initializer_list<widget_ptr>>
         ({ std::make_shared<color_widget>()
          , std::make_shared<swipe_area>([](swipe_action act){ std::cout << "swipe = " << (int)act << std::endl; }, [](){ std::cout << "press" << std::endl; })
          });
 
+    auto lv = std::make_shared<list_view>(0, 2, 4, test_values, [](){ std::cout << "press list_view" << std::endl; });
+
     //color_widget cw;
     box main_widget(
         box::orientation::HORIZONTAL,
-        { std::make_shared<list_view>(dc, 0, 2, 4, test_values, [](){ std::cout << "press list_view" << std::endl; })
-        , nb
+        { { true, vbox({ { true, lv }, { false, nb } }) }
         // std::make_shared<color_widget>()
         //, pad(20, 80, std::make_shared<color_widget>())
-        , std::make_shared<button>("Button 1", [](){ std::cout << "click1" << std::endl;})
-        , std::make_shared<box, box::orientation, std::initializer_list<widget_ptr>>(
-                box::orientation::VERTICAL,
-                { std::make_shared<button>("Color", [nb](){ nb->set_page(0); })
-                , pad(10, std::make_shared<button>("Filler!", [](){}))
-                , std::make_shared<button>("Swipe", [nb](){ nb->set_page(1); })
-                })
+        , { true, std::make_shared<button>("Button 1", [](){ std::cout << "click1" << std::endl;}) }
+        , { false, vbox( { { false, std::make_shared<button>("Color", [nb](){ nb->set_page(0); })}
+                         , { true, pad(10, std::make_shared<button>("Filler!", [](){}))}
+                         , { false, std::make_shared<button>("Swipe", [nb](){ nb->set_page(1); })}
+                         }) }
         });
 
 
-    // setup necessary contexts (as in local to a window or other unit of management)
-    selection_context sc;
-    swipe_detector sd(30, 0.3);
-
-    main_widget.apply_layout(pad_box({0, 0, dc.width(), dc.height()}, 200));
+    // setup necessary context (as in local to a window or other unit of management)
+    widget_context ctx(window, { "/usr/share/fonts/TTF/DejaVuSans.ttf", 15 }, main_widget);
 
     // draw initial state
-    main_widget.on_draw(dc, sc);
-    dc.present();
+    ctx.draw();
 
     SDL_Event ev;
     while (SDL_WaitEvent(&ev))
@@ -104,55 +92,15 @@ void event_loop(SDL_Window * window)
         // event handling
         if (ev.type == SDL_QUIT)
             break;
-        else if (ev.type == SDL_MOUSEBUTTONDOWN)
+        //else if ((ev.keysym.mod & KMOD_CTRL) && keysym.sym == SDLK_q)
+        //    break;
+        else
         {
-            point p { ev.button.x, ev.button.y };
-            main_widget.on_mouse_down_event({p});
-            sd.mouse_down(p);
+            ctx.process_event(ev);
         }
-        else if (ev.type == SDL_MOUSEBUTTONUP)
-        {
-            main_widget.on_mouse_up_event(sd.mouse_up({ ev.button.x, ev.button.y }));
-        }
-        else if (ev.type == SDL_KEYDOWN)
-        {
-            auto const & keysym = ev.key.keysym;
 
-            if ((keysym.mod & KMOD_CTRL) && keysym.sym == SDLK_q)
-                break;
-            else if (keysym.sym == SDLK_TAB)
-            {
-                if (keysym.mod & KMOD_SHIFT)
-                {
-                    sc.navigate_selection(navigation_type::PREV, &main_widget);
-                }
-                else
-                {
-                    sc.navigate_selection(navigation_type::NEXT, &main_widget);
-                }
-            }
-            else if (keysym.mod & KMOD_SHIFT)
-            {
-                navigation_type nt;
-                switch (keysym.sym)
-                {
-                    case SDLK_UP:    nt = navigation_type::PREV_Y; break;
-                    case SDLK_DOWN:  nt = navigation_type::NEXT_Y; break;
-                    case SDLK_LEFT:  nt = navigation_type::PREV_X; break;
-                    case SDLK_RIGHT: nt = navigation_type::NEXT_X; break;
-                    default: goto render;
-                }
-                sc.navigate_selection(nt, &main_widget);
-            }
-            else if (keysym.sym == SDLK_RETURN)
-                sc.dispatch_activation();
-            else
-                sc.dispatch_key_event(key_event());
-        }
-render:
         // render
-        main_widget.draw_when_dirty(dc, sc);
-        dc.present();
+        ctx.draw();
     }
 }
 

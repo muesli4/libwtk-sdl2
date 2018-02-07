@@ -2,6 +2,7 @@
 #define WIDGET_HPP
 
 #include <memory>
+#include <vector>
 
 #include "draw_context.hpp"
 #include "mouse_event.hpp"
@@ -10,12 +11,27 @@
 #include "selection_context.hpp"
 #include "geometry.hpp"
 
-
 enum class navigation_type { NEXT_X, NEXT_Y, PREV_X, PREV_Y, NEXT, PREV };
 
 struct widget;
 
 typedef std::shared_ptr<widget> widget_ptr;
+
+enum class allocation_type { CONSTANT, WIDTH_FOR_HEIGHT };
+
+struct size_hint
+{
+    allocation_type type;
+    union
+    {
+        struct
+        {
+            int width;
+            double ratio;
+        } ratio;
+        vec constant;
+    };
+};
 
 struct widget
 {
@@ -33,9 +49,15 @@ struct widget
     void draw_when_dirty(draw_context & dc, selection_context const & sc);
     void mark_dirty();
 
-    SDL_Rect const & box() const;
+    SDL_Rect const & get_box() const;
+    void set_layout_info(layout_info const & li);
+    layout_info const & get_layout_info() const;
 
     void set_parent(widget * parent);
+
+    // Return child widgets in Z-order. Should be implemented by containers.
+    virtual std::vector<widget *> get_children();
+    virtual std::vector<widget const *> get_children() const;
 
     // In the simplest case this just sets the bounding box but may involve more
     // complex calculations with containers.
@@ -69,6 +91,12 @@ struct widget
     virtual void on_select();
     virtual void on_unselect();
 
+    // This should return the approximate size the widget will require in its
+    // minimal state. Any containers are responsible to follow these constraints
+    // as best as possible. It is however in no way guaranteed.
+    //virtual size_hint get_size_hint() = 0;
+    virtual vec min_size_hint() const = 0;
+
     virtual ~widget();
 
     private:
@@ -83,8 +111,12 @@ struct widget
 
     widget * _parent;
 
+    private:
+
     // cached for efficiency, may be replaced by just width and height
     SDL_Rect _box;
+
+    layout_info const * _layout_info;
 };
 
 #endif

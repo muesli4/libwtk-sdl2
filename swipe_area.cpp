@@ -22,12 +22,17 @@ void swipe_area::on_mouse_up_event(mouse_up_event const & e)
     {
         auto se = e.opt_swipe_event.value();
 
-        if (within_rect(se.position, _box))
+        if (within_rect(se.position, get_box()))
             _swipe_callback(se.action);
     }
-    else if (within_rect(e.position, _box))
+    else if (within_rect(e.position, get_box()))
     {
         _press_callback();
     }
+}
+
+vec swipe_area::min_size_hint() const
+{
+    return { 0, 0 };
 }
 

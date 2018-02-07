@@ -1,26 +1,28 @@
-#ifndef LINEAR_CONTAINER_HPP
-#define LINEAR_CONTAINER_HPP
+#ifndef CONTAINER_HPP
+#define CONTAINER_HPP
 
-#include <vector>
+#include <functional>
 
 #include "widget.hpp"
 
+// Base class for containers with multiple widgets that are all drawn to a
+// common area.
 struct container : widget
 {
-    container(std::initializer_list<widget_ptr> ws);
+    ~container() override;
     void on_draw(draw_context & dc, selection_context const & sc) const override;
     void on_mouse_up_event(mouse_up_event const & me) override;
     void on_mouse_down_event(mouse_down_event const & me) override;
-    ~container() override;
 
-
+    std::vector<widget *> get_children() override = 0;
+    std::vector<widget const *> get_children() const override = 0;
     void apply_layout_to_children() override = 0;
-
     widget * find_selectable(navigation_type nt) override = 0;
 
     protected:
 
-    std::vector<widget_ptr> _children;
+    void init_children();
+
 };
 
 #endif

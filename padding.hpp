@@ -1,32 +1,23 @@
 #ifndef PADDING_HPP
 #define PADDING_HPP
 
-#include "widget.hpp"
+#include "bin.hpp"
 
-// TODO good idea?
-struct padding : widget
+struct padding : bin
 {
-    padding(int pad, widget_ptr wptr);
-    padding(int pad_x, int pad_y, widget_ptr wptr);
-
-    void on_draw(draw_context & dc, selection_context const & sc) const override;
-
-    void on_mouse_up_event(mouse_up_event const & me) override;
-    void on_mouse_down_event(mouse_down_event const & me) override;
-
-    void on_key_event(key_event const & ke) override;
+    padding(int pad, widget_ptr child);
+    padding(int pad_x, int pad_y, widget_ptr child);
 
     void apply_layout_to_children() override;
 
-    widget * find_selectable(navigation_type nt) override;
-    widget * navigate_selectable_from_children(navigation_type nt, widget * w, point center) override;
+    vec min_size_hint() const override;
 
     ~padding() override;
 
     private:
+
     int _pad_x;
     int _pad_y;
-    widget_ptr _wptr;
 };
 
 std::shared_ptr<padding> pad(int pad_x, int pad_y, widget_ptr wptr);

@@ -22,6 +22,10 @@ struct notebook : widget
     widget * navigate_selectable(navigation_type nt) override;
     widget * navigate_selectable_from_children(navigation_type nt, widget * w, point center) override;
 
+    std::vector<widget *> get_children() override;
+
+    vec min_size_hint() const override;
+
     // notebook interface
     widget_ptr get_shown_widget();
     widget_ptr const get_shown_widget() const;

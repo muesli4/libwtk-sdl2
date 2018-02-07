@@ -10,6 +10,11 @@ point rect_center(SDL_Rect const & r)
     return { r.x + r.w / 2, r.y + r.h / 2 };
 }
 
+vec operator+(vec v, vec u)
+{
+    return { v.w + u.w, v.h + u.h };
+}
+
 point operator+(point p, vec v)
 {
     return { p.x + v.w, p.y + v.h };

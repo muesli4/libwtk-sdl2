@@ -18,17 +18,17 @@ void color_widget::on_draw(draw_context & dc, selection_context const & sc) cons
         , 0
         };
     dc.set_color(c);
-    dc.draw_rect_filled(box());
+    dc.draw_rect_filled(get_box());
     if (sc.is_selected_widget(this))
     {
         dc.set_color({255, 255, 255, 0});
-        dc.draw_rect(box());
+        dc.draw_rect(get_box());
     }
 }
 
 void color_widget::on_mouse_up_event(mouse_up_event const & e)
 {
-    if (within_rect(e.position, box()))
+    if (within_rect(e.position, get_box()))
     {
         std::cout << "mouse event" << std::endl;
         recolor();
@@ -47,6 +47,11 @@ void color_widget::on_activate()
 {
     recolor();
     mark_dirty();
+}
+
+vec color_widget::min_size_hint() const
+{
+    return { 0, 0 };
 }
 
 void color_widget::recolor()

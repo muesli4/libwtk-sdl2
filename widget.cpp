@@ -39,14 +39,34 @@ void widget::mark_dirty()
         _parent->mark_dirty();
 }
 
-SDL_Rect const & widget::box() const
+SDL_Rect const & widget::get_box() const
 {
     return _box;
+}
+
+void widget::set_layout_info(layout_info const & li)
+{
+    _layout_info = &li;
+}
+
+layout_info const & widget::get_layout_info() const
+{
+    return *_layout_info;
 }
 
 void widget::set_parent(widget * parent)
 {
     _parent = parent;
+}
+
+std::vector<widget *> widget::get_children()
+{
+    return {};
+}
+
+std::vector<widget const *> widget::get_children() const
+{
+    return {};
 }
 
 void widget::apply_layout(SDL_Rect box)
