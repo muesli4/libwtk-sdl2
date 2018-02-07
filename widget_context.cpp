@@ -38,6 +38,8 @@ widget_context::widget_context(SDL_Window * window, SDL_Rect box, font f, widget
 
 void widget_context::process_event(SDL_Event & ev)
 {
+    // TODO hardcoded keys are probably not the best idea for reusability
+
     if (ev.type == SDL_MOUSEBUTTONDOWN)
     {
         point p { ev.button.x, ev.button.y };

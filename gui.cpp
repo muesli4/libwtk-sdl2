@@ -52,6 +52,7 @@ struct table : container
 };
 */
 
+// TODO provide means to add widgets outside of constructors (redo layout only for local container or upwards?)
 // TODO enable querying minimal widget size
 // TODO find something similar to width-for-height/heigh-for-width
 
@@ -89,11 +90,10 @@ void event_loop(SDL_Window * window)
     SDL_Event ev;
     while (SDL_WaitEvent(&ev))
     {
-        // event handling
         if (ev.type == SDL_QUIT)
             break;
-        //else if ((ev.keysym.mod & KMOD_CTRL) && keysym.sym == SDLK_q)
-        //    break;
+        else if (ev.type == SDL_KEYDOWN && (ev.key.keysym.mod & KMOD_CTRL) && ev.key.keysym.sym == SDLK_q)
+            break;
         else
         {
             ctx.process_event(ev);
