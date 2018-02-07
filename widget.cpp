@@ -81,17 +81,20 @@ void widget::apply_layout_to_children()
 
 widget * widget::find_selectable(navigation_type nt)
 {
+    // Default implementation: Widgets are not selectable by default.
     return nullptr;
 }
 
 widget * widget::navigate_selectable(navigation_type nt)
 {
+    // Default implementation: Not navigateable by default.
     return nullptr;
 }
 
 widget * widget::navigate_selectable_from_children(navigation_type nt, widget * w, point center)
 {
-    // TODO is this really correct? better default implementation with navigate_selectable_parent
+    // Default implementation: Has no child widgets, therefore this will never
+    // be called from a child.
     return nullptr;
 }
 
