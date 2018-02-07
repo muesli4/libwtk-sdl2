@@ -69,16 +69,16 @@ void event_loop(SDL_Window * window)
 
     //color_widget cw;
     padding main_widget(20, hbox(
-        { { true, vbox({ { true, lv }, { false, nb } }, 20) }
+        { { true, vbox({ { true, lv }, { false, nb } }, 20, false) }
         // std::make_shared<color_widget>()
         //, pad(20, 80, std::make_shared<color_widget>())
-        , { true, std::make_shared<button>("Button 1", [](){ std::cout << "click1" << std::endl;}) }
+        , { false, std::make_shared<button>("Button 1", [](){ std::cout << "click1" << std::endl;}) }
         , { false, vbox( { { false, std::make_shared<button>("Color", [nb](){ nb->set_page(0); })}
-                         , { true, pad(10, std::make_shared<button>("Filler!", [](){}))}
+                         , { false, pad(10, std::make_shared<button>("Filler!", [](){}))}
                          , { false, std::make_shared<button>("Swipe", [nb](){ nb->set_page(1); })}
                          }
-                       , 20) }
-        }, 20));
+                       , 20, false) }
+        }, 20, false));
 
 
     // setup necessary context (as in local to a window or other unit of management)

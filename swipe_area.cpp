@@ -33,6 +33,8 @@ void swipe_area::on_mouse_up_event(mouse_up_event const & e)
 
 vec swipe_area::min_size_hint() const
 {
-    return { 0, 0 };
+    // TODO how to dimension ?
+    int v = get_layout_info().font_line_skip();
+    return { v, v };
 }
 

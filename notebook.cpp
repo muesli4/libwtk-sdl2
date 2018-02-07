@@ -84,7 +84,7 @@ std::vector<widget *> notebook::get_children()
 
 vec notebook::min_size_hint() const
 {
-    vec max_vec;
+    vec max_vec = { 0, 0 };
     for (auto p : _pages)
     {
         vec v = p->min_size_hint();

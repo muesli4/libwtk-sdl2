@@ -52,8 +52,8 @@ void button::on_activate()
 
 vec button::min_size_hint() const
 {
-    vec s { 2, 2 };
-    return s + get_layout_info().text_size(_text);
+    vec size = get_layout_info().text_size(_text);
+    return { size.w * 2, size.h * 2 };
 }
 
 button::~button()

@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <iterator>
 
 #include "box.hpp"
 
@@ -34,7 +35,6 @@ void box::apply_layout_to_children()
             else
             {
                 int const child_height = (get_box().h - (n - 1) * _children_spacing) / n;
-                std::cout << child_height << std::endl;
                 int yoffset = get_box().y;
 
                 for (auto c : _children)
@@ -46,12 +46,58 @@ void box::apply_layout_to_children()
         }
         else
         {
-            int num_expand = std::count_if(std::begin(_children), std::end(_children), [](auto const & c){ return c.expand; });
 
             // 1. Ask for minimum size of each widget
             // 2. Calculate difference with available space
             // 3. Distribute left-over space to widgets with expand property
             // TODO give expand weight for each widget
+            // TODO natural size property, width-for-height, etc.
+            using namespace std;
+
+            int sum = 0;
+            int num_expand = 0;
+            vector<vec> min_sizes;
+            for (auto & c : _children)
+            {
+                auto size = c.wptr->min_size_hint();
+                min_sizes.push_back(size);
+                if (c.expand)
+                    num_expand += 1;
+
+                if (_o == orientation::HORIZONTAL)
+                {
+                    sum = sum + size.w;
+                }
+                else
+                {
+                    sum = sum + size.h;
+                }
+
+            }
+
+            int const avail = std::max<int>(0, ((_o == orientation::HORIZONTAL ? get_box().w : get_box().h) - sum - (n - 1) * _children_spacing));
+            int const extra_width = avail / std::max(1, num_expand);
+            int offset = _o == orientation::HORIZONTAL ? get_box().x : get_box().y;
+
+            for (std::size_t k = 0; k < n; k++)
+            {
+                auto & c = _children[k];
+
+                int expand_width = c.expand ? extra_width : 0;
+
+                if (_o == orientation::HORIZONTAL)
+                {
+                    int w = min_sizes[k].w + expand_width;
+                    c.wptr->apply_layout({ offset, get_box().y, w, get_box().h });
+                    offset += w + _children_spacing;
+                }
+                else
+                {
+                    int h = min_sizes[k].h + expand_width;
+                    c.wptr->apply_layout({ get_box().x, offset, get_box().w, h });
+                    offset += h + _children_spacing;
+                }
+            }
         }
     }
 }
@@ -67,7 +113,6 @@ widget * box::find_selectable(navigation_type nt)
     // TODO add point
     else
     {
-
         if (is_forward(nt))
         {
             for (auto c : _children)
@@ -156,7 +201,23 @@ widget * box::navigate_selectable_from_children(navigation_type nt, widget * w, 
 
 vec box::min_size_hint() const
 {
-    return { 0, 0 };
+    vec result = { 0, 0 };
+
+    for (auto & c : _children)
+    {
+        vec size = c.wptr->min_size_hint();
+        if (_o == orientation::HORIZONTAL)
+        {
+            result.h = std::max(size.h, result.h);
+            result.w += size.w;
+        }
+        else
+        {
+            result.h += size.h;
+            result.w = std::max(size.w, result.w);
+        }
+    }
+    return result;
 }
 
 box::~box()

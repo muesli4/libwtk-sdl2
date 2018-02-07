@@ -51,7 +51,9 @@ void color_widget::on_activate()
 
 vec color_widget::min_size_hint() const
 {
-    return { 0, 0 };
+    // TODO how to dimension ?
+    int v = get_layout_info().font_line_skip();
+    return { v, v };
 }
 
 void color_widget::recolor()
