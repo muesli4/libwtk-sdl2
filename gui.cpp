@@ -2,7 +2,7 @@
 //      screen (basically bounding box drawn in offset mode)
 
 // TODO implement mouse move event for several widgets
-
+// TODO widget: add hit test for widgets, then there is no need to propagate the mouse event
 // TODO should mouse click select selectable widgets? if so, the mouse_down
 //      event will have to go to a unqiue widget. This also makes sense when
 //      considering the fact that widgets should only respond to mouse down
