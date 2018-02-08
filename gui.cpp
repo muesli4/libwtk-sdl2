@@ -1,12 +1,16 @@
 // TODO think about a way where the widget might not arbitrarily draw to the
 //      screen (basically bounding box drawn in offset mode)
 
-// TODO add mouse move event
+// TODO implement mouse move event for several widgets
 
 // TODO should mouse click select selectable widgets? if so, the mouse_down
 //      event will have to go to a unqiue widget. This also makes sense when
 //      considering the fact that widgets should only respond to mouse down
 //      events within their box.
+
+// TODO provide means to add widgets outside of constructors (redo layout only for local container or upwards?)
+// TODO should widgets relayout when their content changes?
+// TODO find something similar to width-for-height/heigh-for-width
 
 // - Out of consistency widgets should not react to MOUSEUP events when they
 //   haven't been activted by a MOUSEDOWN event in their area before. However,
@@ -53,10 +57,6 @@ struct table : container
 
 };
 */
-
-// TODO provide means to add widgets outside of constructors (redo layout only for local container or upwards?)
-// TODO enable querying minimal widget size
-// TODO find something similar to width-for-height/heigh-for-width
 
 void event_loop(SDL_Window * window)
 {
