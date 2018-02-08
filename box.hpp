@@ -37,6 +37,12 @@ struct box : container
 
     private:
 
+    // Finds the relevant distance based on the containers orientation.
+    int relevant_distance(point old_center, point new_center) const;
+
+    // Check for orthogonality to container orientation.
+    bool is_orthogonal(navigation_type nt) const;
+
 
     std::vector<child> _children;
     int _children_spacing;

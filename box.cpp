@@ -50,7 +50,7 @@ void box::apply_layout_to_children()
             // 1. Ask for minimum size of each widget
             // 2. Calculate difference with available space
             // 3. Distribute left-over space to widgets with expand property
-            // TODO give expand weight for each widget
+            // TODO give expand weight for each widget instead
             // TODO natural size property, width-for-height, etc.
             using namespace std;
 
@@ -106,7 +106,7 @@ widget * box::find_selectable(navigation_type nt, point center)
 {
     // When the navigation request is orthogonal, pick the widget with the
     // closest distance on that particular dimension.
-    if (is_orthogonal(nt, _o))
+    if (is_orthogonal(nt))
     {
 
         widget * min_w;
@@ -121,40 +121,42 @@ widget * box::find_selectable(navigation_type nt, point center)
 
             if (min_w != nullptr)
             {
-                auto center_w = rect_center(min_w->get_box());
-                min_distance = std::abs(_o == orientation::HORIZONTAL ? center.x - center_w.x : center.y - center_w.y);
+                auto found_widget_center = rect_center(min_w->get_box());
+                min_distance = relevant_distance(center, found_widget_center);
                 break;
             }
         }
 
         if (min_w == nullptr)
             return nullptr;
-
-        // Refine by finding a selectable widget with a smaller distance.
-        for (++k; k < _children.size(); ++k)
+        else
         {
-            auto new_w = _children[k].wptr->find_selectable(nt, center);
-
-            if (new_w != nullptr)
+            // Refine by finding a selectable widget with a smaller distance.
+            for (++k; k < _children.size(); ++k)
             {
-                auto center_w = rect_center(new_w->get_box());
-                int new_distance = std::abs(_o == orientation::HORIZONTAL ? center.x - center_w.x : center.y - center_w.y);
+                auto new_w = _children[k].wptr->find_selectable(nt, center);
 
-                if (new_distance < min_distance)
+                if (new_w != nullptr)
                 {
-                    min_w = new_w;
-                    min_distance = new_distance;
-                }
-                else
-                {
-                    // Assumption: Parallel widget dimension increases with
-                    // order in container.
-                    break;
+                    auto new_center = rect_center(new_w->get_box());
+                    int new_distance = relevant_distance(center, new_center);
+
+                    if (new_distance < min_distance)
+                    {
+                        min_w = new_w;
+                        min_distance = new_distance;
+                    }
+                    else
+                    {
+                        // Assumption: Parallel widget dimension increases with
+                        // order in container.
+                        break;
+                    }
                 }
             }
-        }
 
-        return min_w;
+            return min_w;
+        }
     }
     // Otherwise just pick the first selectable one in the direction of the
     // request.
@@ -186,18 +188,6 @@ widget * box::find_selectable(navigation_type nt, point center)
     return nullptr;
 }
 
-bool box::is_orthogonal(navigation_type nt, orientation o)
-{
-    return
-        ((nt == navigation_type::NEXT_X || nt == navigation_type::PREV_X)
-            && o == orientation::VERTICAL
-        )
-        ||
-        ((nt == navigation_type::NEXT_Y || nt == navigation_type::PREV_Y)
-            && o == orientation::HORIZONTAL
-        );
-}
-
 bool box::is_forward(navigation_type nt)
 {
     return
@@ -213,7 +203,7 @@ widget * box::navigate_selectable_from_children(navigation_type nt, widget * w, 
     // then the parent will handle it, or we're parallel to it, then we just
     // need to pick a consecutive widget.
 
-    if (is_orthogonal(nt, _o))
+    if (is_orthogonal(nt))
     {
         return navigate_selectable_parent(nt, center);
     }
@@ -275,6 +265,24 @@ vec box::min_size_hint() const
 box::~box()
 {
 }
+
+int box::relevant_distance(point old_center, point new_center) const
+{
+    return std::abs(_o == orientation::HORIZONTAL ? old_center.x - new_center.x : old_center.y - new_center.y);
+}
+
+bool box::is_orthogonal(navigation_type nt) const
+{
+    return
+        ((nt == navigation_type::NEXT_X || nt == navigation_type::PREV_X)
+            && _o == orientation::VERTICAL
+        )
+        ||
+        ((nt == navigation_type::NEXT_Y || nt == navigation_type::PREV_Y)
+            && _o == orientation::HORIZONTAL
+        );
+}
+
 
 std::vector<widget *> box::get_children()
 {
