@@ -22,6 +22,10 @@ struct list_view : selectable
 
     vec min_size_hint() const override;
 
+    // list_view interface
+
+    void set_position(std::size_t position);
+
     private:
 
     std::optional<point> _opt_pressed_point;

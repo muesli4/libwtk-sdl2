@@ -87,10 +87,10 @@ void list_view::on_mouse_up_event(mouse_up_event const & e)
             }
             else
             {
-
                 int const visible_entries = (get_box().h - 2) / _row_height;
                 int const distance = static_cast<int>(visible_entries) * se.length.h / (get_box().w / 2);
                 unsigned int const next_selected_position = _position + distance;
+
                 if (se.action == swipe_action::UP)
                     _position = dec_ensure_lower(next_selected_position, _position, 0);
                 else // if (se.action == swipe_action::DOWN)
@@ -139,49 +139,18 @@ void list_view::on_activate()
 
 void list_view::apply_layout_to_children()
 {
+    // TODO code smell ?
     _row_height = get_layout_info().font_line_skip();
 }
-
-//size_hint list_view::get_size_hint()
-//{
-//
-//    // TODO consider entries ?
-//    size_hint sh { allocation_type::WIDTH_FOR_HEIGHT, { { fa.font_line_skip() * 5, 2.0 } } };
-//    return sh;
-//}
 
 vec list_view::min_size_hint() const
 {
     return { 3 + 2 * get_layout_info().font_line_skip(), 0 };
 }
 
-/*
-// for the moment only one highlight is supported, maybe more make sense later on
-int list_view(SDL_Rect box, std::vector<std::string> const & entries, unsigned int & pos, int highlight, font_atlas & fa, gui_context & gc)
+void list_view::set_position(std::size_t position)
 {
-    unsigned int const visible_items = list_view_visible_items(box, fa);
-
-    int selection = -1;
-    gc.draw_entry_box(box);
-
-    SDL_Rect text_box { box.x + 1, box.y + 1, box.w - 2, static_cast<int>(fa.height()) };
-
-    gui_event_info const & gei = gc.gei;
-
-    bool const swipe = gei.valid_swipe && gei.mouse_event && within_rect(gei.down_x, gei.down_y, box) && !gei.pressed;
-    // hacky update before drawing...
-    if (swipe && gei.abs_ydiff * gc.dir_unambig_factor_threshold >= gei.abs_xdiff)
-    {
-        int const distance = static_cast<int>(visible_items) * 10 * gei.ydiff / (box.w / 2);
-        unsigned int const next_pos = pos + distance;
-        if (gei.ydiff < 0)
-            pos = dec_ensure_lower(next_pos, pos, 0);
-        else
-            pos = inc_ensure_upper(next_pos, pos, entries.size() < visible_items ? 0 : entries.size() - visible_items);
-    }
-
-
-    return swipe ? -1 : selection;
+    auto size = _values.size();
+    _position = std::min(position, size == 0 ? 0 : size - 1);
 }
-*/
 
