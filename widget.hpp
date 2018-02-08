@@ -88,14 +88,18 @@ struct widget
     // Should return the first selectable widget according to the navigation
     // type. If a widget is selectable it should return itself. Containers
     // should return the first selectable child widget.
-    virtual widget * find_selectable(navigation_type nt);
+    //
+    // The point may serve as a hint to provide a more accurate selection.
+    virtual widget * find_selectable(navigation_type nt, point center);
 
     // Perform a navigation request from this widget as source.
     //
     // A widget that is not selectable doesn't have to implement this.
     // Containers on the other hand should implement this to enable selection of
     // their children.
-    virtual widget * navigate_selectable(navigation_type nt);
+    //
+    // The point may serve as a hint to provide a more accurate selection.
+    virtual widget * navigate_selectable(navigation_type nt, point center);
 
     // When a child widget has exhausted its selectable widgets it may ask its
     // parent for the next widget according to the navigation. The coordinates

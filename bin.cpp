@@ -23,9 +23,9 @@ void bin::on_mouse_up_event(mouse_up_event const & me)
     _child->on_mouse_up_event(me);
 }
 
-widget * bin::find_selectable(navigation_type nt)
+widget * bin::find_selectable(navigation_type nt, point center)
 {
-    return _child->find_selectable(nt);
+    return _child->find_selectable(nt, center);
 }
 
 widget * bin::navigate_selectable_from_children(navigation_type nt, widget * w, point center)

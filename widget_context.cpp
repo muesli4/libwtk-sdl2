@@ -16,7 +16,7 @@ widget_context::widget_context(SDL_Window * window, font f, widget & main_widget
 widget_context::widget_context(SDL_Window * window, SDL_Rect box, font f, widget & main_widget)
     : _fa(f.path, f.size)
     , _dc(window, _fa)
-    , _sc()
+    , _sc(box)
     , _sd(_fa.font_line_skip(), 0.3)
     , _main_widget(main_widget)
     , _layout_info(_fa)

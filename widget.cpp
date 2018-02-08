@@ -84,13 +84,13 @@ void widget::apply_layout_to_children()
 {
 }
 
-widget * widget::find_selectable(navigation_type nt)
+widget * widget::find_selectable(navigation_type nt, point center)
 {
     // Default implementation: Widgets are not selectable by default.
     return nullptr;
 }
 
-widget * widget::navigate_selectable(navigation_type nt)
+widget * widget::navigate_selectable(navigation_type nt, point center)
 {
     // Default implementation: Not navigateable by default.
     return nullptr;

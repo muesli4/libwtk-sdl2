@@ -19,7 +19,7 @@ struct box : container
 
     void apply_layout_to_children() override;
 
-    widget * find_selectable(navigation_type nt) override;
+    widget * find_selectable(navigation_type nt, point center) override;
 
     static bool is_orthogonal(navigation_type nt, orientation o);
     static bool is_forward(navigation_type nt);

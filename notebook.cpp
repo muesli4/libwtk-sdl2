@@ -34,14 +34,14 @@ void notebook::apply_layout_to_children()
         p->apply_layout(get_box());
 }
 
-widget * notebook::find_selectable(navigation_type nt)
+widget * notebook::find_selectable(navigation_type nt, point center)
 {
-    return get_shown_widget()->find_selectable(nt);
+    return get_shown_widget()->find_selectable(nt, center);
 }
 
-widget * notebook::navigate_selectable(navigation_type nt)
+widget * notebook::navigate_selectable(navigation_type nt, point center)
 {
-    return get_shown_widget()->navigate_selectable(nt);
+    return get_shown_widget()->navigate_selectable(nt, center);
 }
 
 widget * notebook::navigate_selectable_from_children(navigation_type nt, widget * w, point center)

@@ -14,7 +14,7 @@ struct bin : widget
 
     void apply_layout_to_children() override = 0;
 
-    widget * find_selectable(navigation_type nt) override;
+    widget * find_selectable(navigation_type nt, point center) override;
     widget * navigate_selectable_from_children(navigation_type nt, widget * w, point center) override;
 
     // Should be provided when geometry of the child changes.

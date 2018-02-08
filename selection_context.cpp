@@ -1,11 +1,14 @@
 #include "selection_context.hpp"
 
+#include "sdl_util.hpp"
 #include "widget.hpp"
 
 
-selection_context::selection_context(widget * w)
+selection_context::selection_context(SDL_Rect widget_area, widget * w)
     // Set to first selectable widget.
-    : _selected_widget(w == nullptr ? w : w->find_selectable(navigation_type::NEXT))
+    : _selected_position(rect_center(widget_area))
+    , _selected_widget(w == nullptr ? w : w->find_selectable(navigation_type::NEXT, _selected_position))
+    , _widget_area(widget_area)
 {
     select_helper();
 }
@@ -22,6 +25,8 @@ void selection_context::unselect_widget()
 {
     unselect_helper();
     _selected_widget = nullptr;
+    // When manually unselecting the position is reset.
+    _selected_position = rect_center(_widget_area);
 }
 
 void selection_context::dispatch_activation()
@@ -53,12 +58,12 @@ void selection_context::navigate_selection(navigation_type nt, widget * main_wid
     if (_selected_widget == nullptr)
     {
         // select first selectable
-        _selected_widget = main_widget->find_selectable(nt);
+        _selected_widget = main_widget->find_selectable(nt, _selected_position);
     }
     else
     {
         _selected_widget->on_unselect();
-        _selected_widget = _selected_widget->navigate_selectable(nt);
+        _selected_widget = _selected_widget->navigate_selectable(nt, _selected_position);
     }
     select_helper();
 }
@@ -75,6 +80,7 @@ void selection_context::select_helper()
 {
     if (_selected_widget != nullptr)
     {
+        _selected_position = rect_center(_selected_widget->get_box());
         _selected_widget->on_select();
     }
 }

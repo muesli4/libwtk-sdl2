@@ -1,13 +1,13 @@
 #include "selectable.hpp"
 
-widget * selectable::find_selectable(navigation_type nt)
+widget * selectable::find_selectable(navigation_type nt, point center)
 {
     return this;
 }
 
-widget * selectable::navigate_selectable(navigation_type nt)
+widget * selectable::navigate_selectable(navigation_type nt, point p)
 {
-    return navigate_selectable_parent(nt, rect_center(get_box()));
+    return navigate_selectable_parent(nt, p);
 }
 
 selectable::~selectable()

@@ -102,22 +102,24 @@ void box::apply_layout_to_children()
     }
 }
 
-widget * box::find_selectable(navigation_type nt)
+widget * box::find_selectable(navigation_type nt, point center)
 {
+    // TODO add point
     if (is_orthogonal(nt, _o))
     {
         // get middle
         if (!_children.empty())
-            return _children[_children.size() / 2].wptr->find_selectable(nt);
+        {
+            return _children[_children.size() / 2].wptr->find_selectable(nt, center);
+        }
     }
-    // TODO add point
     else
     {
         if (is_forward(nt))
         {
             for (auto c : _children)
             {
-                auto w = c.wptr->find_selectable(nt);
+                auto w = c.wptr->find_selectable(nt, center);
                 if (w != nullptr)
                 {
                     return w;
@@ -128,7 +130,7 @@ widget * box::find_selectable(navigation_type nt)
         {
             for (auto it = _children.rbegin(); it != _children.rend(); ++it)
             {
-                auto w = it->wptr->find_selectable(nt);
+                auto w = it->wptr->find_selectable(nt, center);
                 if (w != nullptr)
                 {
                     return w;
@@ -191,7 +193,7 @@ widget * box::navigate_selectable_from_children(navigation_type nt, widget * w, 
             }
             else
             {
-                auto result = it->wptr->find_selectable(nt);
+                auto result = it->wptr->find_selectable(nt, center);
                 if (result != nullptr)
                     return result;
             }
