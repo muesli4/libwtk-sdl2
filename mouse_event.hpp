@@ -3,8 +3,6 @@
 
 #include <optional>
 
-#include <SDL2/SDL.h>
-
 #include "geometry.hpp"
 #include "swipe_event.hpp"
 

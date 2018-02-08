@@ -2,7 +2,9 @@
 #define WIDGET_CONTEXT_HPP
 
 #include <string>
-#include <SDL2/SDL.h>
+#include <SDL2/SDL_video.h>
+#include <SDL2/SDL_rect.h>
+#include <SDL2/SDL_events.h>
 
 #include "font_atlas.hpp"
 #include "draw_context.hpp"
