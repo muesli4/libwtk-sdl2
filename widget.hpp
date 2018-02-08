@@ -42,6 +42,8 @@ struct size_hint
 struct widget
 {
     widget();
+    widget(widget const &) = delete;
+    widget & operator=(widget const &) = delete;
 
     virtual void on_draw(draw_context & dc, selection_context const & sc) const = 0;
     virtual void on_mouse_up_event(mouse_up_event const & e);
