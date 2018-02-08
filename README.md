@@ -1,6 +1,20 @@
-A flexible GUI library for SDL2 (might be adapted to other libraries with some small changes).
+Provides a framework for hierarchic widgets based on SDL2. Most of the event handling and drawing is however abstracted away and should be easily replacable. The original purpose of this library is to supersede my quick and dirty *immediate GUI* implementation in my [touchscreen GUI](https://github.com/muesli4/mpd-touch-screen-gui) and at the same time provide GUI support for a remote control.
 
-## Scope
+## Features
 
-At the moment only static widget sizes are supported. That means every widget has a fixed size give from above by running `apply_layout`.
+* Clean and easy to use (mostly declarative) GUI building with modern C++.
+* Simple widget hierarchy with useful base classes. New widgets can be created by deriving.
+* Support for widget selection. In addition selectable widgets can be navigated in 2 dimensions. The intention was to support faster and more intuitive keyboard or infra-red remote navigation.
+* Dirty-based drawing: Widgets will only be redrawn when they're marked as dirty.
+
+## Current Shortcomings
+
+* The drawing primitives are lacking (should probably be refactored into low-level and desing-based drawing).
+* Only a basic (dark) theme is provided.
+* Widget layout is rudimentary but still very usable. It is static however. That is, widgets don't change their size when their content changes.
+* Only one font size and style is supported.
+* Containers don't have interfaces to add or remove children.
+* No text field.
+* No build system (early developement).
+* Only minimum size hints of widgets supported.
 
