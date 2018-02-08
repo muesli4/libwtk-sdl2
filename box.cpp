@@ -104,15 +104,60 @@ void box::apply_layout_to_children()
 
 widget * box::find_selectable(navigation_type nt, point center)
 {
-    // TODO add point
+    // When the navigation request is orthogonal, pick the widget with the
+    // closest distance on that particular dimension.
     if (is_orthogonal(nt, _o))
     {
-        // get middle
-        if (!_children.empty())
+
+        widget * min_w;
+        int min_distance;
+
+        std::size_t k = 0;
+
+        // Find a selectable widget for a start.
+        for (; k < _children.size(); ++k)
         {
-            return _children[_children.size() / 2].wptr->find_selectable(nt, center);
+            min_w = _children[k].wptr->find_selectable(nt, center);
+
+            if (min_w != nullptr)
+            {
+                auto center_w = rect_center(min_w->get_box());
+                min_distance = std::abs(_o == orientation::HORIZONTAL ? center.x - center_w.x : center.y - center_w.y);
+                break;
+            }
         }
+
+        if (min_w == nullptr)
+            return nullptr;
+
+        // Refine by finding a selectable widget with a smaller distance.
+        for (++k; k < _children.size(); ++k)
+        {
+            auto new_w = _children[k].wptr->find_selectable(nt, center);
+
+            if (new_w != nullptr)
+            {
+                auto center_w = rect_center(new_w->get_box());
+                int new_distance = std::abs(_o == orientation::HORIZONTAL ? center.x - center_w.x : center.y - center_w.y);
+
+                if (new_distance < min_distance)
+                {
+                    min_w = new_w;
+                    min_distance = new_distance;
+                }
+                else
+                {
+                    // Assumption: Parallel widget dimension increases with
+                    // order in container.
+                    break;
+                }
+            }
+        }
+
+        return min_w;
     }
+    // Otherwise just pick the first selectable one in the direction of the
+    // request.
     else
     {
         if (is_forward(nt))
@@ -163,7 +208,12 @@ bool box::is_forward(navigation_type nt)
 
 widget * box::navigate_selectable_from_children(navigation_type nt, widget * w, point center)
 {
-    if (is_orthogonal(nt, _o))//nt == navigation_type::NEXT_Y || nt == navigation_type::PREV_Y)
+    // When navigating in a linear container like box, we don't have to consider
+    // the center hint, as we're either orthogonal with the navigation request,
+    // then the parent will handle it, or we're parallel to it, then we just
+    // need to pick a consecutive widget.
+
+    if (is_orthogonal(nt, _o))
     {
         return navigate_selectable_parent(nt, center);
     }
