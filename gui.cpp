@@ -67,21 +67,26 @@ void event_loop(SDL_Window * window)
          , std::make_shared<swipe_area>([](swipe_action act){ std::cout << "swipe = " << (int)act << std::endl; }, [](){ std::cout << "press" << std::endl; })
          });
 
+    auto nb_indicator = std::make_shared<label>("Active Notebook Widget: Color");
+    auto nb_controls = hbox({ { false, std::make_shared<button>("Color", [nb, nb_indicator](){ nb->set_page(0); nb_indicator->set_text("Active Notebook Widget: Color"); })}
+                            , { false, std::make_shared<button>("Swipe", [nb, nb_indicator](){ nb->set_page(1); nb_indicator->set_text("Active Notebook Widget: Swipe"); })}
+                            }, 20, true);
+
+
     auto lv = std::make_shared<list_view>(0, 2, 4, test_values, [](){ std::cout << "press list_view" << std::endl; });
 
     padding main_widget(20, hbox(
-        { { true, vbox({ { true, lv }, { false, nb } }, 20, false) }
+        { { true, vbox({ { true, lv }, { false, nb_indicator }, { true, nb }, { false, nb_controls } }, 20, false) }
         , { true, std::make_shared<color_widget>() }
         , { false, vbox( { { false, std::make_shared<button>("Button 1", [](){ std::cout << "click1" << std::endl; }) }
                          , { false, std::make_shared<color_widget>() }
                          , { false, std::make_shared<label>("This text should hopefully produce a linebreak. Otherwise something is not working correctly.\n\nYou may use Tab and Shift+Tab to focus widgets or use Shift and the corresponding arrow key for a 2-dimensional direction.") }
-                         , { true, std::make_shared<color_widget>() }
+                         , { true, hbox({ { true, std::make_shared<color_widget>() }, { true, std::make_shared<color_widget>() } }) }
                          , { false, std::make_shared<label>(std::vector<paragraph>{paragraph("Text 1, Paragraph 1."), paragraph("Text 1, Paragraph 2.")}) }
                          , { true, std::make_shared<color_widget>() }
                          , { true, std::make_shared<label>(std::vector<paragraph>{paragraph("Text 2, Paragraph 1.")}) }
                          }, 20, false) }
-        , { false, vbox( { { false, std::make_shared<button>("Color", [nb](){ nb->set_page(0); })}
-                         , { false, std::make_shared<button>("Swipe", [nb](){ nb->set_page(1); })}
+        , { false, vbox( { { false, std::make_shared<button>("Button 2", [](){ std::cout << "click2" << std::endl; })}
                          , { true, std::make_shared<empty>() }
                          , { false, std::make_shared<button>("Quit", [](){ SDL_Event ev { .type = SDL_QUIT }; SDL_PushEvent(&ev); })}
                          }
