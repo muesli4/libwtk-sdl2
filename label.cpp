@@ -68,7 +68,7 @@ void label::on_draw(draw_context & dc, selection_context const & sc) const
     auto real_box = pad_rect(get_box(), font_height / 2);
     // TODO refactor centered property
     // If the real box is bigger now, the text should be centered.
-    int yoffset = real_box.y + (real_box.h - (_cached_height - font_height)) / 2;
+    int yoffset = real_box.y + (real_box.h - (height_for_width_hint(get_box().w) - font_height)) / 2;
     int remaining_height = real_box.h;
 
     // clear background
