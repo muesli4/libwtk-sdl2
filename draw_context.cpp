@@ -89,7 +89,7 @@ void draw_context::draw_entry_text(std::string text, SDL_Rect abs_rect, int text
     }
 }
 
-void draw_context::draw_label_text(SDL_Rect box, std::string text)
+int draw_context::draw_label_text(SDL_Rect box, std::string text)
 {
     auto text_surf_ptr = _fa.text(text, box.w);
     SDL_SetSurfaceColorMod(text_surf_ptr.get(), 255, 255, 255);
@@ -104,6 +104,7 @@ void draw_context::draw_label_text(SDL_Rect box, std::string text)
     draw_rect_filled(box);
 
     blit(text_surf_ptr.get(), &source, &target);
+    return height;
 }
 
 void draw_context::draw_background(SDL_Rect box)

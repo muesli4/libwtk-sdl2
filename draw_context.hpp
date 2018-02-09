@@ -151,7 +151,9 @@ struct draw_context
     void draw_entry_active_background(SDL_Rect box);
     void draw_entry_position_indicator(SDL_Rect box);
 
-    void draw_label_text(SDL_Rect box, std::string text);
+    // Draws a string in the box and returns the actually used height within the
+    // box.
+    int draw_label_text(SDL_Rect box, std::string text);
 
     void draw_background(SDL_Rect box);
 

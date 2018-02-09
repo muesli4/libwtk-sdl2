@@ -74,7 +74,10 @@ void event_loop(SDL_Window * window)
         , { true, std::make_shared<color_widget>() }
         , { false, vbox( { { false, std::make_shared<button>("Button 1", [](){ std::cout << "click1" << std::endl; }) }
                          , { false, pad(20, 80, std::make_shared<color_widget>())}
-                         , { true, std::make_shared<label>("This text should hopefully produce a linebreak. Otherwise something is not working correctly.\n\nYou may use Tab and Shift+Tab to focus widgets or use Shift and the corresponding arrow key for a 2-dimensional direction.") }
+                         , { false, std::make_shared<label>("This text should hopefully produce a linebreak. Otherwise something is not working correctly.\n\nYou may use Tab and Shift+Tab to focus widgets or use Shift and the corresponding arrow key for a 2-dimensional direction.") }
+                         , { true, std::make_shared<color_widget>() }
+                         , { false, std::make_shared<label>(std::vector<paragraph>{paragraph("Paragraph 1."), paragraph("Paragraph 2.")}) }
+                         , { true, std::make_shared<color_widget>() }
                          }, 20, true) }
         , { false, vbox( { { false, std::make_shared<button>("Color", [nb](){ nb->set_page(0); })}
                          , { false, std::make_shared<button>("Swipe", [nb](){ nb->set_page(1); })}
