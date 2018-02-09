@@ -97,13 +97,14 @@ void box::apply_layout_to_children()
 
                 if (_o == orientation::HORIZONTAL)
                 {
-                    int w = min_sizes[k].w + expand_width;
+                    // TODO should both lengths be limited?
+                    int w = std::min(min_sizes[k].w + expand_width, get_box().w);
                     c.wptr->apply_layout({ offset, get_box().y, w, get_box().h });
                     offset += w + _children_spacing;
                 }
                 else
                 {
-                    int h = min_sizes[k].h + expand_width;
+                    int h = std::min(min_sizes[k].h + expand_width, get_box().h);
                     c.wptr->apply_layout({ get_box().x, offset, get_box().w, h });
                     offset += h + _children_spacing;
                 }
