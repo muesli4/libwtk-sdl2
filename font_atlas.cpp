@@ -231,48 +231,52 @@ vec font_atlas::text_size(std::string t, int max_line_width)
     }
     else
     {
-        int actual_max_width = 0;
-
         auto words = split_words(t);
 
-        int current_line_word_widths = 0;
-        int current_line_num_words = 0;
-        int lines = 1;
-
-        for (auto w : words)
+        if (words.empty())
         {
-            auto surf = word(w);
+            return { 0, 0 };
+        }
 
-            if (surf->w + current_line_word_widths >= max_line_width)
+        int actual_max_width = 0;
+        int lines = 1;
+        int current_line_num_words = 1;
+        int current_line_width = word(words[0])->w;
+
+        for (std::size_t k = 0; k < words.size(); ++k)
+        {
+            auto surf = word(words[k]);
+
+            int const additional_width = surf->w + _space_advance;
+
+            if (additional_width + current_line_width >= max_line_width)
             {
+                // Not enough space to fit it on the current line.
+
                 if (surf->w >= max_line_width)
                 {
                     // TODO word does not fit:
-                    //      can resurn failure
+                    //      can return failure
                     //      or try to do word splitting
                     return { -1, -1 };
                 }
                 else
                 {
-                    actual_max_width = std::max(current_line_word_widths + std::max(0, current_line_num_words - 1) * _space_advance, actual_max_width);
-                    current_line_word_widths = surf->w;
+                    actual_max_width = std::max(current_line_width, actual_max_width);
+                    current_line_width = surf->w;
                     current_line_num_words = 1;
                     lines += 1;
                 }
             }
             else
             {
-                current_line_word_widths += surf->w;
+                current_line_width += additional_width;
                 current_line_num_words += 1;
             }
         }
 
-        if (current_line_word_widths != 0)
-        {
-            actual_max_width = std::max(current_line_word_widths + std::max(0, current_line_num_words - 1) * _space_advance, actual_max_width);
-            lines += 1;
-        }
-        
+        actual_max_width = std::max(current_line_width, actual_max_width);
+
         return { actual_max_width, lines * font_line_skip() };
     }
 }
