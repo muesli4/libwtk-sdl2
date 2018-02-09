@@ -59,7 +59,17 @@ void box::apply_layout_to_children()
             vector<vec> min_sizes;
             for (auto & c : _children)
             {
-                auto size = c.wptr->min_size_hint();
+                int hfw = _o == orientation::VERTICAL ? c.wptr->height_for_width_hint(get_box().w) : -1;
+                vec size;
+                if (hfw  == -1)
+                {
+                    size = c.wptr->min_size_hint();
+                }
+                else
+                {
+                    size = { get_box().w, hfw };
+                }
+
                 min_sizes.push_back(size);
                 if (c.expand)
                     num_expand += 1;

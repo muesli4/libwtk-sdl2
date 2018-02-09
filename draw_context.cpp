@@ -99,6 +99,7 @@ int draw_context::draw_label_text(SDL_Rect box, std::string text)
     SDL_Rect source { 0, 0, width, height };
     SDL_Rect target { box.x, box.y, width, height };
 
+    // TODO fade effect when clipped?
 
     set_color({0, 0, 0});
     draw_rect_filled(box);

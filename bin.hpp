@@ -20,6 +20,8 @@ struct bin : widget
     // Should be provided when geometry of the child changes.
     vec min_size_hint() const override;
 
+    int height_for_width_hint(int width) const;
+
     std::vector<widget *> get_children() override;
     std::vector<widget const *> get_children() const override;
 

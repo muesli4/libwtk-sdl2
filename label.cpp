@@ -47,12 +47,13 @@ paragraph::paragraph(std::string text)
 }
 
 label::label(std::string text)
-    : _content(parse_text_fragments(text))
+    : label(parse_text_fragments(text))
 {
 }
 
 label::label(std::vector<paragraph> content)
     : _content(content)
+    , _cached_height(-1)
 {
 }
 
@@ -65,11 +66,17 @@ void label::on_draw(draw_context & dc, selection_context const & sc) const
     int const font_height = get_layout_info().font_line_skip();
 
     auto real_box = pad_rect(get_box(), font_height / 2);
-    int yoffset = real_box.y;
+    // TODO refactor centered property
+    // If the real box is bigger now, the text should be centered.
+    int yoffset = real_box.y + (real_box.h - (_cached_height - font_height)) / 2;
     int remaining_height = real_box.h;
 
     // clear background
     dc.draw_background(get_box());
+#ifdef DEBUG_LAYOUT
+    dc.set_color({255, 0, 0});
+    dc.draw_rect(get_box());
+#endif
 
     for (auto const & tf : _content)
     {
@@ -94,13 +101,18 @@ vec label::min_size_hint() const
     return vec{ font_height, font_height } + size;
 }
 
+int label::height_for_width_hint(int width) const
+{
+    if (_cached_height == -1)
+        _cached_height = calculate_height_for_width(width);
+    return _cached_height;
+}
+
 // label interface
 
 void label::set_text(std::string text)
 {
-    _content = parse_text_fragments(text);
-
-    mark_dirty();
+    set_content(parse_text_fragments(text));
 }
 
 std::string label::get_text() const
@@ -121,6 +133,7 @@ std::string label::get_text() const
 void label::set_content(std::vector<paragraph> content)
 {
     _content = content;
+    _cached_height = -1;
 
     mark_dirty();
 }
@@ -128,5 +141,18 @@ void label::set_content(std::vector<paragraph> content)
 std::vector<paragraph> const & label::get_content() const
 {
     return _content;
+}
+
+int label::calculate_height_for_width(int width) const
+{
+    int const font_height = get_layout_info().font_line_skip();
+    int const real_width = width - font_height;
+
+    int height = 0;
+    for (auto const & tf : _content)
+    {
+        height += get_layout_info().text_size(tf.text, real_width).h + tf.trailing_newlines * font_height;
+    }
+    return height + font_height;
 }
 

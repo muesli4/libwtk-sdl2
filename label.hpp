@@ -26,6 +26,7 @@ struct label : widget
 
     void on_draw(draw_context & dc, selection_context const & sc) const override;
     vec min_size_hint() const override;
+    int height_for_width_hint(int width) const;
 
     // label interface
 
@@ -37,7 +38,10 @@ struct label : widget
 
     private:
 
+    int calculate_height_for_width(int width) const;
+
     std::vector<paragraph> _content;
+    mutable int _cached_height;
 };
 
 #endif

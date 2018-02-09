@@ -118,6 +118,14 @@ struct widget
     // as best as possible. It is however in no way guaranteed.
     virtual vec min_size_hint() const = 0;
 
+    // A widget may better estimate its size with a given width. For example,
+    // when text is used it is much easier to estimate its size.
+    //
+    // Containers that know their width should prefer this to test children.
+    //
+    // Returns a negative value when not supported by the widget.
+    virtual int height_for_width_hint(int width) const;
+
     virtual ~widget();
 
     private:

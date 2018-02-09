@@ -108,6 +108,11 @@ widget * widget::navigate_selectable_from_children(navigation_type nt, widget * 
     return nullptr;
 }
 
+int widget::height_for_width_hint(int width) const
+{
+    return -1;
+}
+
 widget::~widget()
 {
 }
