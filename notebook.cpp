@@ -1,6 +1,6 @@
 #include "notebook.hpp"
 
-notebook::notebook(std::initializer_list<widget_ptr> pages)
+notebook::notebook(std::vector<widget_ptr> pages)
     : _pages(pages)
     , _current_page_index(0)
 {

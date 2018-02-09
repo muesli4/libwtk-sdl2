@@ -9,7 +9,7 @@
 // time.
 struct notebook : widget
 {
-    notebook(std::initializer_list<widget_ptr> pages);
+    notebook(std::vector<widget_ptr> pages);
     ~notebook() override;
 
     void on_draw(draw_context & dc, selection_context const & sc) const override;
