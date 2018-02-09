@@ -77,6 +77,11 @@ std::vector<widget const *> widget::get_children() const
 void widget::apply_layout(SDL_Rect box)
 {
     _box = box;
+
+    // If we can't assing enough space for a widget make at least a sane box.
+    _box.w = std::max(0, _box.w);
+    _box.h = std::max(0, _box.h);
+
     apply_layout_to_children();
 }
 
