@@ -68,6 +68,13 @@ void selection_context::navigate_selection(navigation_type nt, widget * main_wid
     select_helper();
 }
 
+void selection_context::change_widget_area(SDL_Rect new_box)
+{
+    _widget_area = new_box;
+    if (_selected_widget == nullptr)
+        _selected_position = rect_center(_widget_area);
+}
+
 void selection_context::unselect_helper()
 {
     if (_selected_widget != nullptr)

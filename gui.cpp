@@ -111,6 +111,17 @@ void event_loop(SDL_Window * window)
             break;
         else if (ev.type == SDL_KEYDOWN && (ev.key.keysym.mod & KMOD_CTRL) && ev.key.keysym.sym == SDLK_q)
             break;
+        else if (ev.type == SDL_WINDOWEVENT)
+        {
+            if (ev.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+                // FIXME window is black after resize (probably SDL2 or WM bug)
+                ctx.change_widget_area({ 0, 0, ev.window.data1, ev.window.data2 });
+            else if (ev.window.event != SDL_WINDOWEVENT_EXPOSED)
+            {
+                continue;
+            }
+
+        }
         else
         {
             ctx.process_event(ev);
@@ -142,6 +153,7 @@ int main()
     }
     else
     {
+        SDL_SetWindowResizable(window, SDL_TRUE);
         event_loop(window);
     }
 

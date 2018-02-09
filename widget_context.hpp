@@ -35,10 +35,13 @@ struct widget_context
     void unselect_widget();
     bool is_selected_widget(widget const & w);
 
+    void change_widget_area(SDL_Rect new_box);
+
     private:
 
     void set_layout_info(widget *);
 
+    SDL_Rect _box;
     font_atlas _fa;
     draw_context _dc;
     selection_context _sc;

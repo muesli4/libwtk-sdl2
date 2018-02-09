@@ -38,6 +38,8 @@ struct selection_context
     // This is the entry point of all navigation events.
     void navigate_selection(navigation_type nt, widget * main_widget);
 
+    void change_widget_area(SDL_Rect new_box);
+
     private:
 
     void unselect_helper();
@@ -45,7 +47,7 @@ struct selection_context
 
     point _selected_position;
     widget * _selected_widget;
-    SDL_Rect const _widget_area;
+    SDL_Rect _widget_area;
 };
 
 #endif

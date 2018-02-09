@@ -14,7 +14,8 @@ widget_context::widget_context(SDL_Window * window, font f, widget & main_widget
 }
 
 widget_context::widget_context(SDL_Window * window, SDL_Rect box, font f, widget & main_widget)
-    : _fa(f.path, f.size)
+    : _box(box)
+    , _fa(f.path, f.size)
     , _dc(window, _fa)
     , _sc(box)
     , _sd(_fa.font_line_skip(), 0.3)
@@ -111,6 +112,13 @@ void widget_context::unselect_widget()
 bool widget_context::is_selected_widget(widget const & w)
 {
     return _sc.is_selected_widget(&w);
+}
+
+void widget_context::change_widget_area(SDL_Rect new_box)
+{
+    _box = new_box;
+    _main_widget.apply_layout(_box);
+    _sc.change_widget_area(new_box);
 }
 
 void widget_context::set_layout_info(widget * w)
