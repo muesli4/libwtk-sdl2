@@ -8,11 +8,14 @@ table::table(vec size, std::vector<entry> entries)
     , _size(size)
     , _grid(size.w, std::vector<int>(size.h, -1))
     , _spacing(20) // TODO
+    , _x_offsets(size.h + 1, 0)
+    , _y_offsets(size.w + 1, 0)
 {
     init_children();
 
     for (std::size_t k = 0; k < _entries.size(); ++k)
     {
+        // TODO sanity check
         auto const & e = _entries[k];
         for (int x = e.placement.x; x < e.placement.x + e.placement.w; ++x)
         {
@@ -69,51 +72,241 @@ void table::apply_layout_to_children()
         h += bonus_height;
     }
 
-    // Compute offsets and sizes.
-    int x_offsets[_size.w + 1];
-    int y_offsets[_size.h + 1];
-    x_offsets[0] = get_box().x;
-    y_offsets[0] = get_box().y;
+    // Compute offsets, store them for reuse and apply to children.
+    _x_offsets[0] = get_box().x;
+    _y_offsets[0] = get_box().y;
 
     for (int k = 0; k < _size.w; ++k)
     {
-        x_offsets[k + 1] = widths[k] + x_offsets[k] + _spacing;
+        _x_offsets[k + 1] = widths[k] + _x_offsets[k] + _spacing;
     }
 
     for (int k = 0; k < _size.h; ++k)
     {
-        y_offsets[k + 1] = heights[k] + y_offsets[k] + _spacing;
+        _y_offsets[k + 1] = heights[k] + _y_offsets[k] + _spacing;
     }
 
     for (auto & e : _entries)
     {
-        int const x = x_offsets[e.placement.x];
-        int const y = y_offsets[e.placement.y];
+        int const x = _x_offsets[e.placement.x];
+        int const y = _y_offsets[e.placement.y];
 
-        int const w = x_offsets[e.placement.x + e.placement.w] - x - _spacing;
-        int const h = y_offsets[e.placement.y + e.placement.h] - y - _spacing;
+        int const w = _x_offsets[e.placement.x + e.placement.w] - x - _spacing;
+        int const h = _y_offsets[e.placement.y + e.placement.h] - y - _spacing;
 
         e.wptr->apply_layout({ x, y, w, h });
     }
 }
 
+template <typename It>
+int find_y_index(It first, It last, point center, vec size)
+{
+    auto it_y = std::find_if(first, last, [=](int bound){ return bound > center.y; });
+    return std::min(size.h - 1, static_cast<int>(std::distance(first, it_y)) - 1);
+}
+
+template <typename It>
+int find_x_index(It first, It last, point center, vec size)
+{
+    auto it_x = std::find_if(first, last, [=](int bound){ return bound > center.x; });
+
+    return std::min(size.w - 1, static_cast<int>(std::distance(first, it_x)) - 1);
+}
+
 widget * table::find_selectable(navigation_type nt, point center)
 {
-    // TODO Create a an array with row and column coordinates to find the grid position.
+    if (_entries.empty())
+        return nullptr;
+
+    if (nt == navigation_type::NEXT)
+    {
+        return _entries[0].wptr.get();
+    }
+    else if (nt == navigation_type::PREV)
+    {
+        return _entries.back().wptr.get();
+    }
+    else if (nt == navigation_type::NEXT_X)
+    {
+        int const y = find_y_index(std::begin(_y_offsets), std::end(_y_offsets), center, _size);
+        for (int x = 0; x < _size.w; ++x)
+        {
+            int eidx = _grid[x][y];
+
+            if (eidx != -1)
+                return _entries[eidx].wptr.get();
+        }
+    }
+    else if (nt == navigation_type::PREV_X)
+    {
+        int const y = find_y_index(std::begin(_y_offsets), std::end(_y_offsets), center, _size);
+        for (int x = _size.w - 1; x >= 0; --x)
+        {
+            int eidx = _grid[x][y];
+
+            if (eidx != -1)
+                return _entries[eidx].wptr.get();
+        }
+    }
+    else if (nt == navigation_type::NEXT_Y)
+    {
+        int const x = find_x_index(std::begin(_x_offsets), std::end(_x_offsets), center, _size);
+
+        for (int y = 0; y < _size.h; ++y)
+        {
+            int eidx = _grid[x][y];
+
+            if (eidx != -1)
+                return _entries[eidx].wptr.get();
+        }
+    }
+    else //if (nt == navigation_type::PREV_Y)
+    {
+        int const x = find_x_index(std::begin(_x_offsets), std::end(_x_offsets), center, _size);
+
+        for (int y = _size.h - 1; y >= 0; --y)
+        {
+            int eidx = _grid[x][y];
+
+            if (eidx != -1)
+                return _entries[eidx].wptr.get();
+        }
+    }
+
+    return nullptr;
+}
+
+template <typename It>
+widget * navigate_natural_order(It first, It last, navigation_type nt, widget * w, point center)
+{
+
+    auto it = std::find_if(first, last, [=](auto const & e){ return e.wptr.get() == w; });
+
+    if (it != last)
+    {
+
+        while (true)
+        {
+            ++it;
+
+            if (it == last)
+            {
+                break;
+            }
+            else
+            {
+                auto w = it->wptr->find_selectable(nt, center);
+
+                if (w != nullptr)
+                    return w;
+            }
+        }
+
+    }
+
     return nullptr;
 }
 
 widget * table::navigate_selectable_from_children(navigation_type nt, widget * w, point center)
 {
+    // TODO consistent behavior with box
+
     if (nt == navigation_type::NEXT)
     {
-
+        auto res = navigate_natural_order(std::begin(_entries), std::end(_entries), nt, w, center);
+        if (res != nullptr)
+            return res;
     }
     else if (nt == navigation_type::PREV)
     {
+        auto res = navigate_natural_order(std::rbegin(_entries), std::rend(_entries), nt, w, center);
+        if (res != nullptr)
+            return res;
     }
-    // TODO Navigate with _grid.
-    return nullptr;
+    else
+    {
+        int const y = find_y_index(std::begin(_y_offsets), std::end(_y_offsets), center, _size);
+        int const x = find_x_index(std::begin(_x_offsets), std::end(_x_offsets), center, _size);
+
+        if (nt == navigation_type::NEXT_X)
+        {
+            for (int p = x; p < _size.w; ++p)
+            {
+                int eidx = _grid[p][y];
+                if (eidx != -1)
+                {
+                    auto & e = _entries[eidx];
+                    widget * found_widget = e.wptr.get();
+
+                    if (found_widget != w)
+                    {
+                        widget * selectable_widget = found_widget->find_selectable(nt, center);
+                        if (selectable_widget != nullptr)
+                            return selectable_widget;
+                    }
+                }
+            }
+        }
+        else if (nt == navigation_type::PREV_X)
+        {
+            for (int p = x; p >= 0; --p)
+            {
+                int eidx = _grid[p][y];
+                if (eidx != -1)
+                {
+                    auto & e = _entries[eidx];
+                    widget * found_widget = e.wptr.get();
+
+                    if (found_widget != w)
+                    {
+                        widget * selectable_widget = found_widget->find_selectable(nt, center);
+                        if (selectable_widget != nullptr)
+                            return selectable_widget;
+                    }
+                }
+            }
+        }
+        else if (nt == navigation_type::NEXT_Y)
+        {
+            for (int p = y; p < _size.h; ++p)
+            {
+                int eidx = _grid[x][p];
+                if (eidx != -1)
+                {
+                    auto & e = _entries[eidx];
+                    widget * found_widget = e.wptr.get();
+
+                    if (found_widget != w)
+                    {
+                        widget * selectable_widget = found_widget->find_selectable(nt, center);
+                        if (selectable_widget != nullptr)
+                            return selectable_widget;
+                    }
+                }
+            }
+        }
+        else //if (nt == navigation_type::PREV_Y)
+        {
+            for (int p = y; p >= 0; --p)
+            {
+                int eidx = _grid[x][p];
+                if (eidx != -1)
+                {
+                    auto & e = _entries[eidx];
+                    widget * found_widget = e.wptr.get();
+
+                    if (found_widget != w)
+                    {
+                        widget * selectable_widget = found_widget->find_selectable(nt, center);
+                        if (selectable_widget != nullptr)
+                            return selectable_widget;
+                    }
+                }
+            }
+        }
+    }
+
+    return navigate_selectable_parent(nt, center);
 }
 
 vec table::min_size_hint() const

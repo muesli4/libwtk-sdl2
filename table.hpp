@@ -3,6 +3,8 @@
 
 #include "container.hpp"
 
+#include <vector>
+
 struct table : container
 {
     struct entry
@@ -31,6 +33,9 @@ struct table : container
     vec _size;
     std::vector<std::vector<int>> _grid;
     int _spacing;
+
+    std::vector<int> _x_offsets;
+    std::vector<int> _y_offsets;
 
 };
 
