@@ -47,30 +47,9 @@ std::vector<widget const *> table::get_children() const
 void table::apply_layout_to_children()
 {
 
-    vec min_sizes[_entries.size()];
-    for (std::size_t k = 0; k < _entries.size(); ++k)
-    {
-        min_sizes[k] = _entries[k].wptr->min_size_hint();
-    }
-
-    // Determine the minimum width for each column and row in one go.
     int min_widths[_size.w];
     int min_heights[_size.h];
-    std::uninitialized_fill_n(min_widths, _size.w, 0);
-    for (int y = 0; y < _size.h; ++y)
-    {
-        min_heights[y] = 0;
-
-        for (int x = 0; x < _size.w; ++x)
-        {
-            int const entry_index = _grid[x][y];
-            auto const & e = _entries[entry_index];
-
-            vec const min_size = min_sizes[entry_index];
-            min_heights[y] = std::max(min_heights[y], min_size.h / e.placement.h);
-            min_widths[x] = std::max(min_widths[x], min_size.w / e.placement.w);
-        }
-    }
+    min_cell_dimensions(min_widths, min_heights);
 
     // For the moment: Equally distribute remaining space on all rows and columns.
     // TODO consider height-for-width (how?)
@@ -127,5 +106,31 @@ vec table::min_size_hint() const
 {
     // TODO Proper implementation based on refactor of layout method.
     return { 400, 400 };
+}
+
+void table::min_cell_dimensions(int * min_widths, int * min_heights)
+{
+    vec min_sizes[_entries.size()];
+    for (std::size_t k = 0; k < _entries.size(); ++k)
+    {
+        min_sizes[k] = _entries[k].wptr->min_size_hint();
+    }
+
+    // Determine the minimum width for each column and row in one go.
+    std::uninitialized_fill_n(min_widths, _size.w, 0);
+    for (int y = 0; y < _size.h; ++y)
+    {
+        min_heights[y] = 0;
+
+        for (int x = 0; x < _size.w; ++x)
+        {
+            int const entry_index = _grid[x][y];
+            auto const & e = _entries[entry_index];
+
+            vec const min_size = min_sizes[entry_index];
+            min_heights[y] = std::max(min_heights[y], min_size.h / e.placement.h);
+            min_widths[x] = std::max(min_widths[x], min_size.w / e.placement.w);
+        }
+    }
 }
 

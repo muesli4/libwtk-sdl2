@@ -24,6 +24,8 @@ struct table : container
 
     private:
 
+    void min_cell_dimensions(int * min_widths, int * min_heights);
+
     std::vector<entry> _entries;
     vec _size;
     std::vector<std::vector<int>> _grid;
