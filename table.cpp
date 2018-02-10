@@ -54,8 +54,8 @@ void table::apply_layout_to_children()
     // For the moment: Equally distribute remaining space on all rows and columns.
     // TODO consider height-for-width (how?)
     // TODO distribute to empty cells?
-    int const min_width = std::accumulate(min_widths, min_widths + _size.w, std::max(0, _size.w - 1) * _spacing);
-    int const min_height = std::accumulate(min_heights, min_heights + _size.h, std::max(0, _size.h - 1) * _spacing);
+    int const min_width = min_length(min_widths, _size.w);
+    int const min_height = min_length(min_heights, _size.h);
 
     int const bonus_width = (get_box().w - min_width) / _size.w;
     int const bonus_height = (get_box().h - min_height) / _size.h;
@@ -104,11 +104,19 @@ widget * table::navigate_selectable_from_children(navigation_type nt, widget * w
 
 vec table::min_size_hint() const
 {
-    // TODO Proper implementation based on refactor of layout method.
-    return { 400, 400 };
+    int min_widths[_size.w];
+    int min_heights[_size.h];
+    min_cell_dimensions(min_widths, min_heights);
+
+    return { min_length(min_widths, _size.w), min_length(min_heights, _size.h) };
 }
 
-void table::min_cell_dimensions(int * min_widths, int * min_heights)
+int table::min_length(int * min_lengths, int n) const
+{
+    return std::accumulate(min_lengths, min_lengths + n, std::max(0, n - 1) * _spacing);
+}
+
+void table::min_cell_dimensions(int * min_widths, int * min_heights) const
 {
     vec min_sizes[_entries.size()];
     for (std::size_t k = 0; k < _entries.size(); ++k)
