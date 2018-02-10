@@ -46,26 +46,25 @@ std::vector<widget const *> table::get_children() const
 
 void table::apply_layout_to_children()
 {
-
-    int min_widths[_size.w];
-    int min_heights[_size.h];
-    min_cell_dimensions(min_widths, min_heights);
+    int widths[_size.w];
+    int heights[_size.h];
+    min_cell_dimensions(widths, heights);
 
     // For the moment: Equally distribute remaining space on all rows and columns.
     // TODO consider height-for-width (how?)
     // TODO distribute to empty cells?
-    int const min_width = length_with_spacing(min_widths, _size.w);
-    int const min_height = length_with_spacing(min_heights, _size.h);
+    int const min_width = length_with_spacing(widths, _size.w);
+    int const min_height = length_with_spacing(heights, _size.h);
 
     int const bonus_width = (get_box().w - min_width) / _size.w;
     int const bonus_height = (get_box().h - min_height) / _size.h;
 
-    for (auto & w : min_widths)
+    for (auto & w : widths)
     {
         w += bonus_width;
     }
 
-    for (auto & h : min_heights)
+    for (auto & h : heights)
     {
         h += bonus_height;
     }
@@ -75,16 +74,16 @@ void table::apply_layout_to_children()
     int y_offsets[_size.h];
     x_offsets[0] = 0;
     y_offsets[0] = 0;
-    std::partial_sum(min_widths, min_widths + _size.w - 1, x_offsets + 1);
-    std::partial_sum(min_heights, min_heights + _size.h - 1, y_offsets + 1);
+    std::partial_sum(widths, widths + _size.w - 1, x_offsets + 1);
+    std::partial_sum(heights, heights + _size.h - 1, y_offsets + 1);
 
     for (auto & e : _entries)
     {
         int const x = get_box().x + x_offsets[e.placement.x] + e.placement.x * _spacing;
         int const y = get_box().y + y_offsets[e.placement.y] + e.placement.y * _spacing;
 
-        int const w = std::accumulate(min_widths + e.placement.x, min_widths + e.placement.x + e.placement.w, 0) + std::max(0, e.placement.w - 1) * _spacing;
-        int const h = std::accumulate(min_heights + e.placement.y, min_heights + e.placement.y + e.placement.h, 0) + std::max(0, e.placement.h - 1) * _spacing;
+        int const w = std::accumulate(widths + e.placement.x, widths + e.placement.x + e.placement.w, std::max(0, e.placement.w - 1) * _spacing);
+        int const h = std::accumulate(heights + e.placement.y, heights + e.placement.y + e.placement.h, std::max(0, e.placement.h - 1) * _spacing);
 
         e.wptr->apply_layout({ x, y, w, h });
     }
@@ -98,6 +97,13 @@ widget * table::find_selectable(navigation_type nt, point center)
 
 widget * table::navigate_selectable_from_children(navigation_type nt, widget * w, point center)
 {
+    if (nt == navigation_type::NEXT)
+    {
+
+    }
+    else if (nt == navigation_type::PREV)
+    {
+    }
     // TODO Navigate with _grid.
     return nullptr;
 }
