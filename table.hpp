@@ -24,7 +24,7 @@ struct table : container
 
     private:
 
-    int min_length(int * min_lengths, int n) const;
+    int length_with_spacing(int * lengths, int n) const;
     void min_cell_dimensions(int * min_widths, int * min_heights) const;
 
     std::vector<entry> _entries;
