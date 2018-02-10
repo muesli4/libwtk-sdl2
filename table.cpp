@@ -70,20 +70,28 @@ void table::apply_layout_to_children()
     }
 
     // Compute offsets and sizes.
-    int x_offsets[_size.w];
-    int y_offsets[_size.h];
-    x_offsets[0] = 0;
-    y_offsets[0] = 0;
-    std::partial_sum(widths, widths + _size.w - 1, x_offsets + 1);
-    std::partial_sum(heights, heights + _size.h - 1, y_offsets + 1);
+    int x_offsets[_size.w + 1];
+    int y_offsets[_size.h + 1];
+    x_offsets[0] = get_box().x;
+    y_offsets[0] = get_box().y;
+
+    for (int k = 0; k < _size.w; ++k)
+    {
+        x_offsets[k + 1] = widths[k] + x_offsets[k] + _spacing;
+    }
+
+    for (int k = 0; k < _size.h; ++k)
+    {
+        y_offsets[k + 1] = heights[k] + y_offsets[k] + _spacing;
+    }
 
     for (auto & e : _entries)
     {
-        int const x = get_box().x + x_offsets[e.placement.x] + e.placement.x * _spacing;
-        int const y = get_box().y + y_offsets[e.placement.y] + e.placement.y * _spacing;
+        int const x = x_offsets[e.placement.x];
+        int const y = y_offsets[e.placement.y];
 
-        int const w = std::accumulate(widths + e.placement.x, widths + e.placement.x + e.placement.w, std::max(0, e.placement.w - 1) * _spacing);
-        int const h = std::accumulate(heights + e.placement.y, heights + e.placement.y + e.placement.h, std::max(0, e.placement.h - 1) * _spacing);
+        int const w = x_offsets[e.placement.x + e.placement.w] - x - _spacing;
+        int const h = y_offsets[e.placement.y + e.placement.h] - y - _spacing;
 
         e.wptr->apply_layout({ x, y, w, h });
     }
