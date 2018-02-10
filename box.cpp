@@ -240,7 +240,7 @@ widget * box::navigate_selectable_from_children(navigation_type nt, widget * w, 
 
             if (it == end || it < begin)
             {
-                return navigate_selectable_parent(nt, rect_center(get_box()));
+                return navigate_selectable_parent(nt, center);
             }
             else
             {
