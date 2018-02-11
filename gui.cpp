@@ -67,7 +67,7 @@ void event_loop(SDL_Window * window)
     auto lv = std::make_shared<list_view>(0, 2, 4, test_values, [](){ std::cout << "press list_view" << std::endl; });
 
     padding main_widget(20, hbox(
-        { { true, vbox({ { true, lv }, { false, nb_indicator }, { true, nb }, { false, nb_controls } }, 20, false) }
+        { { false, vbox({ { true, lv }, { false, nb_indicator }, { true, nb }, { false, nb_controls } }, 20, false) }
         , { false, cw() }
         , { false, vbox( { { false, num_button() }
                          , { false, cw() }
@@ -110,7 +110,6 @@ void event_loop(SDL_Window * window)
         else if (ev.type == SDL_WINDOWEVENT)
         {
             if (ev.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
-                // FIXME window is black after resize (probably SDL2 or WM bug)
                 ctx.change_widget_area({ 0, 0, ev.window.data1, ev.window.data2 });
             else if (ev.window.event != SDL_WINDOWEVENT_EXPOSED)
             {

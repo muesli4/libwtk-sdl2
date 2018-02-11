@@ -131,6 +131,7 @@ void widget_context::change_widget_area(SDL_Rect new_box)
 {
     _box = new_box;
     _main_widget.apply_layout(_box);
+    _main_widget.mark_dirty();
     _sc.change_widget_area(new_box);
 }
 
