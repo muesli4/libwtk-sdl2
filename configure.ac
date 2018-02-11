@@ -21,7 +21,7 @@ PKG_CHECK_MODULES(SDL2_ttf, SDL2_ttf)
 
 # AX_BOOST_BASE([1.35.0],,[AC_MSG_ERROR([boost was not found])])
 
-AC_CONFIG_FILES([Makefile src/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile include/Makefile])
 
 #AM_GNU_GETTEXT([external])
 #AM_GNU_GETTEXT_VERSION([0.19.7])
