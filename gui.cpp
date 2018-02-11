@@ -10,7 +10,15 @@
 
 // TODO provide means to add widgets outside of constructors (redo layout only for local container or upwards?)
 // TODO should widgets relayout when their content changes?
-// TODO find something similar to width-for-height/heigh-for-width
+
+// TODO which widgets need width-for-height?
+
+// TODO improved box / table layout for height-for-width widgets:
+// 1. Find minimum lengths as usual.
+// 2. Instead of evenly filling, favor height-for-width wigets (in table first
+//    do widths, as it will determine the height).
+// 3. Then distribute remaining space evenly (Improvement: Widgets may decide
+//    how much they profit from additional space).
 
 // - Out of consistency widgets should not react to MOUSEUP events when they
 //   haven't been activted by a MOUSEDOWN event in their area before. However,

@@ -29,7 +29,7 @@ std::vector<paragraph> parse_text_fragments(std::string text)
             trailing_newlines = 0;
         }
     }
-    // TODO ignore last trailing newlines?
+    // Trailing newlines are not ignored.
     result.emplace_back(prev_paragraph, trailing_newlines);
 
     return result;
@@ -94,11 +94,13 @@ vec label::min_size_hint() const
     vec size { 0, 0 };
     for (auto const & tf : _content)
     {
-        // TODO this is not working properly
-        vec psize = get_layout_info().text_size(tf.text, 13 * get_layout_info().font_height()) /*get_layout_info().text_minimum_width(tf.text) * 5*/;
+        // Assuming the average character is more than twice as high as it is
+        // wide, this will allow about 45 characters on the line, which should
+        // be a reasonable minimum for the width.
+        vec psize = get_layout_info().text_size(tf.text, 13 * get_layout_info().font_height());
 
         size.w = std::max(psize.w, size.w);
-        size.h += psize.h/*font_height * 5 + tf.trailing_newlines * font_height*/;
+        size.h += psize.h;
     }
     return vec{ font_height, font_height } + size;
 }
