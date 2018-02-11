@@ -95,8 +95,10 @@ vec label::min_size_hint() const
     for (auto const & tf : _content)
     {
         // TODO this is not working properly
-        size.w = std::max(get_layout_info().text_minimum_width(tf.text) * 5, size.w);
-        size.h += font_height * 5 + tf.trailing_newlines * font_height;
+        vec psize = get_layout_info().text_size(tf.text, 13 * get_layout_info().font_height()) /*get_layout_info().text_minimum_width(tf.text) * 5*/;
+
+        size.w = std::max(psize.w, size.w);
+        size.h += psize.h/*font_height * 5 + tf.trailing_newlines * font_height*/;
     }
     return vec{ font_height, font_height } + size;
 }

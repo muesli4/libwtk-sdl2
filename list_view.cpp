@@ -19,6 +19,9 @@ list_view::~list_view()
 {
 }
 
+int const INDICATOR_MIN_WIDTH = 7;
+int const INDICATOR_MIN_HEIGHT = 15;
+
 void list_view::on_draw(draw_context & dc, selection_context const & sc) const
 {
     dc.draw_entry_box(get_box());
@@ -56,8 +59,8 @@ void list_view::on_draw(draw_context & dc, selection_context const & sc) const
     // draw position indicator if it doesn't fit on one page
     if (_values.size() > static_cast<std::size_t>(visible_entries))
     {
-        int const ind_len = std::max(15, static_cast<int>(((get_box().h - 2) * visible_entries) / _values.size()));
-        int const ind_w = 7;
+        int const ind_len = std::max(INDICATOR_MIN_HEIGHT, static_cast<int>(((get_box().h - 2) * visible_entries) / _values.size()));
+        int const ind_w = INDICATOR_MIN_WIDTH;
 
         int const ind_y = get_box().y + 1 + ((get_box().h - 2 - ind_len) * _position) / (_values.size() - visible_entries);
         SDL_Rect ind_rect { get_box().x + get_box().w - ind_w - 1, ind_y, ind_w, ind_len};
@@ -145,7 +148,10 @@ void list_view::apply_layout_to_children()
 
 vec list_view::min_size_hint() const
 {
-    return { 3 + 2 * get_layout_info().font_line_skip(), 0 };
+    int const line_height = get_layout_info().font_line_skip();
+    int const min_width = INDICATOR_MIN_WIDTH + 4 + 2 * line_height;
+    int const min_height = std::max(2 * INDICATOR_MIN_HEIGHT, 2 * line_height);
+    return { min_width, min_height };
 }
 
 void list_view::set_position(std::size_t position)

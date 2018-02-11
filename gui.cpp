@@ -68,7 +68,7 @@ void event_loop(SDL_Window * window)
 
     padding main_widget(20, hbox(
         { { true, vbox({ { true, lv }, { false, nb_indicator }, { true, nb }, { false, nb_controls } }, 20, false) }
-        , { true, cw() }
+        , { false, cw() }
         , { false, vbox( { { false, num_button() }
                          , { false, cw() }
                          , { false, std::make_shared<label>("This text should hopefully produce a linebreak. Otherwise something is not working correctly.\n\nYou may use Tab and Shift+Tab to focus widgets or use Shift and the corresponding arrow key for a 2-dimensional direction.") }
