@@ -15,12 +15,12 @@ widget_context::widget_context(SDL_Window * window, font f, widget & main_widget
 
 widget_context::widget_context(SDL_Window * window, SDL_Rect box, font f, widget & main_widget)
     : _box(box)
-    , _fa(f.path, f.size)
-    , _dc(window, _fa)
+    , _fwc(f.path, f.size)
+    , _dc(window, _fwc)
     , _sc(box)
-    , _sd(_fa.font_line_skip(), 0.3)
+    , _sd(_fwc.font_line_skip(), 0.3)
     , _main_widget(main_widget)
-    , _layout_info(_fa)
+    , _layout_info(_fwc)
 {
     std::vector<widget *> stack { &main_widget };
     do

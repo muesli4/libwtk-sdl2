@@ -2,8 +2,8 @@
 
 #include "sdl_util.hpp"
 
-draw_context::draw_context(SDL_Window * w, font_atlas & fa)
-    : _fa(fa)
+draw_context::draw_context(SDL_Window * w, font_word_cache & fwc)
+    : _fwc(fwc)
 {
     // sometimes a renderer is already associated with the window
     _renderer = SDL_GetRenderer(w);
@@ -48,7 +48,7 @@ void draw_context::draw_button_box(SDL_Rect box, bool activated, bool selected)
 
 void draw_context::draw_button_text(std::string const & text, SDL_Rect abs_rect)
 {
-    auto text_surf_ptr = _fa.text(text);
+    auto text_surf_ptr = _fwc.text(text);
     SDL_SetSurfaceColorMod(text_surf_ptr.get(), _theme.button_fg_color.r, _theme.button_fg_color.g, _theme.button_fg_color.b);
 
     // center text in abs_rect
@@ -72,7 +72,7 @@ void draw_context::draw_entry_text(std::string text, SDL_Rect abs_rect, int text
 
     if (clipped_width >= 0 && clipped_height >= 0)
     {
-        auto text_surf_ptr = _fa.text(text);
+        auto text_surf_ptr = _fwc.text(text);
 
         int const avail_width = text_surf_ptr->w - texture_x_offset;
         int const avail_height = text_surf_ptr->h - texture_y_offset;
@@ -91,7 +91,7 @@ void draw_context::draw_entry_text(std::string text, SDL_Rect abs_rect, int text
 
 int draw_context::draw_label_text(SDL_Rect box, std::string text)
 {
-    auto text_surf_ptr = _fa.text(text, box.w);
+    auto text_surf_ptr = _fwc.text(text, box.w);
     SDL_SetSurfaceColorMod(text_surf_ptr.get(), 255, 255, 255);
 
     int width = std::min(box.w, text_surf_ptr->w);

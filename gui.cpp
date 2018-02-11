@@ -24,16 +24,12 @@
 #include <exception>
 #include <optional>
 
-#include "font_atlas.hpp"
-#include "draw_context.hpp"
-#include "selection_context.hpp"
 #include "widget.hpp"
 #include "button.hpp"
 #include "padding.hpp"
 #include "color_widget.hpp"
 #include "box.hpp"
 #include "swipe_area.hpp"
-#include "swipe_detector.hpp"
 #include "list_view.hpp"
 #include "notebook.hpp"
 #include "label.hpp"

@@ -6,7 +6,7 @@
 #include <SDL2/SDL_rect.h>
 #include <SDL2/SDL_events.h>
 
-#include "font_atlas.hpp"
+#include "font_word_cache.hpp"
 #include "draw_context.hpp"
 #include "selection_context.hpp"
 #include "swipe_detector.hpp"
@@ -42,7 +42,7 @@ struct widget_context
     void set_layout_info(widget *);
 
     SDL_Rect _box;
-    font_atlas _fa;
+    font_word_cache _fwc;
     draw_context _dc;
     selection_context _sc;
     swipe_detector _sd;

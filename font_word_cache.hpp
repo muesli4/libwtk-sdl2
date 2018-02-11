@@ -1,5 +1,5 @@
-#ifndef FONT_ATLAS_HPP
-#define FONT_ATLAS_HPP
+#ifndef FONT_WORD_CACHE_HPP
+#define FONT_WORD_CACHE_HPP
 
 #include <stdexcept>
 #include <unordered_map>
@@ -14,10 +14,15 @@ struct font_not_found : std::runtime_error
     font_not_found(std::string);
 };
 
-struct font_atlas
+struct font_render_error : std::runtime_error
 {
-    font_atlas(std::string font_path, int ptsize);
-    ~font_atlas();
+    font_render_error(std::string);
+};
+
+struct font_word_cache
+{
+    font_word_cache(std::string font_path, int ptsize);
+    ~font_word_cache();
 
     // TODO use a texture instead of the surface (although clearing it will be a bit more expensive)
     // render a text with an optional width specification

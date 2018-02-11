@@ -1,7 +1,7 @@
 #include <vector>
 #include <algorithm>
 
-#include "font_atlas.hpp"
+#include "font_word_cache.hpp"
 #include "util.hpp"
 #include "sdl_util.hpp"
 
@@ -10,7 +10,12 @@ font_not_found::font_not_found(std::string msg)
 {
 }
 
-font_atlas::font_atlas(std::string font_path, int ptsize)
+font_render_error::font_render_error(std::string msg)
+    : std::runtime_error("failed to render font: " + msg)
+{
+}
+
+font_word_cache::font_word_cache(std::string font_path, int ptsize)
 {
     // load font and generate glyphs
     _font = TTF_OpenFont(font_path.c_str(), ptsize);
@@ -22,7 +27,7 @@ font_atlas::font_atlas(std::string font_path, int ptsize)
     TTF_GlyphMetrics(_font, ' ', &_space_minx, nullptr, nullptr, nullptr, &_space_advance);
 }
 
-font_atlas::~font_atlas()
+font_word_cache::~font_word_cache()
 {
     TTF_CloseFont(_font);
 
@@ -91,12 +96,12 @@ uint32_t get_first_ucs4(std::string s)
     return utf8_to_ucs4(d);
 }
 
-int font_atlas::get_word_left_kerning(std::string const & word)
+int font_word_cache::get_word_left_kerning(std::string const & word)
 {
     return TTF_GetFontKerningSizeGlyphs(_font, get_last_ucs4(word), ' ');
 }
 
-int font_atlas::get_word_right_kerning(std::string const & word)
+int font_word_cache::get_word_right_kerning(std::string const & word)
 {
     return TTF_GetFontKerningSizeGlyphs(_font, ' ', get_first_ucs4(word));
 }
@@ -126,7 +131,7 @@ std::vector<std::string> split_words(std::string t)
     return words;
 }
 
-std::unique_ptr<SDL_Surface, void(*)(SDL_Surface *)> font_atlas::text(std::string t, int max_line_width)
+std::unique_ptr<SDL_Surface, void(*)(SDL_Surface *)> font_word_cache::text(std::string t, int max_line_width)
 {
     SDL_Surface * result = nullptr;
 
@@ -213,7 +218,7 @@ std::unique_ptr<SDL_Surface, void(*)(SDL_Surface *)> font_atlas::text(std::strin
     return std::unique_ptr<SDL_Surface, void(*)(SDL_Surface*)>(result, [](SDL_Surface * s){ SDL_FreeSurface(s); });
 }
 
-vec font_atlas::text_size(std::string t, int max_line_width)
+vec font_word_cache::text_size(std::string t, int max_line_width)
 {
     if (max_line_width == -1)
     {
@@ -281,7 +286,7 @@ vec font_atlas::text_size(std::string t, int max_line_width)
     }
 }
 
-int font_atlas::text_minimum_width(std::string t)
+int font_word_cache::text_minimum_width(std::string t)
 {
     int max_width = 0;
     auto words = split_words(t);
@@ -296,7 +301,7 @@ int font_atlas::text_minimum_width(std::string t)
     return max_width;
 }
 
-SDL_Surface * font_atlas::word(std::string w)
+SDL_Surface * font_word_cache::word(std::string w)
 {
     // FIXME: temporary solution - do not use too much memory, although with words caching it's not as bad as before
     // TODO add use count? would it cause ui lag?
@@ -306,7 +311,12 @@ SDL_Surface * font_atlas::word(std::string w)
     auto it = _prerendered.find(w);
     if (it == _prerendered.end())
     {
-        return _prerendered[w] = TTF_RenderUTF8_Blended(_font, w.c_str(), {255, 255, 255});
+        SDL_Surface * s = TTF_RenderUTF8_Blended(_font, w.c_str(), {255, 255, 255});
+
+        if (s == nullptr)
+            throw font_render_error(TTF_GetError());
+
+        return _prerendered[w] = s;
     }
     else
     {
@@ -314,17 +324,17 @@ SDL_Surface * font_atlas::word(std::string w)
     }
 }
 
-unsigned int font_atlas::font_height() const
+unsigned int font_word_cache::font_height() const
 {
     return TTF_FontHeight(const_cast<TTF_Font *>(_font));
 }
 
-int font_atlas::font_line_skip() const
+int font_word_cache::font_line_skip() const
 {
     return TTF_FontLineSkip(const_cast<TTF_Font *>(_font));
 }
 
-void font_atlas::clear()
+void font_word_cache::clear()
 {
     for (auto p : _prerendered)
         SDL_FreeSurface(p.second);

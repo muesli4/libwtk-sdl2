@@ -6,7 +6,7 @@
 #include <SDL2/SDL_surface.h>
 #include <SDL2/SDL_render.h>
 
-#include "font_atlas.hpp"
+#include "font_word_cache.hpp"
 
 // TODO replace rendering with a virtual interface that might as well blit images
 struct color_theme
@@ -129,12 +129,12 @@ struct default_theme : theme
 struct draw_context
 {
     // draw to a window exclusively
-    draw_context(SDL_Window * w, font_atlas & fa);
+    draw_context(SDL_Window * w, font_word_cache & fwc);
     // draw to a render target exclusively
-    //draw_context(SDL_Renderer * r, font_atlas & fa);
+    //draw_context(SDL_Renderer * r, font_word_cache & fwc);
 
-    //draw_context(SDL_Window * w, SDL_Rect clip_box, font_atlas & fa);
-    //draw_context(SDL_Renderer * r, SDL_Rect clip_box, font_atlas & fa);
+    //draw_context(SDL_Window * w, SDL_Rect clip_box, font_word_cache & fwc);
+    //draw_context(SDL_Renderer * r, SDL_Rect clip_box, font_word_cache & fwc);
 
     //void apply_widget_layout(widget & main_widget);
 
@@ -168,7 +168,7 @@ struct draw_context
 
     SDL_Renderer * _renderer;
 
-    font_atlas & _fa;
+    font_word_cache & _fwc;
 
     //SDL_Rect _clip_box;
 
