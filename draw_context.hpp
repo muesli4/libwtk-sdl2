@@ -129,7 +129,7 @@ struct default_theme : theme
 struct draw_context
 {
     // draw to a window exclusively
-    draw_context(SDL_Window * w, font_word_cache & fwc);
+    draw_context(SDL_Renderer * renderer, font_word_cache & fwc);
     // draw to a render target exclusively
     //draw_context(SDL_Renderer * r, font_word_cache & fwc);
 
@@ -163,6 +163,7 @@ struct draw_context
     void draw_rect_filled(SDL_Rect r);
     void draw_rect(SDL_Rect r);
     void blit(SDL_Surface * s, const SDL_Rect * srcrect, const SDL_Rect * dstrect);
+    void run_copy_commands(std::vector<copy_command> const & commands, SDL_Rect box, SDL_Color color);
 
     private:
 

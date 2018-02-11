@@ -13,10 +13,23 @@ widget_context::widget_context(SDL_Window * window, font f, widget & main_widget
 {
 }
 
+SDL_Renderer * renderer_from_window(SDL_Window * window)
+{
+    // sometimes a renderer is already associated with the window
+    SDL_Renderer * renderer = SDL_GetRenderer(window);
+
+    if (renderer == nullptr)
+        renderer = SDL_CreateRenderer(window, -1, 0);
+    if (renderer == nullptr)
+        throw std::runtime_error("Failed to create renderer: " + std::string(SDL_GetError()));
+    return renderer;
+}
+
 widget_context::widget_context(SDL_Window * window, SDL_Rect box, font f, widget & main_widget)
     : _box(box)
-    , _fwc(f.path, f.size)
-    , _dc(window, _fwc)
+    , _renderer(renderer_from_window(window))
+    , _fwc(_renderer, f.path, f.size)
+    , _dc(_renderer, _fwc)
     , _sc(box)
     , _sd(_fwc.font_line_skip(), 0.3)
     , _main_widget(main_widget)

@@ -4,6 +4,8 @@
 #include <stdexcept>
 #include <unordered_map>
 #include <memory>
+#include <vector>
+#include <tuple>
 
 #include <SDL2/SDL_ttf.h>
 
@@ -19,14 +21,22 @@ struct font_render_error : std::runtime_error
     font_render_error(std::string);
 };
 
+struct copy_command
+{
+    SDL_Texture * texture;
+    int x_offset;
+    int y_offset;
+};
+
 struct font_word_cache
 {
-    font_word_cache(std::string font_path, int ptsize);
+    font_word_cache(SDL_Renderer * renderer, std::string font_path, int ptsize);
     ~font_word_cache();
 
     // TODO use a texture instead of the surface (although clearing it will be a bit more expensive)
     // render a text with an optional width specification
-    std::unique_ptr<SDL_Surface, void(*)(SDL_Surface *)> text(std::string t, int max_line_width = -1);
+
+    std::tuple<vec, std::vector<copy_command>> text(std::string t, int max_line_width = -1); // TODO add offset parameter
 
     vec text_size(std::string t, int max_line_width = -1);
     int text_minimum_width(std::string t);
@@ -42,12 +52,14 @@ struct font_word_cache
     int get_word_left_kerning(std::string const & word);
     int get_word_right_kerning(std::string const & word);
 
-    SDL_Surface * word(std::string);
+    SDL_Texture * word(std::string);
 
-    std::unordered_map<std::string, SDL_Surface *> _prerendered;
+    SDL_Renderer * _renderer;
+    std::unordered_map<std::string, SDL_Texture *> _prerendered;
     TTF_Font * _font;
     int _space_advance;
     int _space_minx;
+
 };
 
 #endif

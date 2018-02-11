@@ -42,6 +42,7 @@ struct widget_context
     void set_layout_info(widget *);
 
     SDL_Rect _box;
+    SDL_Renderer * _renderer;
     font_word_cache _fwc;
     draw_context _dc;
     selection_context _sc;

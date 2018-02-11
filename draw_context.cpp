@@ -2,16 +2,10 @@
 
 #include "sdl_util.hpp"
 
-draw_context::draw_context(SDL_Window * w, font_word_cache & fwc)
-    : _fwc(fwc)
+draw_context::draw_context(SDL_Renderer * renderer, font_word_cache & fwc)
+    : _renderer(renderer)
+    , _fwc(fwc)
 {
-    // sometimes a renderer is already associated with the window
-    _renderer = SDL_GetRenderer(w);
-
-    if (_renderer == nullptr)
-        _renderer = SDL_CreateRenderer(w, -1, 0);
-    if (_renderer == nullptr)
-        throw std::runtime_error("Failed to create renderer: " + std::string(SDL_GetError()));
 }
 
 void draw_context::present()
@@ -46,15 +40,37 @@ void draw_context::draw_button_box(SDL_Rect box, bool activated, bool selected)
     SDL_RenderDrawRect(_renderer, &box);
 }
 
+void set_texture_color_mod(SDL_Texture * t, SDL_Color c)
+{
+    Uint8 r, g, b;
+    if (SDL_GetTextureColorMod(t, &r, &g, &b) < 0)
+        throw std::runtime_error(SDL_GetError());
+
+    if (r != c.r || g != c.g || b != c.b)
+        SDL_SetTextureColorMod(t, c.r, c.g, c.b);
+}
+
+void draw_context::run_copy_commands(std::vector<copy_command> const & commands, SDL_Rect box, SDL_Color color)
+{
+    for (auto const & c : commands)
+    {
+        set_texture_color_mod(c.texture, color);
+        vec size = texture_dim(c.texture);
+        SDL_Rect target { box.x + c.x_offset, box.y + c.y_offset, size.w, size.h };
+        SDL_RenderCopy(_renderer, c.texture, nullptr, &target);
+    }
+}
+
 void draw_context::draw_button_text(std::string const & text, SDL_Rect abs_rect)
 {
-    auto text_surf_ptr = _fwc.text(text);
-    SDL_SetSurfaceColorMod(text_surf_ptr.get(), _theme.button_fg_color.r, _theme.button_fg_color.g, _theme.button_fg_color.b);
+    auto result = _fwc.text(text);
+    vec const & size = std::get<0>(result);
 
     // center text in abs_rect
-    SDL_Rect target_rect = {abs_rect.x + (abs_rect.w - text_surf_ptr->w) / 2, abs_rect.y + (abs_rect.h - text_surf_ptr->h) / 2, text_surf_ptr->w, text_surf_ptr->h};
+    SDL_Rect target_rect { abs_rect.x + (abs_rect.w - size.w) / 2, abs_rect.y + (abs_rect.h - size.h) / 2, size.w, size.h };
 
-    blit(text_surf_ptr.get(), nullptr, &target_rect);
+    //blit(text_surf_ptr.get(), nullptr, &target_rect);
+    run_copy_commands(std::get<1>(result), target_rect, _theme.button_fg_color);
 }
 
 void draw_context::draw_entry_box(SDL_Rect box)
@@ -67,15 +83,17 @@ void draw_context::draw_entry_box(SDL_Rect box)
 
 void draw_context::draw_entry_text(std::string text, SDL_Rect abs_rect, int texture_x_offset, int texture_y_offset)
 {
+    // TODO rework
     int const clipped_width = abs_rect.w - texture_x_offset;
     int const clipped_height = abs_rect.h - texture_y_offset;
 
     if (clipped_width >= 0 && clipped_height >= 0)
     {
-        auto text_surf_ptr = _fwc.text(text);
+        auto result = _fwc.text(text);
+        vec const & size = std::get<0>(result);
 
-        int const avail_width = text_surf_ptr->w - texture_x_offset;
-        int const avail_height = text_surf_ptr->h - texture_y_offset;
+        int const avail_width = size.w - texture_x_offset;
+        int const avail_height = size.h - texture_y_offset;
 
         // don't overstep texture boundaries
         SDL_Rect source_rect { texture_x_offset, texture_y_offset, std::min(avail_width, clipped_width), std::min(avail_height, clipped_height) };
@@ -84,19 +102,20 @@ void draw_context::draw_entry_text(std::string text, SDL_Rect abs_rect, int text
         SDL_Rect target_rect { abs_rect.x, abs_rect.y, source_rect.w, source_rect.h };
 
         // TODO entry text color
-        SDL_SetSurfaceColorMod(text_surf_ptr.get(), 0, 0, 0);
-        blit(text_surf_ptr.get(), &source_rect, &target_rect);
+        //SDL_SetSurfaceColorMod(text_surf_ptr.get(), 0, 0, 0);
+        //blit(text_surf_ptr.get(), &source_rect, &target_rect);
+        run_copy_commands(std::get<1>(result), target_rect, { 0, 0, 0 });
     }
 }
 
 int draw_context::draw_label_text(SDL_Rect box, std::string text)
 {
-    auto text_surf_ptr = _fwc.text(text, box.w);
-    SDL_SetSurfaceColorMod(text_surf_ptr.get(), 255, 255, 255);
+    auto result = _fwc.text(text, box.w);
+    vec const & size = std::get<0>(result);
 
-    int width = std::min(box.w, text_surf_ptr->w);
-    int height = std::min(box.h, text_surf_ptr->h);
-    SDL_Rect source { 0, 0, width, height };
+    int width = std::min(box.w, size.w);
+    int height = std::min(box.h, size.h);
+    //SDL_Rect source { 0, 0, width, height };
     SDL_Rect target { box.x, box.y, width, height };
 
     // TODO fade effect when clipped?
@@ -104,8 +123,9 @@ int draw_context::draw_label_text(SDL_Rect box, std::string text)
     set_color({0, 0, 0});
     draw_rect_filled(box);
 
-    blit(text_surf_ptr.get(), &source, &target);
-    return height;
+    //blit(text_surf_ptr.get(), &source, &target);
+    run_copy_commands(std::get<1>(result), target, { 255, 255, 255});
+    return size.h;
 }
 
 void draw_context::draw_background(SDL_Rect box)

@@ -5,6 +5,8 @@
 #include <SDL2/SDL_rect.h>
 #include <SDL2/SDL_surface.h>
 
+#include "geometry.hpp"
+
 struct surface_deleter
 {
     void operator()(SDL_Surface * s);
@@ -22,4 +24,6 @@ SDL_Surface * create_surface(SDL_PixelFormat const * pf, int width, int height);
 
 // blit a surface to another surface while preserving aspect ratio
 void blit_preserve_ar(SDL_Surface * source, SDL_Surface * dest, SDL_Rect const * destrect);
+
+vec texture_dim(SDL_Texture * tex);
 

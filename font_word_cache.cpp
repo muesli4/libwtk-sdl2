@@ -1,4 +1,3 @@
-#include <vector>
 #include <algorithm>
 
 #include "font_word_cache.hpp"
@@ -15,7 +14,8 @@ font_render_error::font_render_error(std::string msg)
 {
 }
 
-font_word_cache::font_word_cache(std::string font_path, int ptsize)
+font_word_cache::font_word_cache(SDL_Renderer * renderer, std::string font_path, int ptsize)
+    : _renderer(renderer)
 {
     // load font and generate glyphs
     _font = TTF_OpenFont(font_path.c_str(), ptsize);
@@ -131,31 +131,33 @@ std::vector<std::string> split_words(std::string t)
     return words;
 }
 
-std::unique_ptr<SDL_Surface, void(*)(SDL_Surface *)> font_word_cache::text(std::string t, int max_line_width)
+std::tuple<vec, std::vector<copy_command>> font_word_cache::text(std::string t, int max_line_width)
 {
-    SDL_Surface * result = nullptr;
+    std::vector<copy_command> copy_commands;
 
+    vec target_size { 0, 0 };
+    
     if (!t.empty())
     {
         auto words = split_words(t);
 
-        std::vector<SDL_Surface *> surfaces;
+        std::vector<SDL_Texture *> textures;
 
-        // render or load cached word surfaces
+        // render or load cached word textures
         for (auto const & w : words)
         {
-            SDL_Surface * s = word(w);
-            surfaces.push_back(s);
+            SDL_Texture * t = word(w);
+            textures.push_back(t);
         }
-        if (!surfaces.empty())
+        if (!textures.empty())
         {
-            std::vector<int> widths{surfaces[0]->w};
-            std::vector<std::vector<int>> spaces_per_line{{0}};
+            std::vector<int> widths { texture_dim(textures[0]).w };
+            std::vector<std::vector<int>> spaces_per_line { { 0 } };
 
             // TODO check if surface width does exceed line width ?
-            std::vector<std::vector<SDL_Surface *>> surfaces_per_line{{surfaces[0]}};
+            std::vector<std::vector<SDL_Texture *>> textures_per_line { { textures[0] } };
 
-            // assertion: surfaces.size() == words.size()
+            // assertion: textures.size() == words.size()
             for (std::size_t n = 0; n + 1 < words.size(); n++)
             {
                 int & line_width = widths.back();
@@ -163,59 +165,47 @@ std::unique_ptr<SDL_Surface, void(*)(SDL_Surface *)> font_word_cache::text(std::
                 // use proper kerning and advance of space to connect words
                 int const join_width = get_word_left_kerning(words[n]) + _space_advance + get_word_right_kerning(words[n + 1]);
 
-                int const new_line_width = line_width + join_width + surfaces[n + 1]->w;
+                int const new_line_width = line_width + join_width + texture_dim(textures[n + 1]).w;
 
                 if (max_line_width == -1 || new_line_width < max_line_width)
                 {
-                    surfaces_per_line.back().push_back(surfaces[n + 1]);
+                    textures_per_line.back().push_back(textures[n + 1]);
                     spaces_per_line.back().push_back(join_width);
                     line_width = new_line_width;
                 }
                 else
                 {
                     // TODO check if surface width does exceed line width ?
-                    surfaces_per_line.push_back({surfaces[n + 1]});
+                    textures_per_line.push_back({textures[n + 1]});
                     spaces_per_line.push_back({0});
-                    widths.push_back(surfaces[n + 1]->w);
+                    widths.push_back(texture_dim(textures[n + 1]).w);
                 }
             }
 
-            int const target_width = *std::max_element(widths.begin(), widths.end());
-            int const target_height = font_line_skip() * static_cast<int>(widths.size());
-
-            // TODO move and use create_similar_surface
-            result = create_surface(surfaces[0]->format, target_width, target_height);
+            target_size.w = *std::max_element(widths.begin(), widths.end());
+            target_size.h = font_line_skip() * static_cast<int>(widths.size());
 
             int x = 0;
             int y = 0;
 
-            for (std::size_t n = 0; n < surfaces_per_line.size(); n++)
+            for (std::size_t n = 0; n < textures_per_line.size(); n++)
             {
                 // blit line
-                for (std::size_t m = 0; m < surfaces_per_line[n].size(); m++)
+                for (std::size_t m = 0; m < textures_per_line[n].size(); m++)
                 {
-                    SDL_Surface * s = surfaces_per_line[n][m];
-
-                    // use no alpha blending for source, completely overwrite the target, including alpha channel
-                    SDL_SetSurfaceBlendMode(s, SDL_BLENDMODE_NONE);
+                    SDL_Texture * t = textures_per_line[n][m];
 
                     x += spaces_per_line[n][m];
-                    SDL_Rect r {x, y, s->w, s->h};
-                    SDL_BlitSurface(s, nullptr, result, &r);
-                    x += s->w;
+                    copy_commands.push_back({ t, x, y });
+                    x += texture_dim(t).w;
                 }
                 x = 0;
                 y += font_line_skip();
             }
-
-            // use alpha blending supplied by the blitted surfaces' alpha channel
-            SDL_SetSurfaceBlendMode(result, SDL_BLENDMODE_BLEND);
         }
     }
 
-    if (result == nullptr)
-        result = SDL_CreateRGBSurfaceWithFormat(0, 0, font_height(), 32, SDL_PIXELFORMAT_RGBA32);
-    return std::unique_ptr<SDL_Surface, void(*)(SDL_Surface*)>(result, [](SDL_Surface * s){ SDL_FreeSurface(s); });
+    return std::make_tuple(target_size, copy_commands);
 }
 
 vec font_word_cache::text_size(std::string t, int max_line_width)
@@ -246,19 +236,21 @@ vec font_word_cache::text_size(std::string t, int max_line_width)
         int actual_max_width = 0;
         int lines = 1;
         int current_line_num_words = 1;
-        int current_line_width = word(words[0])->w;
+        int current_line_width = texture_dim(word(words[0])).w;
 
         for (std::size_t k = 0; k < words.size(); ++k)
         {
-            auto surf = word(words[k]);
+            auto word_tex = word(words[k]);
+            vec size = texture_dim(word_tex);
 
-            int const additional_width = surf->w + _space_advance;
+
+            int const additional_width = size.w + _space_advance;
 
             if (additional_width + current_line_width >= max_line_width)
             {
                 // Not enough space to fit it on the current line.
 
-                if (surf->w >= max_line_width)
+                if (size.w >= max_line_width)
                 {
                     // TODO word does not fit:
                     //      can return failure
@@ -268,7 +260,7 @@ vec font_word_cache::text_size(std::string t, int max_line_width)
                 else
                 {
                     actual_max_width = std::max(current_line_width, actual_max_width);
-                    current_line_width = surf->w;
+                    current_line_width = size.w;
                     current_line_num_words = 1;
                     lines += 1;
                 }
@@ -301,7 +293,7 @@ int font_word_cache::text_minimum_width(std::string t)
     return max_width;
 }
 
-SDL_Surface * font_word_cache::word(std::string w)
+SDL_Texture * font_word_cache::word(std::string w)
 {
     // FIXME: temporary solution - do not use too much memory, although with words caching it's not as bad as before
     // TODO add use count? would it cause ui lag?
@@ -311,12 +303,23 @@ SDL_Surface * font_word_cache::word(std::string w)
     auto it = _prerendered.find(w);
     if (it == _prerendered.end())
     {
+        // Render in white, then we can use the SDL_SetTextureColorMod to get
+        // any color.
         SDL_Surface * s = TTF_RenderUTF8_Blended(_font, w.c_str(), {255, 255, 255});
 
         if (s == nullptr)
             throw font_render_error(TTF_GetError());
 
-        return _prerendered[w] = s;
+        SDL_Texture * t = SDL_CreateTextureFromSurface(_renderer, s);
+
+        if (t == nullptr)
+            throw font_render_error(SDL_GetError());
+
+        // Use alpha blending to make use of the alpha channel.
+        if (SDL_SetTextureBlendMode(t, SDL_BLENDMODE_BLEND) < 0)
+            throw font_render_error(SDL_GetError());
+
+        return _prerendered[w] = t;
     }
     else
     {
@@ -337,7 +340,7 @@ int font_word_cache::font_line_skip() const
 void font_word_cache::clear()
 {
     for (auto p : _prerendered)
-        SDL_FreeSurface(p.second);
+        SDL_DestroyTexture(p.second);
     _prerendered.clear();
 }
 
