@@ -86,14 +86,14 @@ void box::apply_layout_to_children()
             }
 
             int const avail = std::max<int>(0, ((_o == orientation::HORIZONTAL ? get_box().w : get_box().h) - sum - (n - 1) * _children_spacing));
-            int const extra_width = avail / std::max(1, num_expand);
+            int const extra_width = avail / (num_expand == 0 ? n : num_expand);
             int offset = _o == orientation::HORIZONTAL ? get_box().x : get_box().y;
 
             for (std::size_t k = 0; k < n; k++)
             {
                 auto & c = _children[k];
 
-                int expand_width = c.expand ? extra_width : 0;
+                int expand_width = (c.expand || num_expand == 0) ? extra_width : 0;
 
                 if (_o == orientation::HORIZONTAL)
                 {
