@@ -33,10 +33,15 @@ struct font_word_cache
     font_word_cache(SDL_Renderer * renderer, std::string font_path, int ptsize);
     ~font_word_cache();
 
-    // TODO use a texture instead of the surface (although clearing it will be a bit more expensive)
-    // render a text with an optional width specification
-
-    std::tuple<vec, std::vector<copy_command>> text(std::string t, int max_line_width = -1); // TODO add offset parameter
+    // Renders words onto textures with a cache. A proper layout is then created
+    // to fit the textures on the given line width.
+    //
+    // The result is the required space and the commands necessary to copy it to
+    // a render target. Note that it is not guaranteed that the textures are
+    // still valid after another call only in between calls.
+    //
+    // TODO add offset parameter
+    std::tuple<vec, std::vector<copy_command>> text(std::string t, int max_line_width = -1);
 
     vec text_size(std::string t, int max_line_width = -1);
     int text_minimum_width(std::string t);

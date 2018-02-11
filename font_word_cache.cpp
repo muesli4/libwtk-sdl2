@@ -133,6 +133,11 @@ std::vector<std::string> split_words(std::string t)
 
 std::tuple<vec, std::vector<copy_command>> font_word_cache::text(std::string t, int max_line_width)
 {
+    // FIXME: temporary solution - do not use too much memory, although with words caching it's not as bad as before
+    // TODO add use count? would it cause ui lag?
+    if (_prerendered.size() > 40000)
+        clear();
+
     std::vector<copy_command> copy_commands;
 
     vec target_size { 0, 0 };
@@ -295,11 +300,6 @@ int font_word_cache::text_minimum_width(std::string t)
 
 SDL_Texture * font_word_cache::word(std::string w)
 {
-    // FIXME: temporary solution - do not use too much memory, although with words caching it's not as bad as before
-    // TODO add use count? would it cause ui lag?
-    if (_prerendered.size() > 40000)
-        clear();
-
     auto it = _prerendered.find(w);
     if (it == _prerendered.end())
     {
