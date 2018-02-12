@@ -3,7 +3,7 @@
 #opt:   CXXFLAGS += '-O2'
 
 headers = '-I../include/'
-flags = '-std=c++17' '-std=gnu++17' '-Wall' $(headers)
+flags = @AM_CXXFLAGS@ $(headers)
 
 lib_LTLIBRARIES = libwtk-sdl2.la
 
@@ -33,7 +33,7 @@ libwtk_sdl2_la_SOURCES = \
 	widget.cpp             \
 	widget_context.cpp
 
-libwtk_sdl2_la_CXXFLAGS = $(flags) $(sdl2_CFLAGS) $(SDL2_ttf_CFLAGS) $(headers)
+libwtk_sdl2_la_CXXFLAGS = $(flags) $(sdl2_CFLAGS) $(SDL2_ttf_CFLAGS)
 libwtk_sdl2_la_LIBADD = $(sdl2_LIBS) $(SDL2_ttf_LIBS)
 
 
