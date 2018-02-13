@@ -23,6 +23,7 @@ struct color_theme
         , entry_selected_bg_color{250, 200, 200}
         , bg_color{0, 0, 0}
         , active_color{230, 230, 255}
+        , hightlight_color{210, 210, 210}
     {}
 
     SDL_Color button_bg_color;
@@ -37,6 +38,8 @@ struct color_theme
 
     // displays the status of something, but not related to direct user interaction
     SDL_Color active_color;
+
+    SDL_Color hightlight_color;
 };
 
 /*
@@ -150,6 +153,7 @@ struct draw_context
     void draw_entry_text(std::string text, SDL_Rect abs_rect, int texture_x_offset = 0, int texture_y_offset = 0);
     void draw_entry_pressed_background(SDL_Rect box);
     void draw_entry_active_background(SDL_Rect box);
+    void draw_entry_hightlighted_background(SDL_Rect box);
     void draw_entry_position_indicator(SDL_Rect box);
 
     // Draws a string in the box and returns the actually used height within the

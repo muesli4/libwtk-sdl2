@@ -151,6 +151,12 @@ void draw_context::draw_entry_active_background(SDL_Rect box)
     SDL_RenderFillRect(_renderer, &box);
 }
 
+void draw_context::draw_entry_hightlighted_background(SDL_Rect box)
+{
+    set_color(_theme.hightlight_color);
+    SDL_RenderFillRect(_renderer, &box);
+}
+
 void draw_context::draw_entry_position_indicator(SDL_Rect box)
 {
     SDL_SetRenderDrawBlendMode(_renderer, SDL_BLENDMODE_BLEND);

@@ -45,6 +45,8 @@ void list_view::on_draw(draw_context & dc, selection_context const & sc) const
         // favor pressed over active
         if (_opt_pressed_point.has_value() && within_rect(_opt_pressed_point.value(), abs_rect))
             dc.draw_entry_pressed_background(abs_rect);
+        else if (_highlight_position == n)
+            dc.draw_entry_hightlighted_background(abs_rect);
         else if (sc.is_selected_widget(this) && _selected_position == n)
             dc.draw_entry_active_background(abs_rect);
 
