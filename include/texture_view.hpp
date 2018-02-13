@@ -22,6 +22,10 @@ struct texture_view : widget
 
     int height_for_width_hint(int width) const override;
 
+    // texture_view interface
+
+    void set_texture(unique_texture_ptr p, int min_width = 100);
+
     private:
 
     unique_texture_ptr _p;

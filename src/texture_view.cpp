@@ -37,3 +37,10 @@ int texture_view::height_for_width_hint(int width) const
     return _size.h * ratio;
 }
 
+void texture_view::set_texture(unique_texture_ptr p, int min_width)
+{
+    _p = std::move(p);
+    _size = texture_dim(_p.get());
+    _min_width = std::min(min_width, _size.w);
+    _target = { 0, 0, 0, 0 };
+}
