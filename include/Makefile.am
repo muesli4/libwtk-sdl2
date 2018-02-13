@@ -4,6 +4,7 @@ pkginclude_HEADERS =    \
 	button.hpp            \
 	color_widget.hpp      \
 	container.hpp         \
+	copy_command.hpp      \
 	draw_context.hpp      \
 	empty.hpp             \
 	font_word_cache.hpp   \
@@ -22,6 +23,7 @@ pkginclude_HEADERS =    \
 	swipe_detector.hpp    \
 	swipe_event.hpp       \
 	table.hpp             \
+	texture_view.hpp      \
 	util.hpp              \
 	widget.hpp            \
 	widget_context.hpp

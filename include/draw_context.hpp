@@ -7,6 +7,7 @@
 #include <SDL2/SDL_render.h>
 
 #include "font_word_cache.hpp"
+#include "copy_command.hpp"
 
 // TODO replace rendering with a virtual interface that might as well blit images
 struct color_theme
@@ -164,6 +165,8 @@ struct draw_context
     void draw_rect(SDL_Rect r);
     void blit(SDL_Surface * s, const SDL_Rect * srcrect, const SDL_Rect * dstrect);
     void run_copy_commands(std::vector<copy_command> const & commands, SDL_Rect box, SDL_Color color);
+    void copy_texture(SDL_Texture * t, SDL_Rect src, SDL_Rect dst);
+    void copy_texture(SDL_Texture * t, SDL_Rect dst);
 
     private:
 

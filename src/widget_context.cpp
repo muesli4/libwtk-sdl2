@@ -1,33 +1,15 @@
 #include "widget_context.hpp"
 #include "widget.hpp"
+#include "sdl_util.hpp"
 
-SDL_Rect box_from_window(SDL_Window * w)
-{
-    SDL_Rect result { .x = 0, .y = 0 };
-    SDL_GetWindowSize(w, &result.w, &result.h);
-    return result;
-}
-
-widget_context::widget_context(SDL_Window * window, font f, widget & main_widget)
-    : widget_context(window, box_from_window(window), f, main_widget)
+widget_context::widget_context(SDL_Renderer * renderer, font f, widget & main_widget)
+    : widget_context(renderer, f, main_widget, box_from_renderer(renderer))
 {
 }
 
-SDL_Renderer * renderer_from_window(SDL_Window * window)
-{
-    // sometimes a renderer is already associated with the window
-    SDL_Renderer * renderer = SDL_GetRenderer(window);
-
-    if (renderer == nullptr)
-        renderer = SDL_CreateRenderer(window, -1, 0);
-    if (renderer == nullptr)
-        throw std::runtime_error("Failed to create renderer: " + std::string(SDL_GetError()));
-    return renderer;
-}
-
-widget_context::widget_context(SDL_Window * window, SDL_Rect box, font f, widget & main_widget)
+widget_context::widget_context(SDL_Renderer * renderer, font f, widget & main_widget, SDL_Rect box)
     : _box(box)
-    , _renderer(renderer_from_window(window))
+    , _renderer(renderer)
     , _fwc(_renderer, f.path, f.size)
     , _dc(_renderer, _fwc)
     , _sc(box)

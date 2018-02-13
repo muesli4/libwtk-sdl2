@@ -61,6 +61,16 @@ void draw_context::run_copy_commands(std::vector<copy_command> const & commands,
     }
 }
 
+void draw_context::copy_texture(SDL_Texture * t, SDL_Rect src, SDL_Rect dst)
+{
+    SDL_RenderCopy(_renderer, t, &src, &dst);
+}
+
+void draw_context::copy_texture(SDL_Texture * t, SDL_Rect dst)
+{
+    SDL_RenderCopy(_renderer, t, nullptr, &dst);
+}
+
 void draw_context::draw_button_text(std::string const & text, SDL_Rect abs_rect)
 {
     auto result = _fwc.text(text);
@@ -101,9 +111,6 @@ void draw_context::draw_entry_text(std::string text, SDL_Rect abs_rect, int text
         // avoid automatic stretch of blitting
         SDL_Rect target_rect { abs_rect.x, abs_rect.y, source_rect.w, source_rect.h };
 
-        // TODO entry text color
-        //SDL_SetSurfaceColorMod(text_surf_ptr.get(), 0, 0, 0);
-        //blit(text_surf_ptr.get(), &source_rect, &target_rect);
         run_copy_commands(std::get<1>(result), target_rect, { 0, 0, 0 });
     }
 }
@@ -115,7 +122,6 @@ int draw_context::draw_label_text(SDL_Rect box, std::string text)
 
     int width = std::min(box.w, size.w);
     int height = std::min(box.h, size.h);
-    //SDL_Rect source { 0, 0, width, height };
     SDL_Rect target { box.x, box.y, width, height };
 
     // TODO fade effect when clipped?
@@ -123,7 +129,6 @@ int draw_context::draw_label_text(SDL_Rect box, std::string text)
     set_color({0, 0, 0});
     draw_rect_filled(box);
 
-    //blit(text_surf_ptr.get(), &source, &target);
     run_copy_commands(std::get<1>(result), target, { 255, 255, 255});
     return size.h;
 }

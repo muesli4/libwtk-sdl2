@@ -43,7 +43,9 @@
 #include "label.hpp"
 #include "empty.hpp"
 #include "table.hpp"
+#include "texture_view.hpp"
 #include "widget_context.hpp"
+#include "sdl_util.hpp"
 
 widget_ptr cw()
 {
@@ -58,8 +60,9 @@ widget_ptr num_button()
     return std::make_shared<button>(std::string("Button #") + std::to_string(n), [=](){ std::cout << "click" << n << std::endl; });
 }
 
-void event_loop(SDL_Window * window)
+void event_loop(SDL_Renderer * renderer)
 {
+
     std::vector<std::string> test_values{"a", "b", "c", "d", "testwdfkosadjflkajskdfjlaskdjflkasdjdfklajsdlkfjasldkdfjflkasddjflkdsjlfkjdsalkkfjdkk", "test1", "test2", "a very long string this is indeed", "foo", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a"};
 
     auto nb = std::make_shared<notebook>(std::vector<widget_ptr>
@@ -75,9 +78,9 @@ void event_loop(SDL_Window * window)
     auto lv = std::make_shared<list_view>(0, 2, 4, test_values, [](){ std::cout << "press list_view" << std::endl; });
 
     padding main_widget(20, hbox(
-        { { false, vbox({ { true, lv }, { false, nb_indicator }, { true, nb }, { false, nb_controls } }, 20, false) }
-        , { false, cw() }
-        , { false, vbox( { { false, num_button() }
+        { { true, vbox({ { true, lv }, { false, nb_indicator }, { true, nb }, { false, nb_controls } }, 20, false) }
+        , { false, vbox({ { true, cw() }, { false, std::make_shared<texture_view>(load_texture_from_image(renderer, "/home/moritz/Bilder/PASBTNMagicalSentry.png")) }, { true, cw() } }, 20, false) }
+        , { true, vbox( { { false, num_button() }
                          , { false, cw() }
                          , { false, std::make_shared<label>("This text should hopefully produce a linebreak. Otherwise something is not working correctly.\n\nYou may use Tab and Shift+Tab to focus widgets or use Shift and the corresponding arrow key for a 2-dimensional direction.") }
                          , { true, std::make_shared<table, vec, std::vector<table::entry>>({ 4, 4 },
@@ -103,7 +106,7 @@ void event_loop(SDL_Window * window)
 
 
     // setup necessary context (as in local to a window or other unit of management)
-    widget_context ctx(window, { "/usr/share/fonts/TTF/DejaVuSans.ttf", 15 }, main_widget);
+    widget_context ctx(renderer, { "/usr/share/fonts/TTF/DejaVuSans.ttf", 15 }, main_widget);
 
     // draw initial state
     ctx.draw();
@@ -157,7 +160,7 @@ int main()
     else
     {
         SDL_SetWindowResizable(window, SDL_TRUE);
-        event_loop(window);
+        event_loop(renderer_from_window(window));
     }
 
     SDL_DestroyWindow(window);

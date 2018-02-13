@@ -29,16 +29,17 @@ libwtk_sdl2_la_SOURCES = \
 	swipe_area.cpp         \
 	swipe_detector.cpp     \
 	table.cpp              \
+	texture_view.cpp       \
 	util.cpp               \
 	widget.cpp             \
 	widget_context.cpp
 
-libwtk_sdl2_la_CXXFLAGS = $(flags) $(sdl2_CFLAGS) $(SDL2_ttf_CFLAGS)
-libwtk_sdl2_la_LIBADD = $(sdl2_LIBS) $(SDL2_ttf_LIBS)
+libwtk_sdl2_la_CXXFLAGS = $(flags) $(sdl2_CFLAGS) $(SDL2_ttf_CFLAGS) $(SDL2_image_CFLAGS)
+libwtk_sdl2_la_LIBADD = $(sdl2_LIBS) $(SDL2_ttf_LIBS) $(SDL2_image_LIBS)
 
 
 bin_PROGRAMS = libwtk-sdl2-test
 libwtk_sdl2_test_SOURCES = gui.cpp
-libwtk_sdl2_test_LDADD = libwtk-sdl2.la
+libwtk_sdl2_test_LDADD = libwtk-sdl2.la $(SDL2_image_LIBS)
 libwtk_sdl2_test_CXXFLAGS = $(flags)
 

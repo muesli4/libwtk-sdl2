@@ -24,8 +24,8 @@ struct font
 struct widget_context
 {
 
-    widget_context(SDL_Window * window, font f, widget & main_widget);
-    widget_context(SDL_Window * window, SDL_Rect box, font f, widget & main_widget);
+    widget_context(SDL_Renderer * renderer, font f, widget & main_widget);
+    widget_context(SDL_Renderer * renderer, font f, widget & main_widget, SDL_Rect box);
 
     void process_event(SDL_Event & ev);
 

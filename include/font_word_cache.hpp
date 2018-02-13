@@ -10,6 +10,7 @@
 #include <SDL2/SDL_ttf.h>
 
 #include "geometry.hpp"
+#include "copy_command.hpp"
 
 struct font_not_found : std::runtime_error
 {
@@ -19,13 +20,6 @@ struct font_not_found : std::runtime_error
 struct font_render_error : std::runtime_error
 {
     font_render_error(std::string);
-};
-
-struct copy_command
-{
-    SDL_Texture * texture;
-    int x_offset;
-    int y_offset;
 };
 
 struct font_word_cache
