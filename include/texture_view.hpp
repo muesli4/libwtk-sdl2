@@ -1,5 +1,5 @@
-#ifndef IMAGE_VIEW_CPP
-#define IMAGE_VIEW_HPP
+#ifndef TEXTURE_VIEW_HPP
+#define TEXTURE_VIEW_HPP
 
 #include <string>
 
