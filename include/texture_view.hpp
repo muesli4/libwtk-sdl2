@@ -12,6 +12,7 @@
 // takes ownership of the texture.
 struct texture_view : widget
 {
+    texture_view();
     texture_view(unique_texture_ptr p, int min_width = 100); //texture_dim(p.get()).w / 2);
     ~texture_view() override;
 
