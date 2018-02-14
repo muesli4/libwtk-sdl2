@@ -11,7 +11,7 @@
 struct list_view : selectable
 {
 
-    list_view(std::vector<std::string> const & values, std::size_t position, std::function<void()> activate_callback);
+    list_view(std::vector<std::string> const & values, std::size_t position, std::function<void(std::size_t)> activate_callback);
     ~list_view() override;
 
     void on_draw(draw_context & dc, selection_context const & sc) const override;
@@ -53,7 +53,7 @@ struct list_view : selectable
     // TODO more columns and other types
     std::reference_wrapper<std::vector<std::string> const> _values;
 
-    std::function<void()> _activate_callback;
+    std::function<void(std::size_t)> _activate_callback;
 
     int _row_height;
     int _visible_entries;

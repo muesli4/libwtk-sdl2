@@ -3,7 +3,7 @@
 #include <iostream>
 
 // TODO do bounds checking on positions
-list_view::list_view(std::vector<std::string> const & values, std::size_t position, std::function<void()> activate_callback)
+list_view::list_view(std::vector<std::string> const & values, std::size_t position, std::function<void(std::size_t)> activate_callback)
     : _opt_pressed_point{}
     , _position(position)
     , _selected_position(values.size())
@@ -136,7 +136,7 @@ void list_view::on_key_event(key_event const & e)
 
 void list_view::on_activate()
 {
-    _activate_callback();
+    _activate_callback(_selected_position);
 }
 
 void list_view::apply_layout_to_children()
