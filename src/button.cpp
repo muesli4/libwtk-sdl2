@@ -60,3 +60,10 @@ vec button::min_size_hint() const
 button::~button()
 {
 }
+
+void button::set_label(std::string text)
+{
+    _text = text;
+    mark_dirty();
+}
+

@@ -17,6 +17,10 @@ struct button : selectable
     vec min_size_hint() const override;
     ~button() override;
 
+    // button interface
+
+    void set_label(std::string text);
+
     private:
 
     bool _pressed;
