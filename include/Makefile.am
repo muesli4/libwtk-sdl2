@@ -6,6 +6,7 @@ pkginclude_HEADERS =    \
 	container.hpp         \
 	copy_command.hpp      \
 	draw_context.hpp      \
+	embedded_widget.hpp   \
 	empty.hpp             \
 	font_word_cache.hpp   \
 	geometry.hpp          \
