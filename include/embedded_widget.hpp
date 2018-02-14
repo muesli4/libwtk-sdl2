@@ -23,6 +23,7 @@ struct embedded_widget : widget
     embedded_widget(Args... args)
         : _embedded_widget(args...)
     {
+        _embedded_widget.set_parent(this);
     }
 
     ~embedded_widget() override {}
