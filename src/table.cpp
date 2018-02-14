@@ -3,13 +3,13 @@
 #include <algorithm>
 #include <numeric>
 
-table::table(vec size, std::vector<entry> entries)
+table::table(vec size, std::vector<entry> entries, int spacing)
     : _entries(entries)
     , _size(size)
     , _grid(size.w, std::vector<int>(size.h, -1))
-    , _spacing(20) // TODO
-    , _x_offsets(size.h + 1, 0)
-    , _y_offsets(size.w + 1, 0)
+    , _spacing(spacing)
+    , _x_offsets(size.w + 1, 0)
+    , _y_offsets(size.h + 1, 0)
 {
     init_children();
 

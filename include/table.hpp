@@ -13,7 +13,7 @@ struct table : container
         widget_ptr wptr;
     };
 
-    table(vec size, std::vector<entry> entries);
+    table(vec size, std::vector<entry> entries, int padding);
     ~table() override;
 
     std::vector<widget *> get_children() override;
