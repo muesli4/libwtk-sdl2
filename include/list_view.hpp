@@ -7,9 +7,11 @@
 
 #include "selectable.hpp"
 
+// TODO change to vector_view ?
 struct list_view : selectable
 {
-    list_view(std::size_t position, std::size_t selected_position, std::size_t highlight_position, std::vector<std::string> const & values, std::function<void()> activate_callback);
+
+    list_view(std::vector<std::string> const & values, std::size_t position, std::function<void()> activate_callback);
     ~list_view() override;
 
     void on_draw(draw_context & dc, selection_context const & sc) const override;
@@ -24,7 +26,9 @@ struct list_view : selectable
 
     // list_view interface
 
+    // Set the position of the first entry to be shown.
     void set_position(std::size_t position);
+    void set_list(std::vector<std::string> const & values, std::size_t position = 0);
 
     private:
 
@@ -39,7 +43,7 @@ struct list_view : selectable
     std::size_t _x_shift;
 
     // TODO more columns and other types
-    std::vector<std::string> const & _values;
+    std::reference_wrapper<std::vector<std::string> const> _values;
 
     std::function<void()> _activate_callback;
 

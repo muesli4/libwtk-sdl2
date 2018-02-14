@@ -3,11 +3,11 @@
 #include <iostream>
 
 // TODO do bounds checking on positions
-list_view::list_view(std::size_t position, std::size_t selected_position, std::size_t highlight_position, std::vector<std::string> const & values, std::function<void()> activate_callback)
+list_view::list_view(std::vector<std::string> const & values, std::size_t position, std::function<void()> activate_callback)
     : _opt_pressed_point{}
     , _position(position)
-    , _selected_position(selected_position)
-    , _highlight_position(highlight_position)
+    , _selected_position(values.size())
+    , _highlight_position(values.size())
     , _x_shift(0)
     , _values(values)
     , _activate_callback(activate_callback)
@@ -35,7 +35,7 @@ void list_view::on_draw(draw_context & dc, selection_context const & sc) const
     int y_offset = get_box().y + 1;
     std::size_t n = _position;
     int const y_end = get_box().y + get_box().h;
-    while (n < _values.size() && y_offset < y_end)
+    while (n < _values.get().size() && y_offset < y_end)
     {
         int const overlap = (y_offset + entry_height) - y_end;
         int const entry_height_with_overlap = entry_height - /*(overlap < 0 ? 0 : overlap + 1);*/std::max(0, overlap + 1);
@@ -51,7 +51,7 @@ void list_view::on_draw(draw_context & dc, selection_context const & sc) const
             dc.draw_entry_active_background(abs_rect);
 
 
-        dc.draw_entry_text(_values[n], { x_offset - _x_shift, y_offset, 900, entry_height_with_overlap} /*abs_rect*/, _x_shift /*std::max(0, entry_width - static_cast<int>(_x_shift))*/);
+        dc.draw_entry_text(_values.get()[n], { x_offset - _x_shift, y_offset, 900, entry_height_with_overlap} /*abs_rect*/, _x_shift /*std::max(0, entry_width - static_cast<int>(_x_shift))*/);
 
         y_offset += _row_height;
         n++;
@@ -59,12 +59,12 @@ void list_view::on_draw(draw_context & dc, selection_context const & sc) const
 
     int const visible_entries = (get_box().h - 2) / _row_height;
     // draw position indicator if it doesn't fit on one page
-    if (_values.size() > static_cast<std::size_t>(visible_entries))
+    if (_values.get().size() > static_cast<std::size_t>(visible_entries))
     {
-        int const ind_len = std::max(INDICATOR_MIN_HEIGHT, static_cast<int>(((get_box().h - 2) * visible_entries) / _values.size()));
+        int const ind_len = std::max(INDICATOR_MIN_HEIGHT, static_cast<int>(((get_box().h - 2) * visible_entries) / _values.get().size()));
         int const ind_w = INDICATOR_MIN_WIDTH;
 
-        int const ind_y = get_box().y + 1 + ((get_box().h - 2 - ind_len) * _position) / (_values.size() - visible_entries);
+        int const ind_y = get_box().y + 1 + ((get_box().h - 2 - ind_len) * _position) / (_values.get().size() - visible_entries);
         SDL_Rect ind_rect { get_box().x + get_box().w - ind_w - 1, ind_y, ind_w, ind_len};
         dc.draw_entry_position_indicator(ind_rect);
     }
@@ -99,7 +99,7 @@ void list_view::on_mouse_up_event(mouse_up_event const & e)
                 if (se.action == swipe_action::UP)
                     _position = dec_ensure_lower(next_selected_position, _position, 0);
                 else // if (se.action == swipe_action::DOWN)
-                    _position = inc_ensure_upper(next_selected_position, _position, _values.size() < static_cast<std::size_t>(visible_entries) ? 0 : _values.size() - visible_entries);
+                    _position = inc_ensure_upper(next_selected_position, _position, _values.get().size() < static_cast<std::size_t>(visible_entries) ? 0 : _values.get().size() - visible_entries);
             }
             mark_dirty();
         }
@@ -114,7 +114,7 @@ void list_view::on_mouse_up_event(mouse_up_event const & e)
         // TODO allow unfocused state ?
         std::size_t const new_selected_position = _position + visible_index;
 
-        if (new_selected_position < _values.size())
+        if (new_selected_position < _values.get().size())
         {
             std::cout << "new selected position = " << new_selected_position << ", visible index = " << visible_index << std::endl;
             _selected_position = new_selected_position;
@@ -158,7 +158,17 @@ vec list_view::min_size_hint() const
 
 void list_view::set_position(std::size_t position)
 {
-    auto size = _values.size();
+    auto size = _values.get().size();
     _position = std::min(position, size == 0 ? 0 : size - 1);
+    mark_dirty();
+}
+
+void list_view::set_list(std::vector<std::string> const & values, std::size_t position)
+{
+    _values = values;
+    _position = position;
+    _selected_position = values.size();
+    _highlight_position = values.size();
+    mark_dirty();
 }
 
