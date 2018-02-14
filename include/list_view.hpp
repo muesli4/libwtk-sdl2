@@ -30,6 +30,14 @@ struct list_view : selectable
     void set_position(std::size_t position);
     void set_list(std::vector<std::string> const & values, std::size_t position = 0);
 
+    std::size_t get_visible_entries() const;
+
+    void scroll_up(std::size_t amount);
+    void scroll_down(std::size_t amount);
+    void scroll_up();
+    void scroll_down();
+
+
     private:
 
     std::optional<point> _opt_pressed_point;
@@ -48,6 +56,7 @@ struct list_view : selectable
     std::function<void()> _activate_callback;
 
     int _row_height;
+    int _visible_entries;
 };
 
 #endif
