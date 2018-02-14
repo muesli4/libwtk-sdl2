@@ -15,6 +15,7 @@ notebook::~notebook()
 
 void notebook::on_draw(draw_context & dc, selection_context const & sc) const
 {
+    dc.draw_background(get_box());
     get_shown_widget()->on_draw(dc, sc);
 }
 
