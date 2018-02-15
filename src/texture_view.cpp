@@ -34,7 +34,7 @@ void texture_view::on_draw(draw_context & dc, selection_context const & sc) cons
 void texture_view::apply_layout_to_children()
 {
     if (_p)
-        std::tie(_target, std::ignore, std::ignore) = scale_preserve_ar(texture_dim(_p.get()), get_box());
+        refresh_target();
 }
 
 vec texture_view::min_size_hint() const
@@ -57,6 +57,7 @@ void texture_view::set_texture(unique_texture_ptr p, int min_width)
     if (_p)
     {
         _size = texture_dim(_p.get());
+        refresh_target();
         _min_width = std::min(min_width, _size.w);
         mark_dirty();
     }
@@ -64,7 +65,13 @@ void texture_view::set_texture(unique_texture_ptr p, int min_width)
     {
         _min_width = 0;
         if (!was_nullptr)
+        {
             mark_dirty();
+        }
     }
-    _target = { 0, 0, 0, 0 };
+}
+
+void texture_view::refresh_target()
+{
+    std::tie(_target, std::ignore, std::ignore) = scale_preserve_ar(_size, get_box());
 }

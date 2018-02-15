@@ -29,6 +29,8 @@ struct texture_view : widget
 
     private:
 
+    void refresh_target();
+
     unique_texture_ptr _p;
     vec _size;
     int _min_width;
