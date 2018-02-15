@@ -33,5 +33,16 @@ struct padding : bin
 std::shared_ptr<padding> pad(int pad_x, int pad_y, widget_ptr wptr);
 std::shared_ptr<padding> pad(int pad, widget_ptr wptr);
 
+std::shared_ptr<padding> pad_left(int pad, widget_ptr wptr);
+std::shared_ptr<padding> pad_right(int pad, widget_ptr wptr);
+std::shared_ptr<padding> pad_top(int pad, widget_ptr wptr);
+std::shared_ptr<padding> pad_bottom(int pad, widget_ptr wptr);
+
+// overloads to just modify, works because widgets are passed by reference
+std::shared_ptr<padding> pad_left(int pad, std::shared_ptr<padding> wptr);
+std::shared_ptr<padding> pad_right(int pad, std::shared_ptr<padding> wptr);
+std::shared_ptr<padding> pad_top(int pad, std::shared_ptr<padding> wptr);
+std::shared_ptr<padding> pad_bottom(int pad, std::shared_ptr<padding> wptr);
+
 #endif
 
