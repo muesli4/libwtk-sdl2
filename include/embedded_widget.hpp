@@ -41,6 +41,7 @@ struct embedded_widget : widget
     widget * navigate_selectable(navigation_type nt, point center) override { return _embedded_widget.navigate_selectable(nt, center); }
     widget * navigate_selectable_from_children(navigation_type nt, widget * w, point center) override { return navigate_selectable_parent(nt, center); }
     vec min_size_hint() const override { return _embedded_widget.min_size_hint(); }
+    vec nat_size_inc_hint() const override { return _embedded_widget.nat_size_inc_hint(); }
     int height_for_width_hint(int width) const override { return _embedded_widget.height_for_width_hint(width); }
 
     protected:
