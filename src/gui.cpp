@@ -7,6 +7,10 @@
 // TODO handle double buffer with dirty drawing:
 //          use int instead of bool and draw to every buffer
 
+// TODO add singleton style manager that provides global defaults for spacing and theme
+//      (only used for default parameters)
+//      this might then be overriden for spacing in containers and style in widget_contexts
+//      (maybe even split the singletons)
 // TODO implement mouse move event for several widgets
 // TODO widget: add hit test for widgets, then there is no need to propagate the mouse event
 // TODO should mouse click select selectable widgets? if so, the mouse_down
