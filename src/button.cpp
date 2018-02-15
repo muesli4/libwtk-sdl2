@@ -52,10 +52,17 @@ void button::on_activate()
 
 vec button::min_size_hint() const
 {
-    int h_spacing = get_layout_info().font_line_skip();
+    // TODO get border dimensions from layout_info
     vec size = get_layout_info().text_size(_text);
-    return { size.w + h_spacing, size.h + h_spacing };
+    return { size.w + 2, size.h + 2 };
 }
+
+vec button::nat_size_inc_hint() const
+{
+    int h_spacing = get_layout_info().font_line_skip();
+    return { h_spacing - 1, h_spacing - 1 };
+}
+
 
 button::~button()
 {

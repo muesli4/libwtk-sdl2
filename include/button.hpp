@@ -15,6 +15,8 @@ struct button : selectable
     void on_key_event(key_event const & e) override;
     void on_activate() override;
     vec min_size_hint() const override;
+    vec nat_size_inc_hint() const override;
+
     ~button() override;
 
     // button interface
