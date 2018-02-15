@@ -1,5 +1,11 @@
 // TODO think about a way where the widget might not arbitrarily draw to the
 //      screen (basically bounding box drawn in offset mode)
+// TODO consistent background drawing, best solution:
+//      draw background only when absolutely needed (let top-level widget draw it)
+// TODO improve dirty drawing:
+//          mark_dirty() should only mark the widget (and not propagate upwards)
+// TODO handle double buffer with dirty drawing:
+//          use int instead of bool and draw to every buffer
 
 // TODO implement mouse move event for several widgets
 // TODO widget: add hit test for widgets, then there is no need to propagate the mouse event
@@ -11,6 +17,9 @@
 // TODO provide means to add widgets outside of constructors (redo layout only for local container or upwards?)
 // TODO should widgets relayout when their content changes?
 
+// TODO add natural size property (the size at which the icon looks best
+//      make minimum really the size that is the smallest possible one
+//      widget containers: fill to natural size first, then distribute
 // TODO which widgets need width-for-height?
 
 // TODO improved box / table layout for height-for-width widgets:
@@ -24,6 +33,7 @@
 //   haven't been activted by a MOUSEDOWN event in their area before. However,
 //   They might very well react to events that are not in their area if the
 //   mouse went down in their area before.
+
 
 #include <SDL2/SDL.h>
 #include <memory>
@@ -91,7 +101,7 @@ void event_loop(SDL_Renderer * renderer)
                                  , { { 0, 3, 3, 1 }, num_button() }
                                  , { { 3, 0, 1, 1 }, num_button() }
                                  , { { 3, 1, 1, 3 }, num_button() }
-                                 }) }
+                                 }, 20) }
 
                          , { false, std::make_shared<label>(std::vector<paragraph>{paragraph("Text 1, Paragraph 1."), paragraph("Text 1, Paragraph 2.")}) }
                          , { true, cw() }
