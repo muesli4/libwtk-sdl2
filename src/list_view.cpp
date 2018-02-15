@@ -154,6 +154,13 @@ vec list_view::min_size_hint() const
     return { min_width, min_height };
 }
 
+vec list_view::nat_size_inc_hint() const
+{
+    int const line_height = get_layout_info().font_line_skip();
+    // TODO heuristc of width of each line, goal all text readable
+    return { 200, 2 * line_height };
+}
+
 void list_view::set_position(std::size_t position)
 {
     auto size = _values.get().size();

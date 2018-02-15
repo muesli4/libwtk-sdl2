@@ -23,6 +23,7 @@ struct list_view : selectable
     void apply_layout_to_children() override;
 
     vec min_size_hint() const override;
+    vec nat_size_inc_hint() const override;
 
     // list_view interface
 
