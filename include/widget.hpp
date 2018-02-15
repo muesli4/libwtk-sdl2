@@ -114,10 +114,17 @@ struct widget
     virtual void on_select();
     virtual void on_unselect();
 
-    // This should return the approximate size the widget will require in its
-    // minimal state. Any containers are responsible to follow these constraints
-    // as best as possible. It is however in no way guaranteed.
+    // This should return the best possible approximation of the size the widget
+    // will require in its minimal state. Any containers are responsible to
+    // follow these constraints as best as possible. It is however in no way
+    // guaranteed.
     virtual vec min_size_hint() const = 0;
+
+
+    // This should give the additional size necessary to get the natural width
+    // of a widget. This is the preferred size of the widget where it looks
+    // especially good and is easily usable.
+    virtual vec nat_size_inc_hint() const;
 
     // A widget may better estimate its size with a given width. For example,
     // when text is used it is much easier to estimate its size.

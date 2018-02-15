@@ -108,8 +108,15 @@ widget * widget::navigate_selectable_from_children(navigation_type nt, widget * 
     return nullptr;
 }
 
+vec widget::nat_size_inc_hint() const
+{
+    // Default implemtation: The widgets minimal size is its natural size.
+    return { 0, 0 };
+}
+
 int widget::height_for_width_hint(int width) const
 {
+    // Default implementation: Not supported.
     return -1;
 }
 
