@@ -5,19 +5,30 @@ padding::padding(int pad, widget_ptr child) : padding(pad, pad, child)
 }
 
 padding::padding(int pad_x, int pad_y, widget_ptr child)
+    : padding(pad_x, pad_x, pad_y, pad_y, child)
+{
+}
+
+padding::padding(int pad_left, int pad_right, int pad_top, int pad_bottom, widget_ptr child)
     : bin(child)
-    , _pad_x(pad_x)
-    , _pad_y(pad_y)
+    , _pad_left(std::max(pad_left, 0))
+    , _pad_right(std::max(pad_right, 0))
+    , _pad_top(std::max(pad_top, 0))
+    , _pad_bottom(std::max(pad_bottom, 0))
+{
+}
+
+padding::~padding()
 {
 }
 
 void padding::apply_layout_to_children()
 {
     _child->apply_layout(
-        { get_box().x + _pad_x
-        , get_box().y + _pad_y
-        , get_box().w - 2 * _pad_x
-        , get_box().h - 2 * _pad_y
+        { get_box().x + _pad_left
+        , get_box().y + _pad_top
+        , get_box().w - _pad_left - _pad_right
+        , get_box().h - _pad_top - _pad_bottom
         });
 }
 
@@ -25,14 +36,30 @@ vec padding::min_size_hint() const
 {
     vec v = _child->min_size_hint();
 
-    v.w += 2 * _pad_x;
-    v.h += 2 * _pad_y;
+    v.w += _pad_left + _pad_right;
+    v.h += _pad_top + _pad_bottom;
 
     return v;
 }
 
-padding::~padding()
+void padding::set_pad_left(int pad_left)
 {
+    _pad_left = std::max(0, pad_left);
+}
+
+void padding::set_pad_right(int pad_right)
+{
+    _pad_right = std::max(0, pad_right);
+}
+
+void padding::set_pad_top(int pad_top)
+{
+    _pad_top = std::max(0, pad_top);
+}
+
+void padding::set_pad_bottom(int pad_bottom)
+{
+    _pad_bottom = std::max(0, pad_bottom);
 }
 
 std::shared_ptr<padding> pad(int pad_x, int pad_y, widget_ptr wptr)
