@@ -25,6 +25,7 @@ struct label : widget
     ~label() override;
 
     void on_draw(draw_context & dc, selection_context const & sc) const override;
+    void apply_layout_to_children() override;
     vec min_size_hint() const override;
     int height_for_width_hint(int width) const override;
 

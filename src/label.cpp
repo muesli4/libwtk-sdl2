@@ -86,6 +86,11 @@ void label::on_draw(draw_context & dc, selection_context const & sc) const
     }
 }
 
+void label::apply_layout_to_children()
+{
+    _cached_height = -1;
+}
+
 vec label::min_size_hint() const
 {
     int font_height = get_layout_info().font_line_skip();
@@ -148,13 +153,12 @@ std::vector<paragraph> const & label::get_content() const
 int label::calculate_height_for_width(int width) const
 {
     int const font_height = get_layout_info().font_line_skip();
-    int const real_width = width - font_height;
 
     int height = 0;
     for (auto const & tf : _content)
     {
-        height += get_layout_info().text_size(tf.text, real_width).h + tf.trailing_newlines * font_height;
+        height += get_layout_info().text_size(tf.text, width).h + tf.trailing_newlines * font_height;
     }
-    return height + font_height;
+    return height;
 }
 
