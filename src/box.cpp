@@ -273,6 +273,28 @@ vec box::min_size_hint() const
     return result;
 }
 
+vec box::nat_size_inc_hint() const
+{
+    // TODO refactor
+    vec result = { 0, 0 };
+
+    for (auto & c : _children)
+    {
+        vec size = c.wptr->nat_size_inc_hint();
+        if (_o == orientation::HORIZONTAL)
+        {
+            result.h = std::max(size.h, result.h);
+            result.w += size.w;
+        }
+        else
+        {
+            result.h += size.h;
+            result.w = std::max(size.w, result.w);
+        }
+    }
+    return result;
+}
+
 box::~box()
 {
 }
