@@ -38,6 +38,11 @@ vec bin::min_size_hint() const
     return _child->min_size_hint();
 }
 
+vec bin::nat_size_inc_hint() const
+{
+    return _child->nat_size_inc_hint();
+}
+
 int bin::height_for_width_hint(int width) const
 {
     return _child->height_for_width_hint(width);

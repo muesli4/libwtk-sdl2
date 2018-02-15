@@ -17,8 +17,10 @@ struct bin : widget
     widget * find_selectable(navigation_type nt, point center) override;
     widget * navigate_selectable_from_children(navigation_type nt, widget * w, point center) override;
 
-    // Should be provided when geometry of the child changes.
+    // Should be provided when the geometry of a child is not equal to the
+    // geometry of the bin (i.e. if there is some kind of padding).
     vec min_size_hint() const override;
+    vec nat_size_inc_hint() const override;
 
     int height_for_width_hint(int width) const;
 
