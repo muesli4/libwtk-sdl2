@@ -25,6 +25,7 @@ struct notebook : widget
     std::vector<widget *> get_children() override;
 
     vec min_size_hint() const override;
+    vec nat_size_inc_hint() const override;
 
     // notebook interface
     widget_ptr get_shown_widget();

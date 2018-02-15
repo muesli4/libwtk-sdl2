@@ -95,3 +95,18 @@ vec notebook::min_size_hint() const
     }
     return max_vec;
 }
+
+vec notebook::nat_size_inc_hint() const
+{
+    // TODO refactor with notebook::min_size_hint
+    vec max_vec = { 0, 0 };
+    for (auto p : _pages)
+    {
+        vec v = p->nat_size_inc_hint();
+        max_vec.w = std::max(max_vec.w, v.w);
+        max_vec.h = std::max(max_vec.h, v.h);
+
+    }
+    return max_vec;
+}
+
