@@ -9,13 +9,22 @@ struct box : container
 {
     struct child
     {
+        // Determines whether this child gets additional space when available.
+        // Additional space will be distributed when every widget has reached
+        // its natural size, otherwise natural size is distributed equally among
+        // all widgets.
         bool expand;
         widget_ptr wptr;
     };
 
+    typedef std::vector<child> children_type;
+
     enum class orientation { VERTICAL, HORIZONTAL };
 
-    box(orientation o, std::vector<child> children, int children_spacing = 0, bool children_homogeneous = true);
+    box(orientation o, children_type children);
+    box(orientation o, children_type children, int children_spacing);
+    box(orientation o, children_type children, bool children_homogeneous);
+    box(orientation o, children_type children, int children_spacing, bool children_homogeneous);
 
     void apply_layout_to_children() override;
 
@@ -45,7 +54,7 @@ struct box : container
     bool is_orthogonal(navigation_type nt) const;
 
 
-    std::vector<child> _children;
+    children_type _children;
     int _children_spacing;
     bool _children_homogeneous;
 
@@ -53,7 +62,16 @@ struct box : container
 
 };
 
-widget_ptr hbox(std::vector<box::child> children, int children_spacing = 0, bool children_homogeneous = true);
-widget_ptr vbox(std::vector<box::child> children, int children_spacing = 0, bool children_homogeneous = true);
+widget_ptr hbox(box::children_type children);
+widget_ptr vbox(box::children_type children);
+
+widget_ptr hbox(box::children_type children, int children_spacing);
+widget_ptr vbox(box::children_type children, int children_spacing);
+
+widget_ptr hbox(box::children_type children, bool children_homogeneous);
+widget_ptr vbox(box::children_type children, bool children_homogeneous);
+
+widget_ptr hbox(box::children_type children, int children_spacing, bool children_homogeneous);
+widget_ptr vbox(box::children_type children, int children_spacing, bool children_homogeneous);
 
 #endif

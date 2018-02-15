@@ -3,7 +3,23 @@
 
 #include "box.hpp"
 
-box::box(orientation o, std::vector<box::child> children, int children_spacing, bool children_homogeneous)
+// TODO default setting singleton
+box::box(orientation o, box::children_type children)
+    : box(o, children, 5, true)
+{
+}
+
+box::box(orientation o, box::children_type children, int children_spacing)
+    : box(o, children, children_spacing, true)
+{
+}
+
+box::box(orientation o, box::children_type children, bool children_homogeneous)
+    : box(o, children, 5, children_homogeneous)
+{
+}
+
+box::box(orientation o, box::children_type children, int children_spacing, bool children_homogeneous)
     : _children(children)
     , _children_spacing(children_spacing)
     , _children_homogeneous(children_homogeneous)
@@ -331,12 +347,44 @@ std::vector<widget const *> box::get_children() const
     return result;
 }
 
-widget_ptr hbox(std::vector<box::child> children, int children_spacing, bool children_homogeneous)
+widget_ptr hbox(box::children_type children)
+{
+    return std::make_shared<box>(box::orientation::HORIZONTAL, children);
+}
+
+widget_ptr vbox(box::children_type children)
+{
+    return std::make_shared<box>(box::orientation::VERTICAL, children);
+}
+
+
+widget_ptr hbox(box::children_type children, int children_spacing)
+{
+    return std::make_shared<box>(box::orientation::HORIZONTAL, children, children_spacing);
+}
+
+widget_ptr vbox(box::children_type children, int children_spacing)
+{
+    return std::make_shared<box>(box::orientation::VERTICAL, children, children_spacing);
+}
+
+
+widget_ptr hbox(box::children_type children, bool children_homogeneous)
+{
+    return std::make_shared<box>(box::orientation::HORIZONTAL, children, children_homogeneous);
+}
+
+widget_ptr vbox(box::children_type children, bool children_homogeneous)
+{
+    return std::make_shared<box>(box::orientation::VERTICAL, children, children_homogeneous);
+}
+
+widget_ptr hbox(box::children_type children, int children_spacing, bool children_homogeneous)
 {
     return std::make_shared<box>(box::orientation::HORIZONTAL, children, children_spacing, children_homogeneous);
 }
 
-widget_ptr vbox(std::vector<box::child> children, int children_spacing, bool children_homogeneous)
+widget_ptr vbox(box::children_type children, int children_spacing, bool children_homogeneous)
 {
     return std::make_shared<box>(box::orientation::VERTICAL, children, children_spacing, children_homogeneous);
 }
