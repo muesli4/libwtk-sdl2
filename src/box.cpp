@@ -119,7 +119,7 @@ void box::apply_layout_to_children()
             }
 
             int const max_size = _o == orientation::HORIZONTAL ? get_box().w : get_box().h;
-            int const avail_after_spacing = std::max<int>(0, (max_size - (n - 1) * _children_spacing));
+            int const avail_after_spacing = max<int>(0, (max_size - (n - 1) * _children_spacing));
 
             // the number of widgets receiving extra space
             int const num_receiving = num_expand == 0 ? n : num_expand;
@@ -156,23 +156,23 @@ void box::apply_layout_to_children()
 
                 // Differences and the corresponding index.
                 auto cmp_first = [](auto a, auto b){ return get<0>(a) > get<0>(b); };
-                std::vector<std::pair<int, std::size_t>> diff_heap;
+                vector<pair<int, size_t>> diff_heap;
                 diff_heap.reserve(n);
-                for (std::size_t k = 0; k < n; ++k)
+                for (size_t k = 0; k < n; ++k)
                 {
                     int size = _o == orientation::HORIZONTAL ? nat_size_incs[k].w : nat_size_incs[k].h;
                     diff_heap.emplace_back(size, k);
                 }
 
-                make_heap(std::begin(diff_heap), std::end(diff_heap), cmp_first);
+                make_heap(begin(diff_heap), end(diff_heap), cmp_first);
 
                 vector<int> tmp_partial_nat_size_incs(n, 0);
                 while (remaining_space > 0)
                 {
-                    pop_heap(std::begin(diff_heap), std::end(diff_heap), cmp_first);
+                    pop_heap(begin(diff_heap), end(diff_heap), cmp_first);
                     int min_idx;
                     int min_diff;
-                    std::tie(min_diff, min_idx) = diff_heap.back();
+                    tie(min_diff, min_idx) = diff_heap.back();
                     {
                         int const new_allocated = min_diff;
                         min_diff -= allocated;
@@ -185,7 +185,7 @@ void box::apply_layout_to_children()
                     {
                         // allocate min diff
                         tmp_partial_nat_size_incs[min_idx] += min_diff;
-                        for (std::size_t k = 0; k < diff_heap.size() - 1; ++k)
+                        for (size_t k = 0; k < diff_heap.size() - 1; ++k)
                         {
                             tmp_partial_nat_size_incs[get<1>(diff_heap[k])] += min_diff;
                         }
@@ -211,7 +211,7 @@ void box::apply_layout_to_children()
 
             int offset = _o == orientation::HORIZONTAL ? get_box().x : get_box().y;
 
-            for (std::size_t k = 0; k < n; k++)
+            for (size_t k = 0; k < n; k++)
             {
                 auto & c = _children[k];
 
@@ -235,13 +235,13 @@ void box::apply_layout_to_children()
                 if (_o == orientation::HORIZONTAL)
                 {
                     // TODO should both lengths be limited?
-                    int w = std::min(size.w + expand_width, get_box().w);
+                    int w = min(size.w + expand_width, get_box().w);
                     c.wptr->apply_layout({ offset, get_box().y, w, get_box().h });
                     offset += w + _children_spacing;
                 }
                 else
                 {
-                    int h = std::min(size.h + expand_width, get_box().h);
+                    int h = min(size.h + expand_width, get_box().h);
                     c.wptr->apply_layout({ get_box().x, offset, get_box().w, h });
                     offset += h + _children_spacing;
                 }
