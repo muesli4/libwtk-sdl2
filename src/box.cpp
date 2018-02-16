@@ -167,7 +167,7 @@ void box::apply_layout_to_children()
                 make_heap(begin(diff_heap), end(diff_heap), cmp_first);
 
                 vector<int> tmp_partial_nat_size_incs(n, 0);
-                while (remaining_space > 0)
+                while (true)
                 {
                     pop_heap(begin(diff_heap), end(diff_heap), cmp_first);
                     int min_idx;
@@ -179,22 +179,23 @@ void box::apply_layout_to_children()
                         allocated = new_allocated;
                     }
 
-                    int next_allocation = min_diff * diff_heap.size();
+                    int const next_allocation = min_diff * diff_heap.size();
                     // can we allocate the current size for each?
                     if (next_allocation <= remaining_space)
                     {
-                        // allocate min diff
-                        tmp_partial_nat_size_incs[min_idx] += min_diff;
-                        for (size_t k = 0; k < diff_heap.size() - 1; ++k)
+                        // allocate min diff for every widget (including the popped one)
+                        for (auto const & p : diff_heap)
                         {
-                            tmp_partial_nat_size_incs[get<1>(diff_heap[k])] += min_diff;
+                            tmp_partial_nat_size_incs[get<1>(p)] += min_diff;
                         }
+
+                        diff_heap.pop_back();
                     }
                     else
                     {
                         // allocate otherwise remaining
                         int const extra_space = remaining_space / diff_heap.size();
-                        // TODO int remainder
+                        // TODO allocate int remainder
                         for (auto const & p : diff_heap)
                         {
                             tmp_partial_nat_size_incs[get<1>(p)] += extra_space;
@@ -203,8 +204,6 @@ void box::apply_layout_to_children()
                     }
 
                     remaining_space -= next_allocation;
-
-                    diff_heap.pop_back();
                 }
                 partial_nat_size_incs.swap(tmp_partial_nat_size_incs);
             }
