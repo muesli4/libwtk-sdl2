@@ -1,0 +1,4 @@
+*.o
+*.lo
+libwtk-sdl2-test
+libwtk-sdl2.la
