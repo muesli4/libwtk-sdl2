@@ -76,12 +76,12 @@ void box::apply_layout_to_children()
             using namespace std;
 
             int min_sum = 0;
-            int nat_sum = 0;
+            int nat_inc_sum = 0;
             int num_expand = 0;
             vector<vec> min_sizes;
-            vector<vec> nat_sizes;
+            vector<vec> nat_size_incs;
             min_sizes.reserve(n);
-            nat_sizes.reserve(n);
+            nat_size_incs.reserve(n);
 
             for (auto & c : _children)
             {
@@ -96,14 +96,13 @@ void box::apply_layout_to_children()
                     if (hfw == -1)
                     {
                         vec nat_size_inc = c.wptr->nat_size_inc_hint();
-                        vec nat_size = size + nat_size_inc;
-                        nat_sizes.push_back(nat_size);
-                        nat_sum += nat_size.h;
+                        nat_size_incs.push_back(nat_size_inc);
+                        nat_inc_sum += nat_size_inc.h;
                     }
                     else
                     {
-                        nat_sizes.push_back({ get_box().w, hfw });
-                        nat_sum += hfw;
+                        nat_size_incs.push_back({ get_box().w, hfw });
+                        nat_inc_sum += hfw;
                     }
 
                 }
@@ -111,9 +110,8 @@ void box::apply_layout_to_children()
                 {
                     min_sum += size.w;
                     vec nat_size_inc = c.wptr->nat_size_inc_hint();
-                    vec nat_size = size + nat_size_inc;
-                    nat_sizes.push_back(nat_size);
-                    nat_sum += nat_size.w;
+                    nat_size_incs.push_back(nat_size_inc);
+                    nat_inc_sum += nat_size_inc.w;
                 }
 
                 if (c.expand)
@@ -126,22 +124,89 @@ void box::apply_layout_to_children()
             // the number of widgets receiving extra space
             int const num_receiving = num_expand == 0 ? n : num_expand;
 
-            bool const use_natural_size = nat_sum <= avail_after_spacing;
+            int const remaining_space_with_min_size = avail_after_spacing - min_sum;
 
-            int extra_width;
-            int extra_width_rem;
+            bool const use_natural_size = min_sum + nat_inc_sum <= avail_after_spacing;
+            bool const fill_to_natural = remaining_space_with_min_size > 0;
+
+            // The amount that is used to partially fill the child to the
+            // natural size.
+            vector<int> partial_nat_size_incs;
+            int extra_width = 0;
+            int extra_width_rem = 0;
             if (use_natural_size)
             {
                 // every widget fits with natural size
-                int const remaining_space = avail_after_spacing - nat_sum;
+                int const remaining_space = avail_after_spacing - (min_sum + nat_inc_sum);
                 extra_width = remaining_space / num_receiving;
                 extra_width_rem = remaining_space % num_receiving;
             }
-            else
+            else if (fill_to_natural)
             {
-                int const remaining_space = avail_after_spacing - min_sum;
-                extra_width = std::max(0, remaining_space / num_receiving);
-                extra_width_rem = remaining_space < 0 ? 0 : remaining_space % num_receiving;
+                // 1. Sort differences between natural size (or use min heap).
+                // 2. While there is the minimum difference times the remaining
+                //    widgets space left:
+                //    Fill all remaining widgets equally by the minimum
+                //    difference. Subtract that from every remaining difference.
+
+                int remaining_space = remaining_space_with_min_size;
+
+                // This is used to avoid subtracting from all elements of the heap.
+                int allocated = 0;
+
+                // Differences and the corresponding index.
+                auto cmp_first = [](auto a, auto b){ return get<0>(a) > get<0>(b); };
+                std::vector<std::pair<int, std::size_t>> diff_heap;
+                diff_heap.reserve(n);
+                for (std::size_t k = 0; k < n; ++k)
+                {
+                    int size = _o == orientation::HORIZONTAL ? nat_size_incs[k].w : nat_size_incs[k].h;
+                    diff_heap.emplace_back(size, k);
+                }
+
+                make_heap(std::begin(diff_heap), std::end(diff_heap), cmp_first);
+
+                vector<int> tmp_partial_nat_size_incs(n, 0);
+                while (remaining_space > 0)
+                {
+                    pop_heap(std::begin(diff_heap), std::end(diff_heap), cmp_first);
+                    int min_idx;
+                    int min_diff;
+                    std::tie(min_diff, min_idx) = diff_heap.back();
+                    {
+                        int const new_allocated = min_diff;
+                        min_diff -= allocated;
+                        allocated = new_allocated;
+                    }
+
+                    int next_allocation = min_diff * diff_heap.size();
+                    // can we allocate the current size for each?
+                    if (next_allocation <= remaining_space)
+                    {
+                        // allocate min diff
+                        tmp_partial_nat_size_incs[min_idx] += min_diff;
+                        for (std::size_t k = 0; k < diff_heap.size() - 1; ++k)
+                        {
+                            tmp_partial_nat_size_incs[get<1>(diff_heap[k])] += min_diff;
+                        }
+                    }
+                    else
+                    {
+                        // allocate otherwise remaining
+                        int const extra_space = remaining_space / diff_heap.size();
+                        // TODO int remainder
+                        for (auto const & p : diff_heap)
+                        {
+                            tmp_partial_nat_size_incs[get<1>(p)] += extra_space;
+                        }
+                        break;
+                    }
+
+                    remaining_space -= next_allocation;
+
+                    diff_heap.pop_back();
+                }
+                partial_nat_size_incs.swap(tmp_partial_nat_size_incs);
             }
 
             int offset = _o == orientation::HORIZONTAL ? get_box().x : get_box().y;
@@ -151,13 +216,25 @@ void box::apply_layout_to_children()
                 auto & c = _children[k];
 
                 // TODO evenly distribute remainder?
-                int expand_width = (c.expand || num_expand == 0) ? extra_width + (extra_width_rem < k ? 1 : 0) : 0;
+                // The space expanding widgets receive after every widget is
+                // able to get its natural size.
+                int const expand_width = (c.expand || num_expand == 0) ? extra_width + (extra_width_rem < k ? 1 : 0) : 0;
 
-                vec size = use_natural_size ? nat_sizes[k] : min_sizes[k];
+
+                vec const nat_expand = use_natural_size
+                                     ? nat_size_incs[k]
+                                     : ( fill_to_natural
+                                       ? (_o == orientation::HORIZONTAL
+                                         ? vec{ partial_nat_size_incs[k], 0 }
+                                         : vec{ 0, partial_nat_size_incs[k] }
+                                         )
+                                       : vec { 0, 0 });
+
+                vec const size = min_sizes[k] + nat_expand;
 
                 if (_o == orientation::HORIZONTAL)
                 {
-                    // TODO should both lengths be limited? add property fill_orthogonal
+                    // TODO should both lengths be limited?
                     int w = std::min(size.w + expand_width, get_box().w);
                     c.wptr->apply_layout({ offset, get_box().y, w, get_box().h });
                     offset += w + _children_spacing;
