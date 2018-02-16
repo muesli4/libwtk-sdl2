@@ -91,7 +91,6 @@ vec notebook::min_size_hint() const
         vec v = p->min_size_hint();
         max_vec.w = std::max(max_vec.w, v.w);
         max_vec.h = std::max(max_vec.h, v.h);
-
     }
     return max_vec;
 }
@@ -105,7 +104,6 @@ vec notebook::nat_size_inc_hint() const
         vec v = p->nat_size_inc_hint();
         max_vec.w = std::max(max_vec.w, v.w);
         max_vec.h = std::max(max_vec.h, v.h);
-
     }
     return max_vec;
 }
