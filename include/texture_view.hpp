@@ -13,7 +13,7 @@
 struct texture_view : widget
 {
     texture_view();
-    texture_view(unique_texture_ptr p, int min_width = 100, int nat_width = 200); //texture_dim(p.get()).w / 2);
+    texture_view(unique_texture_ptr p, int min_width = -1, int nat_width = -1);
     ~texture_view() override;
 
     void on_draw(draw_context & dc, selection_context const & sc) const override;
@@ -33,6 +33,8 @@ struct texture_view : widget
 
     void refresh_target();
     vec fit_to_width(int width) const;
+    int decode_min_width_param(int min_width) const;
+    int decode_nat_width_param(int nat_width) const;
 
     unique_texture_ptr _p;
     vec _size;

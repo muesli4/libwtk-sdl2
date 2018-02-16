@@ -1,21 +1,21 @@
-#include "texture_view.hpp"
-
 #include <SDL2/SDL_image.h>
 
-texture_view::texture_view(unique_texture_ptr p, int min_width, int nat_width)
-    : _p(std::move(p))
-    , _size(texture_dim(_p.get()))
-    , _min_width(std::min(min_width, _size.w))
-    , _nat_width(std::min(nat_width, _size.w))
-    , _target { 0, 0, 0, 0 }
-{
-}
+#include "texture_view.hpp"
 
 texture_view::texture_view()
     : _p()
     , _size { 1, 1 }
     , _min_width(0)
     , _nat_width(0)
+    , _target { 0, 0, 0, 0 }
+{
+}
+
+texture_view::texture_view(unique_texture_ptr p, int min_width, int nat_width)
+    : _p(std::move(p))
+    , _size(texture_dim(_p.get()))
+    , _min_width(decode_min_width_param(min_width))
+    , _nat_width(decode_nat_width_param(nat_width))
     , _target { 0, 0, 0, 0 }
 {
 }
@@ -63,8 +63,8 @@ void texture_view::set_texture(unique_texture_ptr p, int min_width, int nat_widt
     {
         _size = texture_dim(_p.get());
         refresh_target();
-        _min_width = std::min(min_width, _size.w);
-        _nat_width = std::min(nat_width, _size.w);
+        _min_width = decode_min_width_param(min_width);
+        _nat_width = decode_nat_width_param(nat_width);
         mark_dirty();
     }
     else
@@ -87,5 +87,15 @@ vec texture_view::fit_to_width(int width) const
 {
     double ratio = static_cast<double>(width) / _size.w;
     return { width, static_cast<int>(_size.h * ratio) };
+}
+
+int texture_view::decode_min_width_param(int min_width) const
+{
+    return min_width < 0 ? _size.w / 2 : std::min(min_width, _size.w);
+}
+
+int texture_view::decode_nat_width_param(int nat_width) const
+{
+    return nat_width < 0 ? _size.w : std::max(_min_width, nat_width);
 }
 
