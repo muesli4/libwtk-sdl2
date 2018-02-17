@@ -85,12 +85,12 @@ void box::apply_layout_to_children()
 
             for (auto & c : _children)
             {
-                vec size = c.wptr->min_size_hint();
-                min_sizes.push_back(size);
+                vec min_size = c.wptr->min_size_hint();
+                min_sizes.push_back(min_size);
 
                 if (_o == orientation::VERTICAL)
                 {
-                    min_sum += size.h;
+                    min_sum += min_size.h;
                     int hfw = c.wptr->height_for_width_hint(get_box().w);
 
                     if (hfw == -1)
@@ -101,14 +101,16 @@ void box::apply_layout_to_children()
                     }
                     else
                     {
-                        nat_size_incs.push_back({ get_box().w, hfw });
+                        nat_size_incs.push_back(
+                            { max(0, get_box().w - min_size.w)
+                            , max(0, hfw - min_size.h)
+                            });
                         nat_inc_sum += hfw;
                     }
-
                 }
                 else
                 {
-                    min_sum += size.w;
+                    min_sum += min_size.w;
                     vec nat_size_inc = c.wptr->nat_size_inc_hint();
                     nat_size_incs.push_back(nat_size_inc);
                     nat_inc_sum += nat_size_inc.w;
@@ -167,7 +169,7 @@ void box::apply_layout_to_children()
                 make_heap(begin(diff_heap), end(diff_heap), cmp_first);
 
                 vector<int> tmp_partial_nat_size_incs(n, 0);
-                while (true)
+                do
                 {
                     pop_heap(begin(diff_heap), end(diff_heap), cmp_first);
                     int min_idx;
@@ -205,6 +207,10 @@ void box::apply_layout_to_children()
 
                     remaining_space -= next_allocation;
                 }
+                // Protect against violated pre-conditions. E.g., when there is
+                // not enough space for the widgets.
+                // TODO figure out when this happens
+                while (!diff_heap.empty());
                 partial_nat_size_incs.swap(tmp_partial_nat_size_incs);
             }
 
@@ -217,7 +223,7 @@ void box::apply_layout_to_children()
                 // TODO evenly distribute remainder?
                 // The space expanding widgets receive after every widget is
                 // able to get its natural size.
-                int const expand_width = (c.expand || num_expand == 0) ? extra_width + (extra_width_rem < k ? 1 : 0) : 0;
+                int const expand_width = c.expand ? extra_width + (extra_width_rem < k ? 1 : 0) : 0;
 
 
                 vec const nat_expand = use_natural_size
