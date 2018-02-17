@@ -106,29 +106,51 @@ int font_word_cache::get_word_right_kerning(std::string const & word)
     return TTF_GetFontKerningSizeGlyphs(_font, ' ', get_first_ucs4(word));
 }
 
-std::vector<std::string> split_words(std::string t)
+std::vector<word_fragment> split_words(std::string t)
 {
-    std::vector<std::string> words;
+    std::vector<word_fragment> words;
 
     std::size_t pos;
     std::size_t last_pos = 0;
     while ((pos = t.find(' ', last_pos)) != std::string::npos)
     {
         std::string const & w = t.substr(last_pos, pos - last_pos);
-        // ignore multiple spaces
-        if (!w.empty())
+
+        std::size_t num_spaces = 1;
+
+        while (pos + num_spaces < t.size())
         {
-            words.push_back(w);
+            if (t[pos + num_spaces] == ' ')
+            {
+                num_spaces++;
+            }
+            else
+                break;
         }
-        last_pos = pos + 1;
+
+        words.push_back(word_fragment{ w, num_spaces - 1 });
+
+        last_pos = pos + num_spaces;
     }
     {
         std::string const & w = t.substr(last_pos);
         if (!w.empty())
-            words.push_back(w);
+            words.push_back(word_fragment{ w, 0 });
     }
 
     return words;
+}
+
+vec font_word_cache::texture_dim_nullptr(SDL_Texture * texture) const
+{
+    if (texture == nullptr)
+    {
+        return { 0, font_line_skip() };
+    }
+    else
+    {
+        return texture_dim(texture);
+    }
 }
 
 std::tuple<vec, std::vector<copy_command>> font_word_cache::text(std::string t, int max_line_width)
@@ -142,72 +164,71 @@ std::tuple<vec, std::vector<copy_command>> font_word_cache::text(std::string t, 
 
     vec target_size { 0, 0 };
     
-    if (!t.empty())
+    auto word_fragments = split_words(t);
+    if (!word_fragments.empty())
     {
-        auto words = split_words(t);
+        int actual_max_width = 0;
 
-        std::vector<SDL_Texture *> textures;
+        auto first_texture = word(word_fragments[0].word);
+        vec const first_dim = texture_dim_nullptr(first_texture);
+        int const first_left_kerning = (word_fragments[0].extra_spaces > 0 ? get_word_left_kerning(word_fragments[0].word) : 0);
 
-        // render or load cached word textures
-        for (auto const & w : words)
+        if (first_texture != nullptr)
+            copy_commands.push_back({ first_texture, 0, 0 });
+
+        int line_width = first_dim.w + first_left_kerning + word_fragments[0].extra_spaces * _space_advance;
+        int height = 0;
+
+        int prev_post_left_kerning = word_fragments[0].extra_spaces > 0 ? 0 : get_word_left_kerning(word_fragments[0].word);
+
+        for (std::size_t k = 1; k < word_fragments.size(); ++k)
         {
-            SDL_Texture * t = word(w);
-            textures.push_back(t);
-        }
-        if (!textures.empty())
-        {
-            std::vector<int> widths { texture_dim(textures[0]).w };
-            std::vector<std::vector<int>> spaces_per_line { { 0 } };
+            auto const & current_wf = word_fragments[k];
+            auto current_texture = word(current_wf.word);
+            vec const current_dim = texture_dim_nullptr(current_texture);
 
-            // TODO check if surface width does exceed line width ?
-            std::vector<std::vector<SDL_Texture *>> textures_per_line { { textures[0] } };
-
-            // assertion: textures.size() == words.size()
-            for (std::size_t n = 0; n + 1 < words.size(); n++)
+            int current_pre_left_kerning;
+            int current_post_left_kerning;
+            
+            if (current_wf.extra_spaces > 0)
             {
-                int & line_width = widths.back();
-
-                // use proper kerning and advance of space to connect words
-                int const join_width = get_word_left_kerning(words[n]) + _space_advance + get_word_right_kerning(words[n + 1]);
-
-                int const new_line_width = line_width + join_width + texture_dim(textures[n + 1]).w;
-
-                if (max_line_width == -1 || new_line_width < max_line_width)
-                {
-                    textures_per_line.back().push_back(textures[n + 1]);
-                    spaces_per_line.back().push_back(join_width);
-                    line_width = new_line_width;
-                }
-                else
-                {
-                    // TODO check if surface width does exceed line width ?
-                    textures_per_line.push_back({textures[n + 1]});
-                    spaces_per_line.push_back({0});
-                    widths.push_back(texture_dim(textures[n + 1]).w);
-                }
+                current_pre_left_kerning = get_word_left_kerning(current_wf.word);
+                current_post_left_kerning = 0;
+            }
+            else
+            {
+                current_pre_left_kerning = 0;
+                current_post_left_kerning = get_word_left_kerning(current_wf.word);
             }
 
-            target_size.w = *std::max_element(widths.begin(), widths.end());
-            target_size.h = font_line_skip() * static_cast<int>(widths.size());
+            int const spacing = prev_post_left_kerning + _space_advance + get_word_right_kerning(current_wf.word);
+            int const next_line_width = line_width + spacing + current_dim.w + current_pre_left_kerning + current_wf.extra_spaces * _space_advance;
 
-            int x = 0;
-            int y = 0;
-
-            for (std::size_t n = 0; n < textures_per_line.size(); n++)
+            if (max_line_width == -1 || next_line_width < max_line_width)
             {
-                // blit line
-                for (std::size_t m = 0; m < textures_per_line[n].size(); m++)
-                {
-                    SDL_Texture * t = textures_per_line[n][m];
+                // word does fit
 
-                    x += spaces_per_line[n][m];
-                    copy_commands.push_back({ t, x, y });
-                    x += texture_dim(t).w;
-                }
-                x = 0;
-                y += font_line_skip();
+                if (current_texture != nullptr)
+                    copy_commands.push_back({ current_texture, line_width + spacing, height });
+
+                line_width = next_line_width;
             }
+            else
+            {
+                // word does not fit, start a new line
+                actual_max_width = std::max(actual_max_width, line_width);
+                line_width = current_dim.w;
+                height += font_line_skip();
+
+                if (current_texture != nullptr)
+                    copy_commands.push_back({ current_texture, 0, height });
+            }
+
+            prev_post_left_kerning = current_post_left_kerning;
         }
+
+        target_size.w = std::max(actual_max_width, line_width);
+        target_size.h = height + font_line_skip();
     }
 
     return std::make_tuple(target_size, copy_commands);
@@ -215,85 +236,16 @@ std::tuple<vec, std::vector<copy_command>> font_word_cache::text(std::string t, 
 
 vec font_word_cache::text_size(std::string t, int max_line_width)
 {
-    if (max_line_width == -1)
-    {
-        int w, h;
-        // TODO probably better to prerender here, since it has to been done in any case
-        if (TTF_SizeUTF8(_font, t.c_str(), &w, &h) == -1)
-        {
-            // TODO handle error properly
-            return { -1, -1 };
-        }
-        else
-        {
-            return { w, h };
-        }
-    }
-    else
-    {
-        auto words = split_words(t);
-
-        if (words.empty())
-        {
-            return { 0, 0 };
-        }
-
-        int actual_max_width = 0;
-        int lines = 1;
-        int current_line_num_words = 1;
-        int current_line_width = texture_dim(word(words[0])).w;
-
-        for (std::size_t k = 0; k < words.size(); ++k)
-        {
-            auto word_tex = word(words[k]);
-            vec size = texture_dim(word_tex);
-
-
-            int const additional_width = size.w + _space_advance;
-
-            if (additional_width + current_line_width >= max_line_width)
-            {
-                // Not enough space to fit it on the current line.
-
-                if (size.w >= max_line_width)
-                {
-                    // TODO word does not fit:
-                    //      can return failure
-                    //      or try to do word splitting
-                    return { -1, -1 };
-                }
-                else
-                {
-                    actual_max_width = std::max(current_line_width, actual_max_width);
-                    current_line_width = size.w;
-                    current_line_num_words = 1;
-                    lines += 1;
-                }
-            }
-            else
-            {
-                current_line_width += additional_width;
-                current_line_num_words += 1;
-            }
-        }
-
-        actual_max_width = std::max(current_line_width, actual_max_width);
-
-        return { actual_max_width, lines * font_line_skip() };
-    }
+    return std::get<0>(text(t, max_line_width));
 }
 
 int font_word_cache::text_minimum_width(std::string t)
 {
     int max_width = 0;
-    auto words = split_words(t);
-    for (auto word : words)
+    auto word_fragments = split_words(t);
+    for (auto wf : word_fragments)
     {
-        int width;
-        // TODO probably better to prerender here, since it has to been done in any case
-        if (TTF_SizeUTF8(_font, word.c_str(), &width, nullptr) == -1)
-            return -1;
-        max_width = std::max(max_width, width);
+        max_width = std::max(max_width, texture_dim_nullptr(word(wf.word)).w + static_cast<int>(wf.extra_spaces) * _space_advance);
     }
     return max_width;
 }
@@ -303,23 +255,31 @@ SDL_Texture * font_word_cache::word(std::string w)
     auto it = _prerendered.find(w);
     if (it == _prerendered.end())
     {
-        // Render in white, then we can use the SDL_SetTextureColorMod to get
-        // any color.
-        SDL_Surface * s = TTF_RenderUTF8_Blended(_font, w.c_str(), {255, 255, 255});
+        // protect against unsupported zero length
+        if (w.empty())
+        {
+            return nullptr;
+        }
+        else
+        {
+            // Render in white, then we can use the SDL_SetTextureColorMod to get
+            // any color.
+            SDL_Surface * s = TTF_RenderUTF8_Blended(_font, w.c_str(), {255, 255, 255});
 
-        if (s == nullptr)
-            throw font_render_error(TTF_GetError());
+            if (s == nullptr)
+                throw font_render_error(TTF_GetError());
 
-        SDL_Texture * t = SDL_CreateTextureFromSurface(_renderer, s);
+            SDL_Texture * t = SDL_CreateTextureFromSurface(_renderer, s);
 
-        if (t == nullptr)
-            throw font_render_error(SDL_GetError());
+            if (t == nullptr)
+                throw font_render_error(SDL_GetError());
 
-        // Use alpha blending to make use of the alpha channel.
-        if (SDL_SetTextureBlendMode(t, SDL_BLENDMODE_BLEND) < 0)
-            throw font_render_error(SDL_GetError());
+            // Use alpha blending to make use of the alpha channel.
+            if (SDL_SetTextureBlendMode(t, SDL_BLENDMODE_BLEND) < 0)
+                throw font_render_error(SDL_GetError());
 
-        return _prerendered[w] = t;
+            return _prerendered[w] = t;
+        }
     }
     else
     {

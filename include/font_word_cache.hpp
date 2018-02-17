@@ -11,6 +11,7 @@
 
 #include "geometry.hpp"
 #include "copy_command.hpp"
+#include "sdl_util.hpp"
 
 struct font_not_found : std::runtime_error
 {
@@ -20,6 +21,12 @@ struct font_not_found : std::runtime_error
 struct font_render_error : std::runtime_error
 {
     font_render_error(std::string);
+};
+
+struct word_fragment
+{
+    std::string word;
+    std::size_t extra_spaces;
 };
 
 struct font_word_cache
@@ -51,6 +58,10 @@ struct font_word_cache
     int get_word_left_kerning(std::string const & word);
     int get_word_right_kerning(std::string const & word);
 
+    // Correctly handles dimension for a nullptr.
+    vec texture_dim_nullptr(SDL_Texture * texture) const;
+
+    // May return nullptr for zero-length text.
     SDL_Texture * word(std::string);
 
     SDL_Renderer * _renderer;
