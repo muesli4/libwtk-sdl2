@@ -1,5 +1,5 @@
-#ifndef COPY_COMMAND_HPP
-#define COPY_COMMAND_HPP
+#ifndef LIBWTK_SDL2_COPY_COMMAND_HPP
+#define LIBWTK_SDL2_COPY_COMMAND_HPP
 
 struct SDL_Texture;
 

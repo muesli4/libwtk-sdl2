@@ -1,5 +1,5 @@
-#ifndef EMPTY_HPP
-#define EMPTY_HPP
+#ifndef LIBWTK_SDL2_EMPTY_HPP
+#define LIBWTK_SDL2_EMPTY_HPP
 
 #include "widget.hpp"
 

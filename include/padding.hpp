@@ -1,5 +1,5 @@
-#ifndef PADDING_HPP
-#define PADDING_HPP
+#ifndef LIBWTK_SDL2_PADDING_HPP
+#define LIBWTK_SDL2_PADDING_HPP
 
 #include "bin.hpp"
 

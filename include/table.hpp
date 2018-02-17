@@ -1,5 +1,5 @@
-#ifndef TABLE_HPP
-#define TABLE_HPP
+#ifndef LIBWTK_SDL2_TABLE_HPP
+#define LIBWTK_SDL2_TABLE_HPP
 
 #include "container.hpp"
 

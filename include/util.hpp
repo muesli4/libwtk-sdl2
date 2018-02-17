@@ -1,5 +1,5 @@
-#ifndef UTIL_HPP
-#define UTIL_HPP
+#ifndef LIBWTK_SDL2_UTIL_HPP
+#define LIBWTK_SDL2_UTIL_HPP
 
 #ifdef _WIN32
 char const PATH_SEP = '\\';
@@ -12,5 +12,6 @@ unsigned int inc_ensure_upper(unsigned int new_pos, unsigned int old_pos, unsign
 
 // check underflow and ensure at least lower_bound
 unsigned int dec_ensure_lower(unsigned int new_pos, unsigned int old_pos, unsigned int lower_bound);
+
 #endif
 

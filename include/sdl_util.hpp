@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef LIBWTK_SDL2_UTIL
+#define LIBWTK_SDL2_UTIL
 #include <memory>
 
 #include <SDL2/SDL_rect.h>
@@ -42,4 +42,6 @@ std::tuple<SDL_Rect, SDL_Rect, SDL_Rect> scale_preserve_ar(vec size, SDL_Rect ta
 void blit_preserve_ar(SDL_Surface * source, SDL_Surface * dest, SDL_Rect const * destrect);
 
 vec texture_dim(SDL_Texture * tex);
+
+#endif
 

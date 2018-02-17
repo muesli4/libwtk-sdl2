@@ -1,5 +1,5 @@
-#ifndef MOUSE_EVENT_HPP
-#define MOUSE_EVENT_HPP
+#ifndef LIBWTK_SDL2_MOUSE_EVENT_HPP
+#define LIBWTK_SDL2_MOUSE_EVENT_HPP
 
 #include <optional>
 

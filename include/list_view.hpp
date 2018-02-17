@@ -1,5 +1,5 @@
-#ifndef LIST_VIEW_HPP
-#define LIST_VIEW_HPP
+#ifndef LIBWTK_SDL2_LIST_VIEW_HPP
+#define LIBWTK_SDL2_LIST_VIEW_HPP
 
 #include <vector>
 #include <functional>

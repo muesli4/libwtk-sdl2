@@ -1,5 +1,5 @@
-#ifndef SWIPE_AREA_HPP
-#define SWIPE_AREA_HPP
+#ifndef LIBWTK_SDL2_SWIPE_AREA_HPP
+#define LIBWTK_SDL2_SWIPE_AREA_HPP
 
 #include <functional>
 

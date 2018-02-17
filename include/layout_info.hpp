@@ -1,5 +1,5 @@
-#ifndef LAYOUT_INFO_HPP
-#define LAYOUT_INFO_HPP
+#ifndef LIBWTK_SDL2_LAYOUT_INFO_HPP
+#define LIBWTK_SDL2_LAYOUT_INFO_HPP
 
 #include "font_word_cache.hpp"
 

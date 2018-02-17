@@ -1,5 +1,5 @@
-#ifndef KEY_EVENT_HPP
-#define KEY_EVENT_HPP
+#ifndef LIBWTK_SDL2_KEY_EVENT_HPP
+#define LIBWTK_SDL2_KEY_EVENT_HPP
 
 struct key_event
 {

@@ -1,5 +1,5 @@
-#ifndef WIDGET_HPP
-#define WIDGET_HPP
+#ifndef LIBWTK_SDL2_WIDGET_HPP
+#define LIBWTK_SDL2_WIDGET_HPP
 
 #include <memory>
 #include <vector>

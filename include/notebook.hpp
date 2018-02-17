@@ -1,5 +1,5 @@
-#ifndef NOTEBOOK_HPP
-#define NOTEBOOK_HPP
+#ifndef LIBWTK_SDL2_NOTEBOOK_HPP
+#define LIBWTK_SDL2_NOTEBOOK_HPP
 
 #include <vector>
 

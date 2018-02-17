@@ -1,5 +1,5 @@
-#ifndef SWIPE_EVENT_HPP
-#define SWIPE_EVENT_HPP
+#ifndef LIBWTK_SDL2_SWIPE_EVENT_HPP
+#define LIBWTK_SDL2_SWIPE_EVENT_HPP
 
 #include "geometry.hpp"
 

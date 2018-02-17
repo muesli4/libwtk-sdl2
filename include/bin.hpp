@@ -1,5 +1,5 @@
-#ifndef BIN_HPP
-#define BIN_HPP
+#ifndef LIBWTK_SDL2_BIN_HPP
+#define LIBWTK_SDL2_BIN_HPP
 
 #include "widget.hpp"
 
@@ -35,4 +35,3 @@ struct bin : widget
 };
 
 #endif
-

@@ -1,5 +1,5 @@
-#ifndef LABEL_HPP
-#define LABEL_HPP
+#ifndef LIBWTK_SDL2_LABEL_HPP
+#define LIBWTK_SDL2_LABEL_HPP
 
 // TODO different text sizes (will require changes to the font system)
 // TODO tiny DSEL for markup and font size

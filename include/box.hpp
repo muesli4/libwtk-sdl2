@@ -1,5 +1,5 @@
-#ifndef BOX_HPP
-#define BOX_HPP
+#ifndef LIBWTK_SDL2_BOX_HPP
+#define LIBWTK_SDL2_BOX_HPP
 
 #include <vector>
 

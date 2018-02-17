@@ -1,5 +1,5 @@
-#ifndef SELECTABLE_HPP
-#define SELECTABLE_HPP
+#ifndef LIBWTK_SDL2_SELECTABLE_HPP
+#define LIBWTK_SDL2_SELECTABLE_HPP
 
 #include "widget.hpp"
 

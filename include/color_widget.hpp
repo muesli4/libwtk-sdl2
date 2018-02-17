@@ -1,5 +1,5 @@
-#ifndef COLOR_WIDGET_HPP
-#define COLOR_WIDGET_HPP
+#ifndef LIBWTK_SDL2_COLOR_WIDGET_HPP
+#define LIBWTK_SDL2_COLOR_WIDGET_HPP
 
 #include "selectable.hpp"
 

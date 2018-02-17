@@ -1,5 +1,5 @@
-#ifndef TEXTURE_VIEW_HPP
-#define TEXTURE_VIEW_HPP
+#ifndef LIBWTK_SDL2_TEXTURE_VIEW_HPP
+#define LIBWTK_SDL2_TEXTURE_VIEW_HPP
 
 #include <string>
 

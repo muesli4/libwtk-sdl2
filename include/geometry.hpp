@@ -1,5 +1,5 @@
-#ifndef GEOMETRY_HPP
-#define GEOMETRY_HPP
+#ifndef LIBWTK_SDL2_GEOMETRY_HPP
+#define LIBWTK_SDL2_GEOMETRY_HPP
 
 #include <SDL2/SDL.h>
 

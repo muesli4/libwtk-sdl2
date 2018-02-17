@@ -1,5 +1,5 @@
-#ifndef BUTTON_HPP
-#define BUTTON_HPP
+#ifndef LIBWTK_SDL2_BUTTON_HPP
+#define LIBWTK_SDL2_BUTTON_HPP
 
 #include <functional>
 

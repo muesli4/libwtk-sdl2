@@ -1,5 +1,5 @@
-#ifndef SWIPE_DETECTOR_HPP
-#define SWIPE_DETECTOR_HPP
+#ifndef LIBWTK_SDL2_SWIPE_DETECTOR_HPP
+#define LIBWTK_SDL2_SWIPE_DETECTOR_HPP
 
 #include <optional>
 

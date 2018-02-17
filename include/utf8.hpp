@@ -1,5 +1,5 @@
-#ifndef UTF8_HPP
-#define UTF8_HPP
+#ifndef LIBWTK_SDL2_UTF8_HPP
+#define LIBWTK_SDL2_UTF8_HPP
 
 #include <cstdint>
 

@@ -1,5 +1,5 @@
-#ifndef FONT_WORD_CACHE_HPP
-#define FONT_WORD_CACHE_HPP
+#ifndef LIBWTK_SDL2_FONT_WORD_CACHE_HPP
+#define LIBWTK_SDL2_FONT_WORD_CACHE_HPP
 
 #include <stdexcept>
 #include <unordered_map>

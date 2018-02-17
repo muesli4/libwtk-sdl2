@@ -1,5 +1,5 @@
-#ifndef DRAW_CONTEXT_HPP
-#define DRAW_CONTEXT_HPP
+#ifndef LIBWTK_SDL2_DRAW_CONTEXT_HPP
+#define LIBWTK_SDL2_DRAW_CONTEXT_HPP
 
 #include <exception>
 #include <SDL2/SDL_rect.h>

@@ -1,5 +1,5 @@
-#ifndef CONTAINER_HPP
-#define CONTAINER_HPP
+#ifndef LIBWTK_SDL2_CONTAINER_HPP
+#define LIBWTK_SDL2_CONTAINER_HPP
 
 #include <functional>
 

@@ -1,5 +1,5 @@
-#ifndef WIDGET_CONTEXT_HPP
-#define WIDGET_CONTEXT_HPP
+#ifndef LIBWTK_SDL2_WIDGET_CONTEXT_HPP
+#define LIBWTK_SDL2_WIDGET_CONTEXT_HPP
 
 #include <string>
 #include <SDL2/SDL_video.h>
