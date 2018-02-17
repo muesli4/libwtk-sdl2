@@ -55,6 +55,9 @@ struct font_word_cache
 
     private:
 
+    template <typename BackInsertIt>
+    vec compute_text_layout(std::string t, int max_line_width, BackInsertIt it);
+
     int get_word_left_kerning(std::string const & word);
     int get_word_right_kerning(std::string const & word);
 

@@ -153,15 +153,9 @@ vec font_word_cache::texture_dim_nullptr(SDL_Texture * texture) const
     }
 }
 
-std::tuple<vec, std::vector<copy_command>> font_word_cache::text(std::string t, int max_line_width)
+template <typename BackInsertIt>
+vec font_word_cache::compute_text_layout(std::string t, int max_line_width, BackInsertIt it)
 {
-    // FIXME: temporary solution - do not use too much memory, although with words caching it's not as bad as before
-    // TODO add use count? would it cause ui lag?
-    if (_prerendered.size() > 40000)
-        clear();
-
-    std::vector<copy_command> copy_commands;
-
     vec target_size { 0, 0 };
     
     auto word_fragments = split_words(t);
@@ -174,7 +168,10 @@ std::tuple<vec, std::vector<copy_command>> font_word_cache::text(std::string t, 
         int const first_left_kerning = (word_fragments[0].extra_spaces > 0 ? get_word_left_kerning(word_fragments[0].word) : 0);
 
         if (first_texture != nullptr)
-            copy_commands.push_back({ first_texture, 0, 0 });
+        {
+            *it = { first_texture, 0, 0 };
+            ++it;
+        }
 
         int line_width = first_dim.w + first_left_kerning + word_fragments[0].extra_spaces * _space_advance;
         int height = 0;
@@ -209,7 +206,10 @@ std::tuple<vec, std::vector<copy_command>> font_word_cache::text(std::string t, 
                 // word does fit
 
                 if (current_texture != nullptr)
-                    copy_commands.push_back({ current_texture, line_width + spacing, height });
+                {
+                    *it = { current_texture, line_width + spacing, height };
+                    ++it;
+                }
 
                 line_width = next_line_width;
             }
@@ -221,7 +221,9 @@ std::tuple<vec, std::vector<copy_command>> font_word_cache::text(std::string t, 
                 height += font_line_skip();
 
                 if (current_texture != nullptr)
-                    copy_commands.push_back({ current_texture, 0, height });
+                {
+                    *it = { current_texture, 0, height };
+                }
             }
 
             prev_post_left_kerning = current_post_left_kerning;
@@ -231,12 +233,35 @@ std::tuple<vec, std::vector<copy_command>> font_word_cache::text(std::string t, 
         target_size.h = height + font_line_skip();
     }
 
+    return target_size;
+}
+
+std::tuple<vec, std::vector<copy_command>> font_word_cache::text(std::string t, int max_line_width)
+{
+    // FIXME: temporary solution - do not use too much memory, although with words caching it's not as bad as before
+    // TODO add use count? would it cause ui lag?
+    if (_prerendered.size() > 40000)
+        clear();
+
+    std::vector<copy_command> copy_commands;
+    vec target_size = compute_text_layout(t, max_line_width, std::back_inserter(copy_commands));
     return std::make_tuple(target_size, copy_commands);
 }
 
+// Not really an iterator but satisfies the use case.
+struct null_iterator
+{
+    struct assignment_dummy
+    {
+        assignment_dummy & operator=(copy_command const & t) { return *this; }
+    };
+    null_iterator & operator++() { return *this; }
+    assignment_dummy operator*() { return assignment_dummy(); };
+};
+
 vec font_word_cache::text_size(std::string t, int max_line_width)
 {
-    return std::get<0>(text(t, max_line_width));
+    return compute_text_layout(t, max_line_width, null_iterator());
 }
 
 int font_word_cache::text_minimum_width(std::string t)
