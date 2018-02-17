@@ -21,6 +21,11 @@ struct padding : bin
     void set_pad_top(int pad_top);
     void set_pad_bottom(int pad_bottom);
 
+    int get_pad_left() const;
+    int get_pad_right() const;
+    int get_pad_top() const;
+    int get_pad_bottom() const;
+
     private:
 
     int _pad_left;

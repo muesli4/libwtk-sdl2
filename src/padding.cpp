@@ -62,6 +62,26 @@ void padding::set_pad_bottom(int pad_bottom)
     _pad_bottom = std::max(0, pad_bottom);
 }
 
+int padding::get_pad_left() const
+{
+    return _pad_left;
+}
+
+int padding::get_pad_right() const
+{
+    return _pad_right;
+}
+
+int padding::get_pad_top() const
+{
+    return _pad_top;
+}
+
+int padding::get_pad_bottom() const
+{
+    return _pad_bottom;
+}
+
 std::shared_ptr<padding> pad(int pad_x, int pad_y, widget_ptr wptr)
 {
     return std::make_shared<padding>(pad_x, pad_y, wptr);
@@ -95,25 +115,25 @@ std::shared_ptr<padding> pad_bottom(int pad, widget_ptr wptr)
 
 std::shared_ptr<padding> pad_left(int pad, std::shared_ptr<padding> wptr)
 {
-    wptr->set_pad_left(pad);
+    wptr->set_pad_left(wptr->get_pad_left() + pad);
     return wptr;
 }
 
 std::shared_ptr<padding> pad_right(int pad, std::shared_ptr<padding> wptr)
 {
-    wptr->set_pad_right(pad);
+    wptr->set_pad_right(wptr->get_pad_right() + pad);
     return wptr;
 }
 
 std::shared_ptr<padding> pad_top(int pad, std::shared_ptr<padding> wptr)
 {
-    wptr->set_pad_top(pad);
+    wptr->set_pad_top(wptr->get_pad_top() + pad);
     return wptr;
 }
 
 std::shared_ptr<padding> pad_bottom(int pad, std::shared_ptr<padding> wptr)
 {
-    wptr->set_pad_bottom(pad);
+    wptr->set_pad_bottom(wptr->get_pad_bottom() + pad);
     return wptr;
 }
 
