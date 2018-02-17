@@ -2,9 +2,9 @@
 #define LIBWTK_SDL2_UTIL_HPP
 
 #ifdef _WIN32
-char const PATH_SEP = '\\';
+#define NEWLINE_C_STR "\r\n"
 #else
-char const PATH_SEP = '/';
+#define NEWLINE_C_STR "\n"
 #endif
 
 // check overflow and ensure at most upper_bound
