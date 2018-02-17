@@ -76,7 +76,6 @@ widget_ptr num_button()
 
 void event_loop(SDL_Renderer * renderer)
 {
-
     std::vector<std::string> test_values{"a", "b", "c", "d", "testwdfkosadjflkajskdfjlaskdjflkasdjdfklajsdlkfjasldkdfjflkasddjflkdsjlfkjdsalkkfjdkk", "test1", "test2", "a very long string this is indeed", "foo", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a"};
 
     auto nb = std::make_shared<notebook>(std::vector<widget_ptr>
@@ -118,6 +117,9 @@ void event_loop(SDL_Renderer * renderer)
                        , 20, false) }
         }, 20, false));
 
+    /*
+    padding main_widget(20, vbox({ { false, std::make_shared<label>("This text should hopefully produce a linebreak. Otherwise something is not working correctly.\n\nYou may use Tab and Shift+Tab to focus widgets or use Shift and the corresponding arrow key for a 2-dimensional direction.")}, { false, cw()} , { false, num_button() }, { false, num_button() } }, 20, false));
+    */
 
     // setup necessary context (as in local to a window or other unit of management)
     widget_context ctx(renderer, { "/usr/share/fonts/TTF/DejaVuSans.ttf", 15 }, main_widget);
@@ -135,7 +137,11 @@ void event_loop(SDL_Renderer * renderer)
         else if (ev.type == SDL_WINDOWEVENT)
         {
             if (ev.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+            {
+                //std::cout << ev.window.data1 << "x" << ev.window.data2 << std::endl;
+
                 ctx.change_widget_area({ 0, 0, ev.window.data1, ev.window.data2 });
+            }
             else if (ev.window.event != SDL_WINDOWEVENT_EXPOSED)
             {
                 continue;
@@ -164,7 +170,7 @@ int main()
         std::exit(0);
     }
 
-    SDL_Window * window = SDL_CreateWindow("widget test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1600, 1000, 0);
+    SDL_Window * window = SDL_CreateWindow("widget test", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1600, 1000/*775*/, 0);
 
     if (window == nullptr)
     {
