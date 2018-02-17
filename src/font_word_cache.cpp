@@ -1,7 +1,7 @@
 #include <algorithm>
 
 #include "font_word_cache.hpp"
-#include "util.hpp"
+#include "utf8.hpp"
 #include "sdl_util.hpp"
 
 font_not_found::font_not_found(std::string msg)

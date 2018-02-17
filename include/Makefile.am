@@ -25,6 +25,7 @@ pkginclude_HEADERS =    \
 	swipe_event.hpp       \
 	table.hpp             \
 	texture_view.hpp      \
+	utf8.hpp              \
 	util.hpp              \
 	widget.hpp            \
 	widget_context.hpp

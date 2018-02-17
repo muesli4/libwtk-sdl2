@@ -30,6 +30,7 @@ libwtk_sdl2_la_SOURCES = \
 	swipe_detector.cpp     \
 	table.cpp              \
 	texture_view.cpp       \
+	utf8.cpp               \
 	util.cpp               \
 	widget.cpp             \
 	widget_context.cpp
