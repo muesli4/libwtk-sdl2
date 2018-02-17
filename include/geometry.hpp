@@ -15,6 +15,8 @@ struct vec
     int h;
 };
 
+int square(int i);
+
 // checks whether a point lies within a rectangle
 bool within_rect(point p, SDL_Rect const & r);
 

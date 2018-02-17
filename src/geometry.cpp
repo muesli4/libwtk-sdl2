@@ -1,5 +1,10 @@
 #include "geometry.hpp"
 
+int square(int i)
+{
+    return i * i;
+}
+
 bool within_rect(point p, SDL_Rect const & r)
 {
     return p.x >= r.x && p.x < r.x + r.w && p.y >= r.y && p.y < r.y + r.h;
@@ -49,3 +54,4 @@ vec operator-(point p, point q)
 {
     return { p.x - q.x, p.y - q.y };
 }
+
