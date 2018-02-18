@@ -13,7 +13,7 @@ widget_context::widget_context(SDL_Renderer * renderer, font f, widget & main_wi
     , _fwc(_renderer, f.path, f.size)
     , _dc(_renderer, _fwc)
     , _sc(box)
-    , _sd(_fwc.font_line_skip(), 0.3)
+    , _sd(_fwc.font_line_skip() * 2, 0.3)
     , _main_widget(main_widget)
     , _layout_info(_fwc)
 {
