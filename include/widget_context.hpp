@@ -10,18 +10,12 @@
 
 #include "context_info.hpp"
 #include "draw_context.hpp"
+#include "font.hpp"
 #include "font_word_cache.hpp"
 #include "mouse_tracker.hpp"
 #include "selection_context.hpp"
 
 struct widget;
-
-// TODO use several fonts
-struct font
-{
-    std::string path;
-    unsigned int size;
-};
 
 struct widget_context
 {
