@@ -18,20 +18,31 @@
 //      considering the fact that widgets should only respond to mouse down
 //      events within their box.
 
+// TODO instead of dirty checking either send request to relayout or redraw an
+//      area.
+//      - Might use clipping and normal drawing or specialized method.
+//      - Use an interface beside the parrent pointer to request these kind of
+//        changes. Then it can be propagated upwards and at the top anything can
+//        be put in that is not even a widget (e.g., helper in widget_context or
+//        a window).
+//
+// struct updateable
+// {
+//     virtual void on_size_changed() = 0;
+//
+//     struct redraw_request
+//     {
+//         widget * w;
+//         SDL_Rect area;
+//     };
+//
+//     virtual void on_child_redraw(std::vector<redraw_request> redraw_requests) = 0;
+// };
+
 // TODO provide means to add widgets outside of constructors (redo layout only for local container or upwards?)
 // TODO should widgets relayout when their content changes?
 
-// TODO add natural size property (the size at which the icon looks best
-//      make minimum really the size that is the smallest possible one
-//      widget containers: fill to natural size first, then distribute
 // TODO which widgets need width-for-height?
-
-// TODO improved box / table layout for height-for-width widgets:
-// 1. Find minimum lengths as usual.
-// 2. Instead of evenly filling, favor height-for-width wigets (in table first
-//    do widths, as it will determine the height).
-// 3. Then distribute remaining space evenly (Improvement: Widgets may decide
-//    how much they profit from additional space).
 
 // - Out of consistency widgets should not react to MOUSEUP events when they
 //   haven't been activted by a MOUSEDOWN event in their area before. However,
@@ -80,7 +91,7 @@ void event_loop(SDL_Renderer * renderer)
 
     auto nb = std::make_shared<notebook>(std::vector<widget_ptr>
         { cw()
-        , std::make_shared<swipe_area>([](swipe_action act){ std::cout << "swipe = " << (int)act << std::endl; }, [](){ std::cout << "press" << std::endl; })
+        , std::make_shared<swipe_area>([](swipe_direction dir){ std::cout << "swipe " << to_string(dir) << std::endl; }, [](){ std::cout << "press" << std::endl; })
         });
 
     auto nb_indicator = std::make_shared<label>("Active Notebook Widget: Color");

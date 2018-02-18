@@ -2,15 +2,16 @@
 #define LIBWTK_SDL2_WIDGET_HPP
 
 #include <memory>
+#include <optional>
 #include <vector>
 
+#include "context_info.hpp"
 #include "draw_context.hpp"
-#include "mouse_event.hpp"
-#include "swipe_event.hpp"
-#include "key_event.hpp"
-#include "selection_context.hpp"
 #include "geometry.hpp"
-#include "layout_info.hpp"
+#include "key_event.hpp"
+#include "mouse_event.hpp"
+#include "selection_context.hpp"
+#include "swipe.hpp"
 
 // Describes how a widget tree might be navigated. A navigation without
 // 2-dimensional context should reach all seletable widgets, whereas one with
@@ -64,10 +65,10 @@ struct widget
     // Get the layout information associated with the widgets context. This is
     // meant for font settings or available area to help with widget layout and
     // drawing.
-    layout_info const & get_layout_info() const;
+    context_info const & get_context_info() const;
 
     // Should not be set manually if you do not know what you're doing.
-    void set_layout_info(layout_info const & li);
+    void set_context_info(context_info const & ci);
 
     // Should not be set manually. Containers are responsible for linking their
     // children to them.
@@ -142,6 +143,10 @@ struct widget
 
     protected:
 
+    // Helper to implement widgets that support swipes. Uses the default values
+    // of the context to generate a possible direction from a mouse up event.
+    std::optional<swipe_direction> get_swipe_direction_with_context_info(mouse_up_event const & e);
+
     // Helper to continue a navigation in a parent once the current widget is
     // exhausted.
     widget * navigate_selectable_parent(navigation_type nt, point center);
@@ -153,7 +158,7 @@ struct widget
     // cached for efficiency, may be replaced by just width and height
     SDL_Rect _box;
 
-    layout_info const * _layout_info;
+    context_info const * _context_info;
 };
 
 #endif

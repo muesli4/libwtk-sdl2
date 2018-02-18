@@ -27,7 +27,7 @@ void list_view::on_draw(draw_context & dc, selection_context const & sc) const
     dc.draw_entry_box(get_box());
 
     // TODO what was the difference between font height and font line skip?
-    int const entry_height = static_cast<int>(get_layout_info().font_height());
+    int const entry_height = static_cast<int>(get_context_info().font_height());
 
     // the entry box has a border of 1 on each side TODO make more flexible
     int const x_offset = get_box().x + 1;
@@ -69,55 +69,67 @@ void list_view::on_draw(draw_context & dc, selection_context const & sc) const
     }
 }
 
+int list_view::hit_entry(int y) const
+{
+    return (y - get_box().y - 2) / _row_height;
+}
+
 void list_view::on_mouse_up_event(mouse_up_event const & e)
 {
+
+    auto opt_dir = get_swipe_direction_with_context_info(e);
     // scroll on swipe
-    if (e.opt_swipe_event.has_value())
+    if (opt_dir.has_value())
     {
-        // TODO swipe in x-axis may show the entries with another x_offset
-        swipe_event const & se = e.opt_swipe_event.value();
-        if (within_rect(se.position, get_box()))
+        auto dir = opt_dir.value();
+
+        // Swipe in x-axis may show the entries with another x_offset.
+        if (dir == swipe_direction::LEFT)
         {
-            if (se.action == swipe_action::LEFT)
-            {
-                std::size_t old = _x_shift;
-                _x_shift -= 10;
-                if (old < _x_shift)
-                    _x_shift = 0;
-                mark_dirty();
-            }
-            else if (se.action == swipe_action::RIGHT)
-            {
-                _x_shift += 10;
-                mark_dirty();
-            }
-            else
-            {
-                int const distance = static_cast<int>(_visible_entries) * se.length.h / (get_box().w / 2);
-
-                if (distance < 0)
-                    scroll_up(distance);
-                else
-                    scroll_down(distance);
-            }
-        }
-    }
-    else if (within_rect(e.position, get_box()))
-    {
-        // TODO may be detected more precise
-        std::size_t const visible_index = (e.position.y - get_box().y) / _row_height;
-
-        // set focus on hit entry
-        // TODO focus seperate from mouse ?
-        // TODO allow unfocused state ?
-        std::size_t const new_selected_position = _position + visible_index;
-
-        if (new_selected_position < _values.get().size())
-        {
-            _selected_position = new_selected_position;
-            on_activate();
+            std::size_t old = _x_shift;
+            _x_shift -= 10;
+            if (old < _x_shift)
+                _x_shift = 0;
             mark_dirty();
         }
+        else if (dir == swipe_direction::RIGHT)
+        {
+            _x_shift += 10;
+            mark_dirty();
+        }
+        else
+        {
+            int const distance = static_cast<int>(_visible_entries) * e.opt_movement.value().length.h / (get_box().w / 2);
+
+            if (distance < 0)
+                scroll_up(distance);
+            else
+                scroll_down(distance);
+        }
+    }
+    else if (within_rect(e.position, pad_rect(get_box(), 2)))
+    {
+        // TODO refactor to remove _opt_pressed_point
+
+        int down_entry = _opt_pressed_point.has_value() ? hit_entry(_opt_pressed_point.value().y) : -1;
+
+        // Only activate when down and up where on the same entry.
+        if (down_entry == hit_entry(e.position.y))
+        {
+            std::size_t const pressed_position = _position + down_entry;
+
+            // Ensure clicked entry is within bounds.
+            if (pressed_position < _values.get().size())
+            {
+                // set focus on hit entry ?
+                // TODO focus seperate from mouse ?
+                // TODO allow unfocused state ?
+                _selected_position = pressed_position;
+
+                _activate_callback(pressed_position);
+            }
+        }
+        mark_dirty();
     }
 
     _opt_pressed_point.reset();
@@ -142,13 +154,13 @@ void list_view::on_activate()
 void list_view::apply_layout_to_children()
 {
     // TODO code smell ?
-    _row_height = get_layout_info().font_line_skip();
+    _row_height = get_context_info().font_line_skip();
     _visible_entries = (get_box().h - 2) / _row_height;
 }
 
 vec list_view::min_size_hint() const
 {
-    int const line_height = get_layout_info().font_line_skip();
+    int const line_height = get_context_info().font_line_skip();
     int const min_width = INDICATOR_MIN_WIDTH + 4 + 2 * line_height;
     int const min_height = std::max(2 * INDICATOR_MIN_HEIGHT, 2 * line_height);
     return { min_width, min_height };
@@ -156,7 +168,7 @@ vec list_view::min_size_hint() const
 
 vec list_view::nat_size_inc_hint() const
 {
-    int const line_height = get_layout_info().font_line_skip();
+    int const line_height = get_context_info().font_line_skip();
     // TODO heuristc of width of each line, goal all text readable
     return { 200, 2 * line_height };
 }

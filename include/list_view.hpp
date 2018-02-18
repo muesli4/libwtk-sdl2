@@ -41,6 +41,8 @@ struct list_view : selectable
 
     private:
 
+    int hit_entry(int y) const;
+
     std::optional<point> _opt_pressed_point;
 
     std::size_t _position;

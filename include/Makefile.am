@@ -4,6 +4,7 @@ pkginclude_HEADERS =    \
 	button.hpp            \
 	color_widget.hpp      \
 	container.hpp         \
+	context_info.hpp      \
 	copy_command.hpp      \
 	draw_context.hpp      \
 	embedded_widget.hpp   \
@@ -12,17 +13,16 @@ pkginclude_HEADERS =    \
 	geometry.hpp          \
 	key_event.hpp         \
 	label.hpp             \
-	layout_info.hpp       \
 	list_view.hpp         \
 	mouse_event.hpp       \
+	mouse_tracker.hpp     \
 	notebook.hpp          \
 	padding.hpp           \
 	sdl_util.hpp          \
 	selectable.hpp        \
 	selection_context.hpp \
+	swipe.hpp             \
 	swipe_area.hpp        \
-	swipe_detector.hpp    \
-	swipe_event.hpp       \
 	table.hpp             \
 	texture_view.hpp      \
 	utf8.hpp              \

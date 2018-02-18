@@ -1,5 +1,6 @@
 #include "label.hpp"
 #include "sdl_util.hpp"
+#include "util.hpp"
 
 #include <sstream>
 
@@ -63,7 +64,7 @@ label::~label()
 
 void label::on_draw(draw_context & dc, selection_context const & sc) const
 {
-    int const font_height = get_layout_info().font_line_skip();
+    int const font_height = get_context_info().font_line_skip();
 
     auto real_box = get_box();
     int yoffset = real_box.y;
@@ -71,10 +72,6 @@ void label::on_draw(draw_context & dc, selection_context const & sc) const
 
     // clear background
     dc.draw_background(get_box());
-#ifdef DEBUG_LAYOUT
-    dc.set_color({255, 0, 0});
-    dc.draw_rect(get_box());
-#endif
 
     for (auto const & tf : _content)
     {
@@ -84,6 +81,10 @@ void label::on_draw(draw_context & dc, selection_context const & sc) const
         yoffset += used_height;
         remaining_height -= used_height;
     }
+#ifdef DEBUG_LAYOUT
+    dc.set_color({255, 0, 0});
+    dc.draw_rect(get_box());
+#endif
 }
 
 void label::apply_layout_to_children()
@@ -93,19 +94,20 @@ void label::apply_layout_to_children()
 
 vec label::min_size_hint() const
 {
-    int font_height = get_layout_info().font_line_skip();
+    int font_height = get_context_info().font_line_skip();
     vec size { 0, 0 };
     for (auto const & tf : _content)
     {
         // Assuming the average character is more than twice as high as it is
         // wide, this will allow about 45 characters on the line, which should
         // be a reasonable minimum for the width.
-        vec psize = get_layout_info().text_size(tf.text, 13 * get_layout_info().font_height());
+        vec psize = get_context_info().text_size(tf.text, 13 * get_context_info().font_height());
 
         size.w = std::max(psize.w, size.w);
         size.h += psize.h;
     }
     return vec{ font_height, font_height } + size;
+    //return vec{ font_height, 0 };
 }
 
 int label::height_for_width_hint(int width) const
@@ -130,8 +132,7 @@ std::string label::get_text() const
         result += tf.text;
         for (int i = 0; i < tf.trailing_newlines; i++)
         {
-            // TODO windows compatibility
-            result += "\n";
+            result += NEWLINE_C_STR;
         }
     }
     return result;
@@ -152,12 +153,12 @@ std::vector<paragraph> const & label::get_content() const
 
 int label::calculate_height_for_width(int width) const
 {
-    int const font_height = get_layout_info().font_line_skip();
+    int const font_height = get_context_info().font_line_skip();
 
     int height = 0;
     for (auto const & tf : _content)
     {
-        height += get_layout_info().text_size(tf.text, width).h + tf.trailing_newlines * font_height;
+        height += get_context_info().text_size(tf.text, width).h + tf.trailing_newlines * font_height;
     }
     return height;
 }

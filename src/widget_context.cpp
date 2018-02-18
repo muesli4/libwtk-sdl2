@@ -13,9 +13,9 @@ widget_context::widget_context(SDL_Renderer * renderer, font f, widget & main_wi
     , _fwc(_renderer, f.path, f.size)
     , _dc(_renderer, _fwc)
     , _sc(box)
-    , _sd(_fwc.font_line_skip() * 2, 0.3)
+    , _mt()
     , _main_widget(main_widget)
-    , _layout_info(_fwc)
+    , _context_info(_fwc, 0.3, _fwc.font_line_skip() * 2)
 {
     std::vector<widget *> stack { &main_widget };
     do
@@ -25,7 +25,7 @@ widget_context::widget_context(SDL_Renderer * renderer, font f, widget & main_wi
         auto cs = wptr->get_children();
         for (auto c : cs)
             stack.push_back(c);
-        wptr->set_layout_info(_layout_info);
+        wptr->set_context_info(_context_info);
     }
     while (!stack.empty());
 
@@ -40,11 +40,11 @@ void widget_context::process_event(SDL_Event & ev)
     {
         point p { ev.button.x, ev.button.y };
         _main_widget.on_mouse_down_event({p});
-        _sd.mouse_down(p);
+        _mt.mouse_down(p);
     }
     else if (ev.type == SDL_MOUSEBUTTONUP)
     {
-        _main_widget.on_mouse_up_event(_sd.mouse_up({ ev.button.x, ev.button.y }));
+        _main_widget.on_mouse_up_event(_mt.mouse_up({ ev.button.x, ev.button.y }));
     }
     else if (ev.type == SDL_KEYDOWN)
     {
@@ -117,11 +117,11 @@ void widget_context::change_widget_area(SDL_Rect new_box)
     _sc.change_widget_area(new_box);
 }
 
-void widget_context::set_layout_info(widget * w)
+void widget_context::set_context_info(widget * w)
 {
-    w->set_layout_info(_layout_info);
+    w->set_context_info(_context_info);
     for (auto ptr : w->get_children())
     {
-        set_layout_info(ptr);
+        set_context_info(ptr);
     }
 }

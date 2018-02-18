@@ -13,21 +13,22 @@ libwtk_sdl2_la_SOURCES = \
 	button.cpp             \
 	color_widget.cpp       \
 	container.cpp          \
+	context_info.cpp       \
 	draw_context.cpp       \
 	empty.cpp              \
 	font_word_cache.cpp    \
 	geometry.cpp           \
 	label.cpp              \
-	layout_info.cpp        \
 	list_view.cpp          \
 	mouse_event.cpp        \
+	mouse_tracker.cpp      \
 	notebook.cpp           \
 	padding.cpp            \
 	sdl_util.cpp           \
 	selectable.cpp         \
 	selection_context.cpp  \
+	swipe.cpp              \
 	swipe_area.cpp         \
-	swipe_detector.cpp     \
 	table.cpp              \
 	texture_view.cpp       \
 	utf8.cpp               \

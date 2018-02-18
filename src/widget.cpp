@@ -49,14 +49,14 @@ SDL_Rect const & widget::get_box() const
     return _box;
 }
 
-void widget::set_layout_info(layout_info const & li)
+void widget::set_context_info(context_info const & ci)
 {
-    _layout_info = &li;
+    _context_info = &ci;
 }
 
-layout_info const & widget::get_layout_info() const
+context_info const & widget::get_context_info() const
 {
-    return *_layout_info;
+    return *_context_info;
 }
 
 void widget::set_parent(widget * parent)
@@ -122,6 +122,18 @@ int widget::height_for_width_hint(int width) const
 
 widget::~widget()
 {
+}
+
+std::optional<swipe_direction> widget::get_swipe_direction_with_context_info(mouse_up_event const & e)
+{
+    if (e.opt_movement.has_value())
+    {
+        auto const & m = e.opt_movement.value();
+        if (within_rect(m.origin, _box))
+            return get_swipe_direction(m, _context_info->swipe_lower_threshold, _context_info->dir_unambig_factor);
+    }
+
+    return std::nullopt;
 }
 
 widget * widget::navigate_selectable_parent(navigation_type nt, point center)

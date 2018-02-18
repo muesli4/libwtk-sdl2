@@ -1,16 +1,18 @@
 #ifndef LIBWTK_SDL2_WIDGET_CONTEXT_HPP
 #define LIBWTK_SDL2_WIDGET_CONTEXT_HPP
 
+#include <optional>
 #include <string>
-#include <SDL2/SDL_video.h>
-#include <SDL2/SDL_rect.h>
-#include <SDL2/SDL_events.h>
 
-#include "font_word_cache.hpp"
+#include <SDL2/SDL_events.h>
+#include <SDL2/SDL_rect.h>
+#include <SDL2/SDL_video.h>
+
+#include "context_info.hpp"
 #include "draw_context.hpp"
+#include "font_word_cache.hpp"
+#include "mouse_tracker.hpp"
 #include "selection_context.hpp"
-#include "swipe_detector.hpp"
-#include "layout_info.hpp"
 
 struct widget;
 
@@ -39,16 +41,17 @@ struct widget_context
 
     private:
 
-    void set_layout_info(widget *);
+    void set_context_info(widget *);
 
     SDL_Rect _box;
     SDL_Renderer * _renderer;
     font_word_cache _fwc;
     draw_context _dc;
     selection_context _sc;
-    swipe_detector _sd;
+    mouse_tracker _mt;
     widget & _main_widget;
-    layout_info _layout_info;
+    context_info _context_info;
+    std::optional<vec> _mouse_down_position;
 };
 
 #endif

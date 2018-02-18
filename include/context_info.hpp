@@ -1,11 +1,11 @@
-#ifndef LIBWTK_SDL2_LAYOUT_INFO_HPP
-#define LIBWTK_SDL2_LAYOUT_INFO_HPP
+#ifndef LIBWTK_SDL2_CONTEXT_INFO_HPP
+#define LIBWTK_SDL2_CONTEXT_INFO_HPP
 
 #include "font_word_cache.hpp"
 
-struct layout_info
+struct context_info
 {
-    layout_info(font_word_cache & fwc);
+    context_info(font_word_cache & fwc, int swipe_lower_threshold, double dir_unambig_factor);
 
     // fonts
     vec text_size(std::string t, int max_line_width = -1) const;
@@ -14,6 +14,11 @@ struct layout_info
     int font_line_skip() const;
 
     // theme
+
+
+    // input
+    double const dir_unambig_factor;
+    int const swipe_lower_threshold;
 
     private:
 

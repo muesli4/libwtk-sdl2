@@ -52,7 +52,7 @@ void color_widget::on_activate()
 vec color_widget::min_size_hint() const
 {
     // TODO how to dimension ?
-    int v = get_layout_info().font_line_skip();
+    int v = get_context_info().font_line_skip();
     return { v, v };
 }
 
