@@ -135,14 +135,14 @@ void box::apply_layout_to_children()
             // The amount that is used to partially fill the child to the
             // natural size.
             vector<int> partial_nat_size_incs;
-            int extra_width = 0;
-            int extra_width_rem = 0;
+            int extra_length = 0;
+            int extra_length_rem = 0;
             if (use_natural_size)
             {
                 // every widget fits with natural size
                 int const remaining_space = avail_after_spacing - (min_sum + nat_inc_sum);
-                extra_width = remaining_space / num_receiving;
-                extra_width_rem = remaining_space % num_receiving;
+                extra_length = remaining_space / num_receiving;
+                extra_length_rem = remaining_space % num_receiving;
             }
             else if (fill_to_natural)
             {
@@ -224,7 +224,7 @@ void box::apply_layout_to_children()
                 // TODO evenly distribute remainder?
                 // The space expanding widgets receive after every widget is
                 // able to get its natural size.
-                int const expand_width = c.expand ? extra_width + (extra_width_rem < k ? 1 : 0) : 0;
+                int const expand_width = c.expand ? extra_length + (extra_length_rem < k ? 1 : 0) : 0;
 
 
                 vec const nat_expand = use_natural_size
@@ -397,22 +397,53 @@ widget * box::navigate_selectable_from_children(navigation_type nt, widget * w, 
 
 vec box::min_size_hint() const
 {
+    int const spacing = _children.empty() ? 0 : (_children.size() - 1) * _children_spacing;
     vec result = { 0, 0 };
 
+    if (_o == orientation::HORIZONTAL)
+    {
+        result.w = spacing;
+    }
+    else
+    {
+        result.h = spacing;
+    }
+
+    int homogeneous_max = 0;
     for (auto & c : _children)
     {
         vec size = c.wptr->min_size_hint();
         if (_o == orientation::HORIZONTAL)
         {
             result.h = std::max(size.h, result.h);
-            result.w += size.w;
+            if (_children_homogeneous)
+                homogeneous_max = std::max(size.w, homogeneous_max);
+            else
+                result.w += size.w;
+
         }
         else
         {
-            result.h += size.h;
+            if (_children_homogeneous)
+                homogeneous_max = std::max(size.h, homogeneous_max);
+            else
+                result.h += size.h;
             result.w = std::max(size.w, result.w);
         }
     }
+
+    if (_children_homogeneous)
+    {
+        if (_o == orientation::HORIZONTAL)
+        {
+            result.w += homogeneous_max * _children.size();
+        }
+        else
+        {
+            result.h += homogeneous_max * _children.size();
+        }
+    }
+
     return result;
 }
 
