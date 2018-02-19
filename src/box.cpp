@@ -101,11 +101,12 @@ void box::apply_layout_to_children()
                     }
                     else
                     {
+                        int const nat_height = hfw - min_size.h;
                         nat_size_incs.push_back(
                             { max(0, get_box().w - min_size.w)
-                            , max(0, hfw - min_size.h)
+                            , max(0, nat_height)
                             });
-                        nat_inc_sum += hfw;
+                        nat_inc_sum += nat_height;
                     }
                 }
                 else
@@ -417,12 +418,14 @@ vec box::min_size_hint() const
 
 vec box::nat_size_inc_hint() const
 {
-    // TODO refactor
     vec result = { 0, 0 };
 
-    for (auto & c : _children)
+    std::vector<std::size_t> hfw_indices;
+
+    for (std::size_t k = 0; k < _children.size(); ++k)
     {
-        vec size = c.wptr->nat_size_inc_hint();
+        auto const & c = _children[k];
+        vec const size = c.wptr->nat_size_inc_hint();
         if (_o == orientation::HORIZONTAL)
         {
             result.h = std::max(size.h, result.h);
@@ -430,10 +433,28 @@ vec box::nat_size_inc_hint() const
         }
         else
         {
-            result.h += size.h;
-            result.w = std::max(size.w, result.w);
+            // TODO not optimal since we can't use it properly
+            int const hfw = c.wptr->height_for_width_hint(get_box().w);
+            if (hfw == -1)
+            {
+                result.h += size.h;
+                result.w = std::max(size.w, result.w);
+            }
+            else
+            {
+                hfw_indices.push_back(k);
+            }
         }
     }
+
+    // Rescale height-for-width widgets with maximum width.
+    for (auto hfw_idx : hfw_indices)
+    {
+        int const hfw = _children[hfw_idx].wptr->height_for_width_hint(result.w);
+        vec const min_size = _children[hfw_idx].wptr->min_size_hint();
+        result.h += hfw - min_size.h;
+    }
+
     return result;
 }
 
