@@ -1,4 +1,4 @@
-SUBDIRS = src include
+SUBDIRS = src include data
 dist_doc_DATA = README.md
 
 pkgconfigdir = $(libdir)/pkgconfig

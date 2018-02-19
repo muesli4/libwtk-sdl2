@@ -103,7 +103,7 @@ void event_loop(SDL_Renderer * renderer)
 
     padding main_widget(20, hbox(
         { { true, vbox({ { true, lv }, { false, nb_indicator }, { true, nb }, { false, nb_controls } }, 20, false) }
-        , { false, vbox({ { true, cw() }, { false, std::make_shared<texture_view>(load_texture_from_image(renderer, "/home/moritz/Bilder/PASBTNMagicalSentry.png")) }, { true, cw() } }, 20, false) }
+        , { false, vbox({ { true, cw() }, { false, std::make_shared<texture_view>(load_texture_from_image(renderer, PKGDATA"/test.jpeg")) }, { true, cw() } }, 20, false) }
         , { true, vbox( { { false, num_button() }
                          , { false, cw() }
                          , { false, std::make_shared<label>("This text should hopefully produce a linebreak. Otherwise something is not working correctly.\n\nYou may use Tab and Shift+Tab to focus widgets or use Shift and the corresponding arrow key for a 2-dimensional direction.") }

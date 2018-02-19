@@ -16,7 +16,7 @@ PKG_CHECK_MODULES(SDL2_image, SDL2_image)
 
 # AX_BOOST_BASE([1.35.0],,[AC_MSG_ERROR([boost was not found])])
 
-AC_CONFIG_FILES([Makefile src/Makefile include/Makefile libwtk-sdl2.pc])
+AC_CONFIG_FILES([Makefile src/Makefile include/Makefile data/Makefile libwtk-sdl2.pc])
 
 #AM_GNU_GETTEXT([external])
 #AM_GNU_GETTEXT_VERSION([0.19.7])

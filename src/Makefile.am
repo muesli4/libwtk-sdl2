@@ -2,6 +2,8 @@
 #debug: CXXFLAGS += '-ggdb'
 #opt:   CXXFLAGS += '-O2'
 
+AM_CPPFLAGS = -DPKGDATA="\"$(pkgdatadir)\""
+
 headers = '-I../include/'
 flags = @AM_CXXFLAGS@ $(headers)
 
