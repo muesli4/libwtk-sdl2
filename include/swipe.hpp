@@ -6,6 +6,12 @@
 
 #include "mouse_event.hpp"
 
+struct swipe_config
+{
+    int lower_threshold;
+    double dir_unambig_factor;
+};
+
 enum class swipe_direction
 {
     UP,
@@ -14,8 +20,22 @@ enum class swipe_direction
     RIGHT,
 };
 
+struct swipe_info
+{
+    enum class type
+    {
+        PRESS,
+        DIRECTION
+    };
+
+    type type;
+
+    // only valid if type is type::DIRECTION
+    swipe_direction dir;
+};
+
 std::string to_string(swipe_direction dir);
 
-std::optional<swipe_direction> get_swipe_direction(mouse_movement const & m, int swipe_lower_threshold, double dir_unambig_factor);
+std::optional<swipe_info> get_swipe_info(mouse_movement const & m, swipe_config const & cfg);
 
 #endif

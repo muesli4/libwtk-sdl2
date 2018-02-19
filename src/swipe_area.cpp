@@ -22,14 +22,19 @@ void swipe_area::on_mouse_down_event(mouse_down_event const & e)
 
 void swipe_area::on_mouse_up_event(mouse_up_event const & e)
 {
-    auto opt_dir = get_swipe_direction_with_context_info(e);
-    if (opt_dir.has_value())
+    auto opt_info = get_swipe_info_with_context_info(e);
+    if (opt_info.has_value())
     {
-        _swipe_callback(opt_dir.value());
-    }
-    else if (within_rect(e.position, get_box()))
-    {
-        _press_callback();
+        auto const & info = opt_info.value();
+
+        if (info.type == swipe_info::type::PRESS)
+        {
+            _press_callback();
+        }
+        else
+        {
+            _swipe_callback(info.dir);
+        }
     }
 }
 

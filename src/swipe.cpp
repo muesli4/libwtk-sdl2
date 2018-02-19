@@ -12,15 +12,18 @@ std::string to_string(swipe_direction dir)
     }
 }
 
-std::optional<swipe_direction> get_swipe_direction(mouse_movement const & m, int swipe_lower_threshold, double dir_unambig_factor)
+std::optional<swipe_info> get_swipe_info(mouse_movement const & m, swipe_config const & cfg)
 {
     vec const swipe_vec = m.length;
     vec const abs_swipe_vec = abs(swipe_vec);
 
     swipe_direction dir;
 
+    bool is_swipe = square(abs_swipe_vec.w) + square(abs_swipe_vec.h)
+                    > square(cfg.lower_threshold);
+
     // vertical swipe
-    if (abs_swipe_vec.h * dir_unambig_factor >= abs_swipe_vec.w)
+    if (abs_swipe_vec.h * cfg.dir_unambig_factor >= abs_swipe_vec.w)
     {
         if (swipe_vec.h < 0)
         {
@@ -32,7 +35,7 @@ std::optional<swipe_direction> get_swipe_direction(mouse_movement const & m, int
         }
     }
     // horizontal swipe
-    else if (abs_swipe_vec.w * dir_unambig_factor >= abs_swipe_vec.h)
+    else if (abs_swipe_vec.w * cfg.dir_unambig_factor >= abs_swipe_vec.h)
     {
         if (swipe_vec.w > 0)
         {
@@ -43,18 +46,20 @@ std::optional<swipe_direction> get_swipe_direction(mouse_movement const & m, int
             dir = swipe_direction::LEFT;
         }
     }
-    else
+    // blind spot
+    else if (is_swipe)
     {
         return std::nullopt;
     }
 
     // A direction is not enough, it also has to be below the threshold.
-    if (square(abs_swipe_vec.w) + square(abs_swipe_vec.h) > square(swipe_lower_threshold))
+    if (is_swipe)
     {
-        return std::make_optional(dir);
+        return std::make_optional(swipe_info{ swipe_info::type::DIRECTION, dir });
     }
+    // press
     else
     {
-        return std::nullopt;
+        return std::make_optional(swipe_info{ swipe_info::type::PRESS });
     }
 }

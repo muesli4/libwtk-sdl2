@@ -15,7 +15,11 @@ widget_context::widget_context(SDL_Renderer * renderer, font f, widget & main_wi
     , _sc(box)
     , _mt()
     , _main_widget(main_widget)
-    , _context_info(_fwc, 0.3, _fwc.font_line_skip() * 2)
+    , _context_info( _fwc
+                   , { .lower_threshold = _fwc.font_line_skip() * 2
+                     , .dir_unambig_factor = 0.3
+                     }
+                   )
 {
     std::vector<widget *> stack { &main_widget };
     do

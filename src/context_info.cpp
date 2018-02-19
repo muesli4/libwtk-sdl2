@@ -1,8 +1,7 @@
 #include "context_info.hpp"
 
-context_info::context_info(font_word_cache & fwc, int swipe_lower_threshold, double dir_unambig_factor)
-    : dir_unambig_factor(dir_unambig_factor)
-    , swipe_lower_threshold(swipe_lower_threshold)
+context_info::context_info(font_word_cache & fwc, swipe_config swipe_cfg)
+    : swipe_cfg(swipe_cfg)
     , _fwc(fwc)
 {
 }

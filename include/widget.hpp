@@ -145,7 +145,7 @@ struct widget
 
     // Helper to implement widgets that support swipes. Uses the default values
     // of the context to generate a possible direction from a mouse up event.
-    std::optional<swipe_direction> get_swipe_direction_with_context_info(mouse_up_event const & e);
+    std::optional<swipe_info> get_swipe_info_with_context_info(mouse_up_event const & e);
 
     // Helper to continue a navigation in a parent once the current widget is
     // exhausted.

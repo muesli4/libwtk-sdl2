@@ -77,59 +77,59 @@ int list_view::hit_entry(int y) const
 void list_view::on_mouse_up_event(mouse_up_event const & e)
 {
 
-    auto opt_dir = get_swipe_direction_with_context_info(e);
+    auto opt_info = get_swipe_info_with_context_info(e);
     // scroll on swipe
-    if (opt_dir.has_value())
+    if (opt_info.has_value())
     {
-        auto dir = opt_dir.value();
+        auto const & info = opt_info.value();
 
-        // Swipe in x-axis may show the entries with another x_offset.
-        if (dir == swipe_direction::LEFT)
+        if (info.type == swipe_info::type::DIRECTION)
         {
-            std::size_t old = _x_shift;
-            _x_shift -= 10;
-            if (old < _x_shift)
-                _x_shift = 0;
-            mark_dirty();
-        }
-        else if (dir == swipe_direction::RIGHT)
-        {
-            _x_shift += 10;
-            mark_dirty();
+            if (info.dir == swipe_direction::LEFT)
+            {
+                std::size_t old = _x_shift;
+                _x_shift -= 10;
+                if (old < _x_shift)
+                    _x_shift = 0;
+                mark_dirty();
+            }
+            else if (info.dir == swipe_direction::RIGHT)
+            {
+                _x_shift += 10;
+                mark_dirty();
+            }
+            else
+            {
+                int const distance = static_cast<int>(_visible_entries) * e.opt_movement.value().length.h / (get_box().w / 2);
+
+                if (distance < 0)
+                    scroll_up(distance);
+                else
+                    scroll_down(distance);
+            }
         }
         else
         {
-            int const distance = static_cast<int>(_visible_entries) * e.opt_movement.value().length.h / (get_box().w / 2);
+            int down_entry = _opt_pressed_point.has_value() ? hit_entry(_opt_pressed_point.value().y) : -1;
 
-            if (distance < 0)
-                scroll_up(distance);
-            else
-                scroll_down(distance);
-        }
-    }
-    else if (within_rect(e.position, pad_rect(get_box(), 2)))
-    {
-        // TODO refactor to remove _opt_pressed_point
-
-        int down_entry = _opt_pressed_point.has_value() ? hit_entry(_opt_pressed_point.value().y) : -1;
-
-        // Only activate when down and up where on the same entry.
-        if (down_entry == hit_entry(e.position.y))
-        {
-            std::size_t const pressed_position = _position + down_entry;
-
-            // Ensure clicked entry is within bounds.
-            if (pressed_position < _values.get().size())
+            // Only activate when down and up where on the same entry.
+            if (down_entry >= 0 && down_entry == hit_entry(e.position.y))
             {
-                // set focus on hit entry ?
-                // TODO focus seperate from mouse ?
-                // TODO allow unfocused state ?
-                _selected_position = pressed_position;
+                std::size_t const pressed_position = _position + down_entry;
 
-                _activate_callback(pressed_position);
+                // Ensure clicked entry is within bounds.
+                if (pressed_position < _values.get().size())
+                {
+                    // set focus on hit entry ?
+                    // TODO focus seperate from mouse ?
+                    // TODO allow unfocused state ?
+                    _selected_position = pressed_position;
+
+                    _activate_callback(pressed_position);
+                }
             }
+            mark_dirty();
         }
-        mark_dirty();
     }
 
     _opt_pressed_point.reset();

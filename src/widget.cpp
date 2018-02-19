@@ -124,13 +124,13 @@ widget::~widget()
 {
 }
 
-std::optional<swipe_direction> widget::get_swipe_direction_with_context_info(mouse_up_event const & e)
+std::optional<swipe_info> widget::get_swipe_info_with_context_info(mouse_up_event const & e)
 {
     if (e.opt_movement.has_value())
     {
         auto const & m = e.opt_movement.value();
         if (within_rect(m.origin, _box))
-            return get_swipe_direction(m, _context_info->swipe_lower_threshold, _context_info->dir_unambig_factor);
+            return get_swipe_info(m, _context_info->swipe_cfg);
     }
 
     return std::nullopt;

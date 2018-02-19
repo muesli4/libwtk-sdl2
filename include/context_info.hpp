@@ -2,10 +2,11 @@
 #define LIBWTK_SDL2_CONTEXT_INFO_HPP
 
 #include "font_word_cache.hpp"
+#include "swipe.hpp"
 
 struct context_info
 {
-    context_info(font_word_cache & fwc, int swipe_lower_threshold, double dir_unambig_factor);
+    context_info(font_word_cache & fwc, swipe_config swipe_cfg);
 
     // fonts
     vec text_size(std::string t, int max_line_width = -1) const;
@@ -17,8 +18,7 @@ struct context_info
 
 
     // input
-    double const dir_unambig_factor;
-    int const swipe_lower_threshold;
+    swipe_config const swipe_cfg;
 
     private:
 
