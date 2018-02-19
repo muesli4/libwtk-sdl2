@@ -51,7 +51,8 @@ vec texture_view::nat_size_inc_hint() const
 
 int texture_view::height_for_width_hint(int width) const
 {
-    return fit_to_width(width).h;
+    // Fit upwards to available width as long as it is below natural width.
+    return fit_to_width(std::min(_nat_width, width)).h;
 }
 
 void texture_view::set_texture(unique_texture_ptr p, int min_width, int nat_width)
