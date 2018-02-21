@@ -12,6 +12,7 @@
 #include "draw_context.hpp"
 #include "font.hpp"
 #include "font_word_cache.hpp"
+#include "font_manager.hpp"
 #include "mouse_tracker.hpp"
 #include "selection_context.hpp"
 
@@ -20,8 +21,8 @@ struct widget;
 struct widget_context
 {
 
-    widget_context(SDL_Renderer * renderer, font f, widget & main_widget);
-    widget_context(SDL_Renderer * renderer, font f, widget & main_widget, SDL_Rect box);
+    widget_context(SDL_Renderer * renderer, std::vector<font> fonts, widget & main_widget);
+    widget_context(SDL_Renderer * renderer, std::vector<font> fonts, widget & main_widget, SDL_Rect box);
 
     void process_event(SDL_Event & ev);
 
@@ -43,7 +44,7 @@ struct widget_context
 
     SDL_Rect _box;
     SDL_Renderer * _renderer;
-    font_word_cache _fwc;
+    font_manager _fm;
     draw_context _dc;
     selection_context _sc;
     mouse_tracker _mt;

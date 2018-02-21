@@ -2,21 +2,21 @@
 #include "widget.hpp"
 #include "sdl_util.hpp"
 
-widget_context::widget_context(SDL_Renderer * renderer, font f, widget & main_widget)
-    : widget_context(renderer, f, main_widget, box_from_renderer(renderer))
+widget_context::widget_context(SDL_Renderer * renderer, std::vector<font> fonts, widget & main_widget)
+    : widget_context(renderer, fonts, main_widget, box_from_renderer(renderer))
 {
 }
 
-widget_context::widget_context(SDL_Renderer * renderer, font f, widget & main_widget, SDL_Rect box)
+widget_context::widget_context(SDL_Renderer * renderer, std::vector<font> fonts, widget & main_widget, SDL_Rect box)
     : _box(box)
     , _renderer(renderer)
-    , _fwc(_renderer, f.path, f.size)
-    , _dc(_renderer, _fwc)
+    , _fm(_renderer, fonts)
+    , _dc(_renderer, _fm)
     , _sc(box)
     , _mt()
     , _main_widget(main_widget)
-    , _context_info( _fwc
-                   , { .lower_threshold = _fwc.font_line_skip() * 2
+    , _context_info( _fm
+                   , { .lower_threshold = _fm.font_line_skip() * 2
                      , .dir_unambig_factor = 0.3
                      }
                    )

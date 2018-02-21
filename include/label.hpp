@@ -1,7 +1,6 @@
 #ifndef LIBWTK_SDL2_LABEL_HPP
 #define LIBWTK_SDL2_LABEL_HPP
 
-// TODO different text sizes (will require changes to the font system)
 // TODO tiny DSEL for markup and font size
 
 #include "widget.hpp"
@@ -9,6 +8,7 @@
 // TODO sum-of-product type would be better suited
 struct paragraph
 {
+    paragraph(std::string text, int trailing_newlines, int font_idx);
     paragraph(std::string text, int trailing_newlines);
     paragraph(std::string text);
     paragraph() = default;
@@ -16,6 +16,7 @@ struct paragraph
     // TODO add font, style, etc.
     std::string text;
     int trailing_newlines;
+    int font_idx;
 };
 
 struct label : widget

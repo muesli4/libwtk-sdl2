@@ -123,6 +123,8 @@ void event_loop(SDL_Renderer * renderer)
                          }, 20, false) }
         , { false, vbox( { { false, num_button() }
                          , { true, std::make_shared<empty>() }
+                         , { false, std::make_shared<label>(std::vector<paragraph>{ paragraph("This is a bigger font.", 0, 1) }) }
+                         , { true, std::make_shared<empty>() }
                          , { false, std::make_shared<button>("Quit", [](){ SDL_Event ev { .type = SDL_QUIT }; SDL_PushEvent(&ev); })}
                          }
                        , 20, false) }
@@ -133,7 +135,13 @@ void event_loop(SDL_Renderer * renderer)
     */
 
     // setup necessary context (as in local to a window or other unit of management)
-    widget_context ctx(renderer, { "/usr/share/fonts/TTF/DejaVuSans.ttf", 15 }, main_widget);
+    widget_context ctx
+        ( renderer
+        , { { "/usr/share/fonts/TTF/DejaVuSans.ttf", 15 }
+          , { "/usr/share/fonts/TTF/DejaVuSans.ttf", 20 }
+          }
+        , main_widget
+        );
 
     // draw initial state
     ctx.draw();

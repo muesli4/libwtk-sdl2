@@ -1,16 +1,17 @@
 #ifndef LIBWTK_SDL2_FONT_WORD_CACHE_HPP
 #define LIBWTK_SDL2_FONT_WORD_CACHE_HPP
 
-#include <stdexcept>
-#include <unordered_map>
 #include <memory>
-#include <vector>
+#include <stdexcept>
 #include <tuple>
+#include <unordered_map>
+#include <vector>
 
 #include <SDL2/SDL_ttf.h>
 
-#include "geometry.hpp"
 #include "copy_command.hpp"
+#include "font.hpp"
+#include "geometry.hpp"
 #include "sdl_util.hpp"
 
 struct font_not_found : std::runtime_error
@@ -31,8 +32,11 @@ struct word_fragment
 
 struct font_word_cache
 {
-    font_word_cache(SDL_Renderer * renderer, std::string font_path, int ptsize);
+    font_word_cache(SDL_Renderer * renderer, font f);
     ~font_word_cache();
+
+    font_word_cache(font_word_cache const &) = delete;
+    font_word_cache(font_word_cache && other);
 
     // Renders words onto textures with a cache. A proper layout is then created
     // to fit the textures on the given line width.

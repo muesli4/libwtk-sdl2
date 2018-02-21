@@ -14,11 +14,11 @@ font_render_error::font_render_error(std::string msg)
 {
 }
 
-font_word_cache::font_word_cache(SDL_Renderer * renderer, std::string font_path, int ptsize)
+font_word_cache::font_word_cache(SDL_Renderer * renderer, font f)
     : _renderer(renderer)
 {
     // load font and generate glyphs
-    _font = TTF_OpenFont(font_path.c_str(), ptsize);
+    _font = TTF_OpenFont(f.path.c_str(), f.size);
 
     if (_font == nullptr)
         throw font_not_found(TTF_GetError());
@@ -32,6 +32,16 @@ font_word_cache::~font_word_cache()
     TTF_CloseFont(_font);
 
     clear();
+}
+
+font_word_cache::font_word_cache(font_word_cache && other)
+    : _renderer(other._renderer)
+    , _prerendered(std::move(other._prerendered))
+    , _font(other._font)
+    , _space_advance(other._space_advance)
+    , _space_minx(other._space_minx)
+{
+    other._font = nullptr;
 }
 
 // http://stackoverflow.com/questions/18534494/convert-from-utf-8-to-unicode-c

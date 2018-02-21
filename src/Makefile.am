@@ -18,6 +18,7 @@ libwtk_sdl2_la_SOURCES = \
 	context_info.cpp       \
 	draw_context.cpp       \
 	empty.cpp              \
+	font_manager.cpp       \
 	font_word_cache.cpp    \
 	geometry.cpp           \
 	label.cpp              \

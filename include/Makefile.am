@@ -10,6 +10,7 @@ pkginclude_HEADERS =    \
 	embedded_widget.hpp   \
 	empty.hpp             \
 	font.hpp              \
+	font_manager.hpp      \
 	font_word_cache.hpp   \
 	geometry.hpp          \
 	key_event.hpp         \

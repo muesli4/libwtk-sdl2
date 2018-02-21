@@ -36,9 +36,15 @@ std::vector<paragraph> parse_text_fragments(std::string text)
     return result;
 }
 
-paragraph::paragraph(std::string text, int trailing_newlines)
+paragraph::paragraph(std::string text, int trailing_newlines, int font_idx)
     : text(text)
     , trailing_newlines(trailing_newlines)
+    , font_idx(font_idx)
+{
+}
+
+paragraph::paragraph(std::string text, int trailing_newlines)
+    : paragraph(text, trailing_newlines, 0)
 {
 }
 
@@ -64,8 +70,6 @@ label::~label()
 
 void label::on_draw(draw_context & dc, selection_context const & sc) const
 {
-    int const font_height = get_context_info().font_line_skip();
-
     auto real_box = get_box();
     int yoffset = real_box.y;
     int remaining_height = real_box.h;
@@ -75,7 +79,12 @@ void label::on_draw(draw_context & dc, selection_context const & sc) const
 
     for (auto const & tf : _content)
     {
-        int used_height = dc.draw_label_text({ real_box.x, yoffset, real_box.w, remaining_height}, tf.text) + tf.trailing_newlines * font_height;
+        SDL_Rect fbox { real_box.x, yoffset, real_box.w, remaining_height};
+
+        // TODO which newline height?
+        int used_height
+            = dc.draw_label_text(fbox, tf.text, tf.font_idx)
+            + tf.trailing_newlines * get_context_info().font_line_skip(tf.font_idx);
         if (used_height > remaining_height)
             break;
         yoffset += used_height;
@@ -94,7 +103,12 @@ void label::apply_layout_to_children()
 
 vec label::min_size_hint() const
 {
+    // TODO temporary fix: introduce differentiation between natural and minimum
+    // width
+
     int font_height = get_context_info().font_line_skip();
+    // TODO find a way to estimate the minimum size that works
+    /*
     vec size { 0, 0 };
     for (auto const & tf : _content)
     {
@@ -107,7 +121,8 @@ vec label::min_size_hint() const
         size.h += psize.h;
     }
     return vec{ font_height, font_height } + size;
-    //return vec{ font_height, 0 };
+    */
+    return vec{ font_height * 6, 0 };
 }
 
 int label::height_for_width_hint(int width) const
@@ -153,12 +168,12 @@ std::vector<paragraph> const & label::get_content() const
 
 int label::calculate_height_for_width(int width) const
 {
-    int const font_height = get_context_info().font_line_skip();
-
     int height = 0;
     for (auto const & tf : _content)
     {
-        height += get_context_info().text_size(tf.text, width).h + tf.trailing_newlines * font_height;
+        // TODO which newline height?
+        height += get_context_info().text_size(tf.text, width).h
+                  + tf.trailing_newlines * get_context_info().font_line_skip(tf.font_idx);
     }
     return height;
 }

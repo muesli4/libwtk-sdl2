@@ -2,9 +2,9 @@
 
 #include "sdl_util.hpp"
 
-draw_context::draw_context(SDL_Renderer * renderer, font_word_cache & fwc)
+draw_context::draw_context(SDL_Renderer * renderer, font_manager & fm)
     : _renderer(renderer)
-    , _fwc(fwc)
+    , _fm(fm)
 {
 }
 
@@ -73,7 +73,7 @@ void draw_context::copy_texture(SDL_Texture * t, SDL_Rect dst)
 
 void draw_context::draw_button_text(std::string const & text, SDL_Rect abs_rect)
 {
-    auto result = _fwc.text(text);
+    auto result = _fm.text(text);
     vec const & size = std::get<0>(result);
 
     // center text in abs_rect
@@ -99,7 +99,7 @@ void draw_context::draw_entry_text(std::string text, SDL_Rect abs_rect, int text
 
     if (clipped_width >= 0 && clipped_height >= 0)
     {
-        auto result = _fwc.text(text);
+        auto result = _fm.text(text);
         vec const & size = std::get<0>(result);
 
         int const avail_width = size.w - texture_x_offset;
@@ -115,9 +115,9 @@ void draw_context::draw_entry_text(std::string text, SDL_Rect abs_rect, int text
     }
 }
 
-int draw_context::draw_label_text(SDL_Rect box, std::string text)
+int draw_context::draw_label_text(SDL_Rect box, std::string text, int font_idx)
 {
-    auto result = _fwc.text(text, box.w);
+    auto result = _fm.text(text, box.w, font_idx);
     vec const & size = std::get<0>(result);
 
     int width = std::min(box.w, size.w);

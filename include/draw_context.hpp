@@ -6,7 +6,7 @@
 #include <SDL2/SDL_surface.h>
 #include <SDL2/SDL_render.h>
 
-#include "font_word_cache.hpp"
+#include "font_manager.hpp"
 #include "copy_command.hpp"
 
 // TODO replace rendering with a virtual interface that might as well blit images
@@ -133,14 +133,7 @@ struct default_theme : theme
 struct draw_context
 {
     // draw to a window exclusively
-    draw_context(SDL_Renderer * renderer, font_word_cache & fwc);
-    // draw to a render target exclusively
-    //draw_context(SDL_Renderer * r, font_word_cache & fwc);
-
-    //draw_context(SDL_Window * w, SDL_Rect clip_box, font_word_cache & fwc);
-    //draw_context(SDL_Renderer * r, SDL_Rect clip_box, font_word_cache & fwc);
-
-    //void apply_widget_layout(widget & main_widget);
+    draw_context(SDL_Renderer * renderer, font_manager & fm);
 
     void present();
 
@@ -158,7 +151,7 @@ struct draw_context
 
     // Draws a string in the box and returns the actually used height within the
     // box.
-    int draw_label_text(SDL_Rect box, std::string text);
+    int draw_label_text(SDL_Rect box, std::string text, int font_idx = 0);
 
     void draw_background(SDL_Rect box);
 
@@ -176,7 +169,7 @@ struct draw_context
 
     SDL_Renderer * _renderer;
 
-    font_word_cache & _fwc;
+    font_manager & _fm;
 
     //SDL_Rect _clip_box;
 
