@@ -17,6 +17,7 @@ pkginclude_HEADERS =    \
 	list_view.hpp         \
 	mouse_event.hpp       \
 	mouse_tracker.hpp     \
+	navigation_type.hpp   \
 	notebook.hpp          \
 	padding.hpp           \
 	sdl_util.hpp          \
