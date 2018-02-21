@@ -121,6 +121,17 @@ void widget_context::change_widget_area(SDL_Rect new_box)
     _sc.change_widget_area(new_box);
 }
 
+void widget_context::activate()
+{
+    _sc.dispatch_activation();
+}
+
+void widget_context::navigate_selection(navigation_type nt)
+{
+    _sc.navigate_selection(nt, &_main_widget);
+}
+
+
 void widget_context::set_context_info(widget * w)
 {
     w->set_context_info(_context_info);

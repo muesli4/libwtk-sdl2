@@ -33,6 +33,10 @@ struct widget_context
 
     void change_widget_area(SDL_Rect new_box);
 
+    // forwarded
+    void activate();
+    void navigate_selection(navigation_type nt);
+
     private:
 
     void set_context_info(widget *);
