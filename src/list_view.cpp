@@ -42,13 +42,14 @@ void list_view::on_draw(draw_context & dc, selection_context const & sc) const
 
         SDL_Rect abs_rect { x_offset, y_offset, entry_width, entry_height_with_overlap};
 
-        // favor pressed over active
+        // favor pressed over selected
         if (_opt_pressed_point.has_value() && within_rect(_opt_pressed_point.value(), abs_rect))
             dc.draw_entry_pressed_background(abs_rect);
-        else if (_highlight_position == n)
-            dc.draw_entry_hightlighted_background(abs_rect);
+        // favor pressed over active
         else if (sc.is_selected_widget(this) && _selected_position == n)
             dc.draw_entry_active_background(abs_rect);
+        else if (_highlight_position == n)
+            dc.draw_entry_hightlighted_background(abs_rect);
 
 
         dc.draw_entry_text(_values.get()[n], { x_offset - _x_shift, y_offset, 900, entry_height_with_overlap} /*abs_rect*/, _x_shift /*std::max(0, entry_width - static_cast<int>(_x_shift))*/);
@@ -85,22 +86,24 @@ void list_view::on_mouse_up_event(mouse_up_event const & e)
 
         if (info.type == swipe_info::type::DIRECTION)
         {
+            auto const & movement = e.opt_movement.value();
+            int font_height = get_context_info().font_line_skip();
             if (info.dir == swipe_direction::LEFT)
             {
                 std::size_t old = _x_shift;
-                _x_shift -= 10;
+                _x_shift -= (movement.length.w * font_height) / 15;
                 if (old < _x_shift)
                     _x_shift = 0;
                 mark_dirty();
             }
             else if (info.dir == swipe_direction::RIGHT)
             {
-                _x_shift += 10;
+                _x_shift += (movement.length.w * font_height) / 15;
                 mark_dirty();
             }
             else
             {
-                int const distance = static_cast<int>(_visible_entries) * e.opt_movement.value().length.h / (get_box().w / 2);
+                int const distance = static_cast<int>(_visible_entries) * movement.length.h / (get_box().w / 2);
 
                 if (distance < 0)
                     scroll_up(distance);
@@ -148,7 +151,8 @@ void list_view::on_key_event(key_event const & e)
 
 void list_view::on_activate()
 {
-    _activate_callback(_selected_position);
+    if (_selected_position < _values.get().size())
+        _activate_callback(_selected_position);
 }
 
 void list_view::apply_layout_to_children()
