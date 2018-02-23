@@ -24,7 +24,7 @@ struct widget_context
     widget_context(SDL_Renderer * renderer, std::vector<font> fonts, widget & main_widget);
     widget_context(SDL_Renderer * renderer, std::vector<font> fonts, widget & main_widget, SDL_Rect box);
 
-    void process_event(SDL_Event & ev);
+    void process_event(SDL_Event const & ev);
 
     void draw(bool only_when_dirty = true, bool present = true);
 

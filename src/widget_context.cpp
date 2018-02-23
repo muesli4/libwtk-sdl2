@@ -36,7 +36,7 @@ widget_context::widget_context(SDL_Renderer * renderer, std::vector<font> fonts,
     main_widget.apply_layout(box);
 }
 
-void widget_context::process_event(SDL_Event & ev)
+void widget_context::process_event(SDL_Event const & ev)
 {
     // TODO hardcoded keys are probably not the best idea for reusability
 
