@@ -179,7 +179,7 @@ vec font_word_cache::compute_text_layout(std::string t, int max_line_width, Back
 
         if (first_texture != nullptr)
         {
-            *it = { first_texture, 0, 0 };
+            *it = { first_texture, rect(first_dim), 0, 0 };
             ++it;
         }
 
@@ -217,7 +217,7 @@ vec font_word_cache::compute_text_layout(std::string t, int max_line_width, Back
 
                 if (current_texture != nullptr)
                 {
-                    *it = { current_texture, line_width + spacing, height };
+                    *it = { current_texture, rect(current_dim), line_width + spacing, height };
                     ++it;
                 }
 
@@ -232,7 +232,7 @@ vec font_word_cache::compute_text_layout(std::string t, int max_line_width, Back
 
                 if (current_texture != nullptr)
                 {
-                    *it = { current_texture, 0, height };
+                    *it = { current_texture, rect(current_dim), 0, height };
                 }
             }
 

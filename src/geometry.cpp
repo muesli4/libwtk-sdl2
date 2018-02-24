@@ -15,6 +15,16 @@ point rect_center(SDL_Rect const & r)
     return { r.x + r.w / 2, r.y + r.h / 2 };
 }
 
+point rect_origin(SDL_Rect const & r)
+{
+    return { r.x, r.y };
+}
+
+SDL_Rect rect(vec v)
+{
+    return { 0, 0, v.w, v.h };
+}
+
 vec operator+(vec v, vec u)
 {
     return { v.w + u.w, v.h + u.h };

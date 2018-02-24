@@ -161,7 +161,7 @@ struct draw_context
     void draw_rect_filled(SDL_Rect r);
     void draw_rect(SDL_Rect r);
     void blit(SDL_Surface * s, const SDL_Rect * srcrect, const SDL_Rect * dstrect);
-    void run_copy_commands(std::vector<copy_command> const & commands, SDL_Rect box, SDL_Color color);
+    void run_copy_commands(std::vector<copy_command> const & commands, point origin, SDL_Color color);
     void copy_texture(SDL_Texture * t, SDL_Rect src, SDL_Rect dst);
     void copy_texture(SDL_Texture * t, SDL_Rect dst);
 

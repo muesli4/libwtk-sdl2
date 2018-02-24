@@ -52,7 +52,7 @@ void list_view::on_draw(draw_context & dc, selection_context const & sc) const
             dc.draw_entry_hightlighted_background(abs_rect);
 
 
-        dc.draw_entry_text(_values.get()[n], { x_offset - _x_shift, y_offset, 900, entry_height_with_overlap} /*abs_rect*/, _x_shift /*std::max(0, entry_width - static_cast<int>(_x_shift))*/);
+        dc.draw_entry_text(_values.get()[n], { x_offset, y_offset, entry_width, entry_height_with_overlap}, -_x_shift);
 
         y_offset += _row_height;
         n++;
@@ -90,15 +90,17 @@ void list_view::on_mouse_up_event(mouse_up_event const & e)
             int font_height = get_context_info().font_line_skip();
             if (info.dir == swipe_direction::LEFT)
             {
-                std::size_t old = _x_shift;
-                _x_shift -= (movement.length.w * font_height) / 15;
-                if (old < _x_shift)
-                    _x_shift = 0;
+                // movement is negative here
+                std::size_t next_x_shift = _x_shift + (movement.length.w * font_height) / 15;
+                _x_shift = dec_ensure_lower(next_x_shift, _x_shift, 0);
                 mark_dirty();
             }
             else if (info.dir == swipe_direction::RIGHT)
             {
-                _x_shift += (movement.length.w * font_height) / 15;
+                // movement is positive here
+                std::size_t next_x_shift = _x_shift + (movement.length.w * font_height) / 15;
+                // TODO maximum? max of all entry widths
+                _x_shift = inc_ensure_upper(next_x_shift, _x_shift, 5000);
                 mark_dirty();
             }
             else

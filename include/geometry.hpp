@@ -21,6 +21,10 @@ int square(int i);
 bool within_rect(point p, SDL_Rect const & r);
 
 point rect_center(SDL_Rect const & r);
+point rect_origin(SDL_Rect const & r);
+
+// Create a rectangle with zero origin.
+SDL_Rect rect(vec v);
 
 vec operator+(vec v, vec u);
 point operator+(point p, vec v);
