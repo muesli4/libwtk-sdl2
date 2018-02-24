@@ -16,6 +16,12 @@ struct font_manager
     font_manager(font_manager const &) = delete;
     font_manager & operator=(font_manager const &) = delete;
 
+    // font manager interface
+
+    std::size_t load_font(font f);
+
+    // forwarded interface
+
     std::tuple<vec, std::vector<copy_command>> text(std::string t, int max_line_width = -1, int font_idx = 0);
     vec text_size(std::string t, int max_line_width = -1, int font_idx = 0);
     int text_minimum_width(std::string t, int font_idx = 0);

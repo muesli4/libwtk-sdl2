@@ -9,6 +9,12 @@ font_manager::font_manager(SDL_Renderer * renderer, std::vector<font> fonts)
     }
 }
 
+std::size_t font_manager::load_font(font f)
+{
+    _font_word_caches.emplace_back(_renderer, f);
+    return _font_word_caches.size() - 1;
+}
+
 std::tuple<vec, std::vector<copy_command>> font_manager::text(std::string t, int max_line_width, int font_idx)
 {
     return _font_word_caches.at(font_idx).text(t, max_line_width);
