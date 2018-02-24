@@ -17,3 +17,6 @@ Provides a framework for hierarchic widgets based on SDL2. Most of the event han
 * No text field.
 * Minimum size hints are supported and for some widgets a height-for-width heuristic is used (e.g., label).
 * The font renderer is optimized on reoccuring words. Rendering arbitrary text with it might use a lot of memory (although it will trade off with rerendering).
+
+## Examples
+![widget test min](/examples/widget_test_min.png)
