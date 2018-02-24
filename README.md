@@ -4,19 +4,22 @@ Provides a framework for hierarchic widgets based on SDL2. Most of the event han
 
 * Clean and easy to use (mostly declarative) GUI building with modern C++.
 * Simple widget hierarchy with useful base classes. New widgets can be created by deriving.
+* Flexible widget containers: (h/v)box and table.
 * Support for widget selection. In addition selectable widgets can be navigated in 2 dimensions. The intention was to support faster and more intuitive keyboard or infra-red remote navigation.
 * Dirty-based drawing: Widgets will only be redrawn when they're marked as dirty.
 
 ## Current Shortcomings
 
-* The drawing primitives are lacking (should probably be refactored into low-level and desing-based drawing).
 * Only a basic (dark) theme is provided.
-* Widget layout is rudimentary but still very usable. It is static however. That is, widgets don't change their size when their content changes.
-* Only one font size and style is supported.
+* No text field and keyboard keys implemented.
+* Minimum size hint for height-for-width widgets is wrong.
+* Widgets do not get a new size when their content changes.
 * Containers don't have interfaces to add or remove children.
-* No text field.
-* Minimum size hints are supported and for some widgets a height-for-width heuristic is used (e.g., label).
+* The drawing primitives are lacking (should probably be refactored into low-level and design-based drawing).
 * The font renderer is optimized on reoccuring words. Rendering arbitrary text with it might use a lot of memory (although it will trade off with rerendering).
+* Dirty widgets redraw all their parents (should move to area based drawing).
+* Double buffering ruins dirty-based to an extent.
+* Widgets can't unselect themselves or others (bad if a selection gets covered).
 
 ## Examples
 ![widget test min](/examples/widget_test_min.png)
