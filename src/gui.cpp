@@ -99,7 +99,7 @@ void event_loop(SDL_Renderer * renderer)
                             , { false, std::make_shared<button>("Swipe", [nb, nb_indicator](){ nb->set_page(1); nb_indicator->set_text("Active Notebook Widget: Swipe"); })}
                             }, 20, true);
 
-    auto lv = std::make_shared<list_view>(test_values, 0, [](auto p){ std::cout << "press list_view at " << p << std::endl; });
+    std::shared_ptr<list_view> lv = std::make_shared<list_view>(test_values, 0, [&lv](std::size_t p){ std::cout << "press list_view at " << p << std::endl; lv->set_highlight_position(p); });
 
     padding main_widget(20, hbox(
         { { true, vbox({ { true, lv }, { false, nb_indicator }, { true, nb }, { false, nb_controls } }, 20, false) }

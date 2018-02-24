@@ -2,6 +2,25 @@
 
 #include "sdl_util.hpp"
 
+color_theme::color_theme()
+    : button_bg_color{25, 25, 25}
+    , button_fg_color{235, 235, 235}
+    , button_frame_color{105, 105, 105}
+    , button_pressed_bg_color{105, 55, 55}
+    , button_selected_bg_color{55, 55, 105}
+
+    , entry_selected_bg_color{250, 200, 200}
+    , entry_highlight_bg_color{240, 240, 240}
+
+    , entry_box_bg_color{255, 255, 255}
+    , entry_box_frame_color{100, 100, 100}
+    , entry_box_selected_frame_color{155, 155, 205}
+
+    , bg_color{0, 0, 0}
+    , active_color{230, 230, 255}
+    , hightlight_color{210, 210, 210}
+{}
+
 draw_context::draw_context(SDL_Renderer * renderer, font_manager & fm)
     : _renderer(renderer)
     , _fm(fm)
@@ -83,11 +102,11 @@ void draw_context::draw_button_text(std::string const & text, SDL_Rect abs_rect)
     run_copy_commands(std::get<1>(result), origin, _theme.button_fg_color);
 }
 
-void draw_context::draw_entry_box(SDL_Rect box)
+void draw_context::draw_entry_box(SDL_Rect box, bool selected)
 {
-    set_color(_theme.entry_bg_color);
+    set_color(_theme.entry_box_bg_color);
     SDL_RenderFillRect(_renderer, &box);
-    set_color(_theme.entry_frame_color);
+    set_color(selected ? _theme.entry_box_selected_frame_color : _theme.entry_box_frame_color);
     SDL_RenderDrawRect(_renderer, &box);
 }
 
@@ -150,7 +169,7 @@ void draw_context::draw_entry_active_background(SDL_Rect box)
 
 void draw_context::draw_entry_hightlighted_background(SDL_Rect box)
 {
-    set_color(_theme.hightlight_color);
+    set_color(_theme.entry_highlight_bg_color);
     SDL_RenderFillRect(_renderer, &box);
 }
 

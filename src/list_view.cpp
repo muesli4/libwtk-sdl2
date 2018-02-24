@@ -24,7 +24,7 @@ int const INDICATOR_MIN_HEIGHT = 15;
 
 void list_view::on_draw(draw_context & dc, selection_context const & sc) const
 {
-    dc.draw_entry_box(get_box());
+    dc.draw_entry_box(get_box(), sc.is_selected_widget(this));
 
     // TODO what was the difference between font height and font line skip?
     int const entry_height = static_cast<int>(get_context_info().font_height());
@@ -125,11 +125,6 @@ void list_view::on_mouse_up_event(mouse_up_event const & e)
                 // Ensure clicked entry is within bounds.
                 if (pressed_position < _values.get().size())
                 {
-                    // set focus on hit entry ?
-                    // TODO focus seperate from mouse ?
-                    // TODO allow unfocused state ?
-                    _selected_position = pressed_position;
-
                     _activate_callback(pressed_position);
                 }
             }
@@ -184,6 +179,25 @@ void list_view::set_position(std::size_t position)
     auto size = _values.get().size();
     _position = std::min(position, size == 0 ? 0 : size - 1);
     mark_dirty();
+}
+
+void list_view::set_selected_position(std::size_t position)
+{
+    auto size = _values.get().size();
+    _selected_position = std::min(position, size == 0 ? 0 : size - 1);
+
+    if (_selected_position < _position + get_visible_entries()
+        && _selected_position >= _position)
+        mark_dirty();
+}
+
+void list_view::set_highlight_position(std::size_t position)
+{
+    auto size = _values.get().size();
+    _highlight_position = std::min(position, size == 0 ? 0 : size - 1);
+    if (_highlight_position < _position + get_visible_entries()
+        && _highlight_position >= _position)
+        mark_dirty();
 }
 
 void list_view::set_list(std::vector<std::string> const & values, std::size_t position)

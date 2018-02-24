@@ -12,28 +12,21 @@
 // TODO replace rendering with a virtual interface that might as well blit images
 struct color_theme
 {
-    color_theme()
-        : button_bg_color{25, 25, 25}
-        , button_fg_color{235, 235, 235}
-        , button_frame_color{105, 105, 105}
-        , button_pressed_bg_color{105, 55, 55}
-        , button_selected_bg_color{55, 55, 105}
-        , entry_bg_color{255, 255, 255}
-        , entry_frame_color{100, 100, 100}
-        , entry_selected_bg_color{250, 200, 200}
-        , bg_color{0, 0, 0}
-        , active_color{230, 230, 255}
-        , hightlight_color{210, 210, 210}
-    {}
+    color_theme();
 
     SDL_Color button_bg_color;
     SDL_Color button_fg_color;
     SDL_Color button_frame_color;
     SDL_Color button_pressed_bg_color;
     SDL_Color button_selected_bg_color;
-    SDL_Color entry_bg_color;
-    SDL_Color entry_frame_color;
+
     SDL_Color entry_selected_bg_color;
+    SDL_Color entry_highlight_bg_color;
+
+    SDL_Color entry_box_bg_color;
+    SDL_Color entry_box_frame_color;
+    SDL_Color entry_box_selected_frame_color;
+
     SDL_Color bg_color;
 
     // displays the status of something, but not related to direct user interaction
@@ -142,7 +135,7 @@ struct draw_context
     void draw_button_text(std::string const & text, SDL_Rect abs_rect);
 
     // entry (lowered box)
-    void draw_entry_box(SDL_Rect box);
+    void draw_entry_box(SDL_Rect box, bool selected);
     void draw_entry_text(std::string text, SDL_Rect abs_rect, int texture_x_offset = 0, int texture_y_offset = 0);
     void draw_entry_pressed_background(SDL_Rect box);
     void draw_entry_active_background(SDL_Rect box);

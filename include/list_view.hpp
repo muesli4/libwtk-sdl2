@@ -10,7 +10,6 @@
 // TODO change to vector_view ?
 struct list_view : selectable
 {
-
     list_view(std::vector<std::string> const & values, std::size_t position, std::function<void(std::size_t)> activate_callback);
     ~list_view() override;
 
@@ -29,6 +28,8 @@ struct list_view : selectable
 
     // Set the position of the first entry to be shown.
     void set_position(std::size_t position);
+    void set_selected_position(std::size_t position);
+    void set_highlight_position(std::size_t position);
     void set_list(std::vector<std::string> const & values, std::size_t position = 0);
 
     std::size_t get_visible_entries() const;
