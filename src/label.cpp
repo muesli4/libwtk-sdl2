@@ -172,7 +172,7 @@ int label::calculate_height_for_width(int width) const
     for (auto const & tf : _content)
     {
         // TODO which newline height?
-        height += get_context_info().text_size(tf.text, width).h
+        height += get_context_info().text_size(tf.text, width, tf.font_idx).h
                   + tf.trailing_newlines * get_context_info().font_line_skip(tf.font_idx);
     }
     return height;
