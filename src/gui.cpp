@@ -2,10 +2,6 @@
 //      screen (basically bounding box drawn in offset mode)
 // TODO consistent background drawing, best solution:
 //      draw background only when absolutely needed (let top-level widget draw it)
-// TODO improve dirty drawing:
-//          mark_dirty() should only mark the widget (and not propagate upwards)
-// TODO handle double buffer with dirty drawing:
-//          use int instead of bool and draw to every buffer
 
 // TODO add singleton style manager that provides global defaults for spacing and theme
 //      (only used for default parameters)
