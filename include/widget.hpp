@@ -18,24 +18,6 @@ struct widget;
 
 typedef std::shared_ptr<widget> widget_ptr;
 
-/* TODO add improved layout
-enum class allocation_type { CONSTANT, WIDTH_FOR_HEIGHT };
-
-struct size_hint
-{
-    allocation_type type;
-    union
-    {
-        struct
-        {
-            int width;
-            double ratio;
-        } ratio;
-        vec constant;
-    };
-};
-*/
-
 struct widget
 {
     widget();
