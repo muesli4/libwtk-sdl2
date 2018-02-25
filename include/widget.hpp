@@ -18,12 +18,52 @@ struct widget;
 
 typedef std::shared_ptr<widget> widget_ptr;
 
+enum class dirty_type
+{
+    CLEAN,
+    CHILD_DIRTY,
+    DIRTY
+};
+
+// This will choose the maximum dirty_type that is necessary such that a widget
+// tree will be properly drawn.
+dirty_type combine(dirty_type a, dirty_type b);
+
 struct widget
 {
+
     widget();
     widget(widget const &) = delete;
     widget & operator=(widget const &) = delete;
 
+    // This is called when a child is marked as dirty. Then widget then may
+    // decide what to do. The default implementation will combine the widget's
+    // dirty state with 'dirty_type::CHILD_DIRTY'.
+    virtual void on_child_dirty(widget * w);
+
+    // Return the visible children in Z-order. The default implementation
+    // assumes that all children are visible.
+    // Once an invisible widget gets visible again the parent is responsible to
+    // mark itself at least as 'dirty_type::CHILD_DIRTY'.
+    virtual std::vector<widget *> get_visible_children();
+    virtual std::vector<widget const *> get_visible_children() const;
+
+    // Sets all dirty flags to clean. Drawing in general will not reset the
+    // dirty state. This is because it won't have to when not using dirty-based
+    // drawing and most importantly if double buffering is used the widget has
+    // to be drawn two times.
+    void clear_dirty();
+
+    void mark_dirty();
+
+    // Recursively draws all widgets without dirty checking. There is also no
+    // need to call 'clear_dirty'.
+    void draw(draw_context & dc, selection_context const & sc) const;
+
+    // Recursively draws all dirty widgets.
+    void draw_dirty(draw_context & dc, selection_context const & sc) const;
+
+    // Draw the widget. No children should be drawn here.
     virtual void on_draw(draw_context & dc, selection_context const & sc) const = 0;
     virtual void on_mouse_up_event(mouse_up_event const & e);
     virtual void on_mouse_down_event(mouse_down_event const & e);
@@ -33,9 +73,6 @@ struct widget
     // A widget may get activated by other means (e.g., infrared remote or
     // return key).
     virtual void on_activate();
-
-    void draw_when_dirty(draw_context & dc, selection_context const & sc);
-    void mark_dirty();
 
     // Get the widget's assigned bounding box.
     SDL_Rect const & get_box() const;
@@ -117,7 +154,7 @@ struct widget
 
     private:
 
-    bool _dirty;
+    dirty_type _dirty;
 
     protected:
 
@@ -130,6 +167,8 @@ struct widget
     widget * navigate_selectable_parent(navigation_type nt, point center);
 
     widget * _parent;
+
+    void notify_parent_child_dirty();
 
     private:
 

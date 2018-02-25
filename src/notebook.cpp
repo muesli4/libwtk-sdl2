@@ -13,6 +13,22 @@ notebook::~notebook()
 {
 }
 
+void notebook::on_child_dirty(widget * w)
+{
+    if (w == get_shown_widget())
+        mark_dirty();
+}
+
+std::vector<widget *> notebook::get_visible_children()
+{
+    return { get_shown_widget() };
+}
+
+std::vector<widget const *> notebook::get_visible_children() const
+{
+    return { get_shown_widget() };
+}
+
 void notebook::on_draw(draw_context & dc, selection_context const & sc) const
 {
     dc.draw_background(get_box());
@@ -50,15 +66,14 @@ widget * notebook::navigate_selectable_from_children(navigation_type nt, widget 
     return navigate_selectable_parent(nt, center);
 }
 
-// notebook interface
-widget_ptr notebook::get_shown_widget()
+widget * notebook::get_shown_widget()
 {
-    return _pages[_current_page_index];
+    return _pages[_current_page_index].get();
 }
 
-widget_ptr const notebook::get_shown_widget() const
+widget const * notebook::get_shown_widget() const
 {
-    return _pages[_current_page_index];
+    return _pages[_current_page_index].get();
 }
 
 std::size_t notebook::get_page() const

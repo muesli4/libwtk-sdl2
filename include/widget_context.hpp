@@ -26,7 +26,8 @@ struct widget_context
 
     void process_event(SDL_Event const & ev);
 
-    void draw(bool only_when_dirty = true, bool present = true);
+    void draw(bool present = true);
+    void draw_dirty(int dirty_redraws = 1);
 
     void select_widget(widget & w);
     void unselect_widget();

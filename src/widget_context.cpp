@@ -87,15 +87,25 @@ void widget_context::process_event(SDL_Event const & ev)
     }
 }
 
-void widget_context::draw(bool only_when_dirty, bool present)
+void widget_context::draw(bool present)
 {
-    if (only_when_dirty)
-        _main_widget.draw_when_dirty(_dc, _sc);
-    else
-        _main_widget.on_draw(_dc, _sc);
-
+    _main_widget.draw(_dc, _sc);
     if (present)
         _dc.present();
+}
+
+void widget_context::draw_dirty(int dirty_redraws)
+{
+    _main_widget.draw_dirty(_dc, _sc);
+
+    while (dirty_redraws > 0)
+    {
+        _dc.present();
+        _main_widget.draw_dirty(_dc, _sc);
+        dirty_redraws--;
+    }
+
+    _main_widget.clear_dirty();
 }
 
 void widget_context::select_widget(widget & w)

@@ -6,10 +6,7 @@ container::~container()
 
 void container::on_draw(draw_context & dc, selection_context const & sc) const
 {
-    for (auto c : get_children())
-    {
-        c->on_draw(dc, sc);
-    }
+    // By default a container has nothing to draw itself.
 }
 
 void container::on_mouse_down_event(mouse_down_event const & me)

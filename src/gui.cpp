@@ -160,6 +160,8 @@ void event_loop(SDL_Renderer * renderer)
                 //std::cout << ev.window.data1 << "x" << ev.window.data2 << std::endl;
 
                 ctx.change_widget_area({ 0, 0, ev.window.data1, ev.window.data2 });
+                // TODO 
+                ctx.draw();
             }
             else if (ev.window.event != SDL_WINDOWEVENT_EXPOSED)
             {
@@ -170,10 +172,9 @@ void event_loop(SDL_Renderer * renderer)
         else
         {
             ctx.process_event(ev);
+            ctx.draw_dirty();
         }
 
-        // render
-        ctx.draw();
     }
 }
 

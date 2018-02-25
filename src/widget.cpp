@@ -1,9 +1,81 @@
 #include "widget.hpp"
 
+dirty_type combine(dirty_type a, dirty_type b)
+{
+    return std::max(a, b);
+}
+
 widget::widget()
-    : _dirty(true)
+    : _dirty(dirty_type::DIRTY)
     , _parent(nullptr)
 {
+}
+
+void widget::on_child_dirty(widget * w)
+{
+    _dirty = combine(_dirty, dirty_type::CHILD_DIRTY);
+    notify_parent_child_dirty();
+}
+
+std::vector<widget *> widget::get_visible_children()
+{
+    return get_children();
+}
+
+std::vector<widget const *> widget::get_visible_children() const
+{
+    return get_children();
+}
+
+void widget::clear_dirty()
+{
+    // Assumption: If the parent is not marked as dirty, neither is any child.
+    if (_dirty != dirty_type::CLEAN)
+    {
+        // Invisible widgets are not considered.
+        for (widget * w : get_visible_children())
+        {
+            w->clear_dirty();
+        }
+
+        _dirty = dirty_type::CLEAN;
+    }
+}
+
+void widget::mark_dirty()
+{
+    _dirty = dirty_type::DIRTY;
+    notify_parent_child_dirty();
+}
+
+void widget::draw(draw_context & dc, selection_context const & sc) const
+{
+    on_draw(dc, sc);
+    auto const & vcs = get_visible_children();
+    // Draw in reversed Z-order.
+    for (auto it = std::crbegin(vcs); it != std::crend(vcs); ++it)
+    {
+        (*it)->draw(dc, sc);
+    }
+}
+
+// Draws only dirty widgets.
+void widget::draw_dirty(draw_context & dc, selection_context const & sc) const
+{
+    if (_dirty == dirty_type::DIRTY)
+        on_draw(dc, sc);
+
+    if (_dirty == dirty_type::CHILD_DIRTY || _dirty == dirty_type::DIRTY)
+    {
+        // TODO Current assumption: child box hasn't changed so redrawing
+        // background is not necessary. This may change in the future and then
+        // the dirty areas from children are necessary.
+        auto const & vcs = get_visible_children();
+        for (auto it = std::crbegin(vcs); it != std::crend(vcs); ++it)
+        {
+            (*it)->draw_dirty(dc, sc);
+        }
+    }
 }
 
 void widget::on_mouse_down_event(mouse_down_event const & e)
@@ -25,23 +97,6 @@ void widget::on_key_event(key_event const & e)
 
 void widget::on_activate()
 {
-}
-
-void widget::draw_when_dirty(draw_context & dc, selection_context const & sc)
-{
-    if (_dirty)
-    {
-        on_draw(dc, sc);
-        _dirty = false;
-    }
-}
-
-void widget::mark_dirty()
-{
-    _dirty = true;
-    // TODO add handler for parent to ignore (e.g. when widget is not visible)
-    if (_parent != nullptr)
-        _parent->mark_dirty();
 }
 
 SDL_Rect const & widget::get_box() const
@@ -152,3 +207,8 @@ void widget::on_unselect()
 {
 }
 
+void widget::notify_parent_child_dirty()
+{
+    if (_parent != nullptr)
+        _parent->on_child_dirty(this);
+}

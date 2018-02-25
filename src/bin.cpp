@@ -10,7 +10,6 @@ void bin::on_draw(draw_context & dc, selection_context const & sc) const
 {
     // we don't have to draw the background because either the parent widget
     // will or someone else is responsible when we're the root widget
-    _child->on_draw(dc, sc);
 }
 
 void bin::on_mouse_down_event(mouse_down_event const & me)

@@ -12,6 +12,10 @@ struct notebook : widget
     notebook(std::vector<widget_ptr> pages);
     ~notebook() override;
 
+    void on_child_dirty(widget * w) override;
+    std::vector<widget *> get_visible_children() override;
+    std::vector<widget const *> get_visible_children() const override;
+
     void on_draw(draw_context & dc, selection_context const & sc) const override;
     void on_mouse_up_event(mouse_up_event const & e) override;
     void on_mouse_down_event(mouse_down_event const & e) override;
@@ -28,13 +32,14 @@ struct notebook : widget
     vec nat_size_inc_hint() const override;
 
     // notebook interface
-    widget_ptr get_shown_widget();
-    widget_ptr const get_shown_widget() const;
-
     std::size_t get_page() const;
     void set_page(std::size_t index);
 
     private:
+
+    widget * get_shown_widget();
+    widget const * get_shown_widget() const;
+
 
     std::vector<widget_ptr> _pages;
     std::size_t _current_page_index;
