@@ -16,6 +16,9 @@
 
 struct widget;
 
+/**
+ * The type of smart pointer that widgets use to be stored in containers.
+ */
 typedef std::shared_ptr<widget> widget_ptr;
 
 enum class dirty_type
@@ -29,7 +32,14 @@ enum class dirty_type
 // tree will be properly drawn.
 dirty_type combine(dirty_type a, dirty_type b);
 
-// Abstract base class for widgets.
+/**
+ * Abstract base class for widgets. A derived class will have to implement at
+ * least \ref on_draw() and \ref min_size_hint(). There exist useful default
+ * implementation for all other methods. Note that there are also several other
+ * abstract classes that already implement certain features.
+ *
+ * Widgets are usually created as \ref widget_ptr to provide easy usage.
+ */
 struct widget
 {
 
@@ -38,11 +48,14 @@ struct widget
     widget & operator=(widget const &) = delete;
 
     /**
-     * This is called when a child is marked as dirty. The widget then may
-     * decide what to do. The default implementation will combine the widget's
-     * dirty state with `dirty_type::CHILD_DIRTY`.
+     * This is called when a child is marked as dirty. The widget may then
+     * decide what to do.
+     *
+     * You might use \ref mark_dirty() to mark this widget dirty or
+     * \ref mark_child_dirty(widget * child) to only propagate the change
+     * upwards (this is the default implementation).
      */
-    virtual void on_child_dirty(widget * w);
+    virtual void on_child_dirty(widget * child);
 
     /**
      * Return the visible children in Z-order. The default implementation
@@ -63,6 +76,7 @@ struct widget
     void clear_dirty();
 
     void mark_dirty();
+    void mark_child_dirty(widget * child);
 
     /**
      * Recursively draws all widgets without dirty checking. There is also no
@@ -214,12 +228,9 @@ struct widget
 
     widget * _parent;
 
-    /**
-     * Helper to propagate the dirty change in a child.
-     */
-    void notify_parent_child_dirty();
-
     private:
+
+    void notify_parent_child_dirty();
 
     // cached for efficiency, may be replaced by just width and height
     SDL_Rect _box;

@@ -11,10 +11,9 @@ widget::widget()
 {
 }
 
-void widget::on_child_dirty(widget * w)
+void widget::on_child_dirty(widget * child)
 {
-    _dirty = combine(_dirty, dirty_type::CHILD_DIRTY);
-    notify_parent_child_dirty();
+    mark_child_dirty(child);
 }
 
 std::vector<widget *> widget::get_visible_children()
@@ -32,19 +31,25 @@ void widget::clear_dirty()
     // Assumption: If the parent is not marked as dirty, neither is any child.
     if (_dirty != dirty_type::CLEAN)
     {
+        _dirty = dirty_type::CLEAN;
+
         // Invisible widgets are not considered.
         for (widget * w : get_visible_children())
         {
             w->clear_dirty();
         }
-
-        _dirty = dirty_type::CLEAN;
     }
 }
 
 void widget::mark_dirty()
 {
     _dirty = dirty_type::DIRTY;
+    notify_parent_child_dirty();
+}
+
+void widget::mark_child_dirty(widget * child)
+{
+    _dirty = combine(_dirty, dirty_type::CHILD_DIRTY);
     notify_parent_child_dirty();
 }
 
