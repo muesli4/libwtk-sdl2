@@ -24,6 +24,7 @@ pkginclude_HEADERS =    \
 	sdl_util.hpp          \
 	selectable.hpp        \
 	selection_context.hpp \
+	slider.hpp            \
 	swipe.hpp             \
 	swipe_area.hpp        \
 	table.hpp             \

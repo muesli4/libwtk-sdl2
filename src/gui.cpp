@@ -45,28 +45,29 @@
 //   They might very well react to events that are not in their area if the
 //   mouse went down in their area before.
 
+#include <exception>
+#include <iostream>
+#include <memory>
+#include <optional>
+#include <vector>
 
 #include <SDL2/SDL.h>
-#include <memory>
-#include <vector>
-#include <iostream>
-#include <exception>
-#include <optional>
 
-#include "widget.hpp"
-#include "button.hpp"
-#include "padding.hpp"
-#include "color_widget.hpp"
 #include "box.hpp"
-#include "swipe_area.hpp"
+#include "button.hpp"
+#include "color_widget.hpp"
+#include "empty.hpp"
+#include "label.hpp"
 #include "list_view.hpp"
 #include "notebook.hpp"
-#include "label.hpp"
-#include "empty.hpp"
+#include "padding.hpp"
+#include "sdl_util.hpp"
+#include "slider.hpp"
+#include "swipe_area.hpp"
 #include "table.hpp"
 #include "texture_view.hpp"
+#include "widget.hpp"
 #include "widget_context.hpp"
-#include "sdl_util.hpp"
 
 widget_ptr cw()
 {
@@ -116,6 +117,8 @@ void event_loop(SDL_Renderer * renderer)
                          , { false, std::make_shared<label>(std::vector<paragraph>{paragraph("Text 1, Paragraph 1."), paragraph("Text 1, Paragraph 2.")}) }
                          , { true, cw() }
                          , { true, std::make_shared<label>(std::vector<paragraph>{paragraph("Text 2, Paragraph 1.")}) }
+                         , { false, std::make_shared<slider>(0, 20, 2) }
+                         , { false, std::make_shared<slider>(0, 100) }
                          }, 20, false) }
         , { false, vbox( { { false, num_button() }
                          , { true, std::make_shared<empty>() }

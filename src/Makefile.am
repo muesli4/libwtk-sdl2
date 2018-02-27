@@ -30,6 +30,7 @@ libwtk_sdl2_la_SOURCES = \
 	sdl_util.cpp           \
 	selectable.cpp         \
 	selection_context.cpp  \
+	slider.cpp             \
 	swipe.cpp              \
 	swipe_area.cpp         \
 	table.cpp              \
