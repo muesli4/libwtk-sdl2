@@ -67,10 +67,10 @@ void widget::draw(draw_context & dc, selection_context const & sc) const
 // Draws only dirty widgets.
 void widget::draw_dirty(draw_context & dc, selection_context const & sc) const
 {
+    // If dirty do a complete redraw of the subtree.
     if (_dirty == dirty_type::DIRTY)
-        on_draw(dc, sc);
-
-    if (_dirty == dirty_type::CHILD_DIRTY || _dirty == dirty_type::DIRTY)
+        draw(dc, sc);
+    else if (_dirty == dirty_type::CHILD_DIRTY)
     {
         // TODO Current assumption: child box hasn't changed so redrawing
         // background is not necessary. This may change in the future and then
