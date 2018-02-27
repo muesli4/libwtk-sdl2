@@ -36,6 +36,11 @@ widget_context::widget_context(SDL_Renderer * renderer, std::vector<font> fonts,
     main_widget.apply_layout(box);
 }
 
+point tfinger_to_point(SDL_TouchFingerEvent const & tfinger, SDL_Rect const & box)
+{
+    return { static_cast<int>(tfinger.x * box.w), static_cast<int>(tfinger.y * box.h) };
+}
+
 void widget_context::process_event(SDL_Event const & ev)
 {
     // TODO hardcoded keys are probably not the best idea for reusability
@@ -53,6 +58,20 @@ void widget_context::process_event(SDL_Event const & ev)
     else if (ev.type == SDL_MOUSEMOTION)
     {
         _main_widget.on_mouse_move_event(_mt.mouse_move({ ev.motion.x, ev.motion.y }));
+    }
+    else if (ev.type == SDL_FINGERDOWN)
+    {
+        point p = tfinger_to_point(ev.tfinger, _box);
+        _main_widget.on_mouse_down_event({p});
+        _mt.mouse_down(p);
+    }
+    else if (ev.type == SDL_FINGERUP)
+    {
+        _main_widget.on_mouse_up_event(_mt.mouse_up(tfinger_to_point(ev.tfinger, _box)));
+    }
+    else if (ev.type == SDL_FINGERMOTION)
+    {
+        _main_widget.on_mouse_move_event(_mt.mouse_move(tfinger_to_point(ev.tfinger, _box)));
     }
     else if (ev.type == SDL_KEYDOWN)
     {
