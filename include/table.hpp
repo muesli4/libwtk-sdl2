@@ -26,8 +26,9 @@ struct table : container
 
     private:
 
-    int length_with_spacing(int * lengths, int n) const;
+    int length_with_spacing(std::vector<int> const & lengths) const;
     void min_cell_dimensions(int * min_widths, int * min_heights) const;
+    void compute_offsets(std::vector<int> & lengths, std::vector<int> & offsets, int n, int box_length, int box_start);
 
     std::vector<entry> _entries;
     vec _size;

@@ -47,44 +47,39 @@ std::vector<widget const *> table::get_children() const
     return result;
 }
 
-void table::apply_layout_to_children()
+void table::compute_offsets(std::vector<int> & lengths, std::vector<int> & offsets, int n, int box_length, int box_start)
 {
-    int widths[_size.w];
-    int heights[_size.h];
-    min_cell_dimensions(widths, heights);
-
-    // For the moment: Equally distribute remaining space on all rows and columns.
     // TODO consider height-for-width (how?)
     // TODO distribute to empty cells?
-    int const min_width = length_with_spacing(widths, _size.w);
-    int const min_height = length_with_spacing(heights, _size.h);
-
-    int const bonus_width = (get_box().w - min_width) / _size.w;
-    int const bonus_height = (get_box().h - min_height) / _size.h;
-
-    for (auto & w : widths)
+    int const min_length = length_with_spacing(lengths);
+    int const avail_length = box_length - min_length;
+    int const bonus_length_div = avail_length / n;
+    int const bonus_length_rem = avail_length % n;
+    for (std::size_t k = 0; k < n; ++k)
     {
-        w += bonus_width;
+        int const bonus_length = bonus_length_div + (k >= (n - bonus_length_rem) ? 1 : 0);
+        lengths[k] += bonus_length;
     }
 
-    for (auto & h : heights)
-    {
-        h += bonus_height;
-    }
+    offsets[0] = box_start;
 
-    // Compute offsets, store them for reuse and apply to children.
-    _x_offsets[0] = get_box().x;
-    _y_offsets[0] = get_box().y;
-
-    for (int k = 0; k < _size.w; ++k)
+    for (int k = 0; k < n; ++k)
     {
-        _x_offsets[k + 1] = widths[k] + _x_offsets[k] + _spacing;
+        offsets[k + 1] = lengths[k] + offsets[k] + _spacing;
     }
+}
 
-    for (int k = 0; k < _size.h; ++k)
-    {
-        _y_offsets[k + 1] = heights[k] + _y_offsets[k] + _spacing;
-    }
+// TODO support natural widths
+void table::apply_layout_to_children()
+{
+    std::vector<int> widths(_size.w, 0);
+    std::vector<int> heights(_size.h, 0);
+
+    min_cell_dimensions(widths.data(), heights.data());
+
+    // For the moment: Equally distribute remaining space on all rows and columns.
+    compute_offsets(widths, _x_offsets, _size.w, get_box().w, get_box().x);
+    compute_offsets(heights, _y_offsets, _size.h, get_box().h, get_box().y);
 
     for (auto & e : _entries)
     {
@@ -311,20 +306,23 @@ widget * table::navigate_selectable_from_children(navigation_type nt, widget * w
 
 vec table::min_size_hint() const
 {
-    int min_widths[_size.w];
-    int min_heights[_size.h];
-    min_cell_dimensions(min_widths, min_heights);
+    std::vector<int> min_widths(_size.w, 0);
+    std::vector<int> min_heights(_size.h, 0);
+    min_cell_dimensions(min_widths.data(), min_heights.data());
 
-    return { length_with_spacing(min_widths, _size.w), length_with_spacing(min_heights, _size.h) };
+    return { length_with_spacing(min_widths), length_with_spacing(min_heights) };
 }
 
-int table::length_with_spacing(int * lengths, int n) const
+int table::length_with_spacing(std::vector<int> const & lengths) const
 {
-    return std::accumulate(lengths, lengths + n, std::max(0, n - 1) * _spacing);
+    int const init = std::max(0, static_cast<int>(lengths.size()) - 1) * _spacing;
+    return std::accumulate(std::cbegin(lengths), std::cend(lengths), init);
 }
 
 void table::min_cell_dimensions(int * min_widths, int * min_heights) const
 {
+    // Assumption: min_widths and min_heights are zero-initialized.
+
     vec min_sizes[_entries.size()];
     for (std::size_t k = 0; k < _entries.size(); ++k)
     {
@@ -332,11 +330,8 @@ void table::min_cell_dimensions(int * min_widths, int * min_heights) const
     }
 
     // Determine the minimum width for each column and row in one go.
-    std::uninitialized_fill_n(min_widths, _size.w, 0);
     for (int y = 0; y < _size.h; ++y)
     {
-        min_heights[y] = 0;
-
         for (int x = 0; x < _size.w; ++x)
         {
             int const entry_index = _grid[x][y];
