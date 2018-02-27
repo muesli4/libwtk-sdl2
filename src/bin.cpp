@@ -22,6 +22,11 @@ void bin::on_mouse_up_event(mouse_up_event const & me)
     _child->on_mouse_up_event(me);
 }
 
+void bin::on_mouse_move_event(mouse_move_event const & e)
+{
+    _child->on_mouse_move_event(e);
+}
+
 widget * bin::find_selectable(navigation_type nt, point center)
 {
     return _child->find_selectable(nt, center);

@@ -11,6 +11,7 @@ struct bin : widget
     void on_draw(draw_context & dc, selection_context const & sc) const override;
     void on_mouse_down_event(mouse_down_event const & me) override;
     void on_mouse_up_event(mouse_up_event const & me) override;
+    void on_mouse_move_event(mouse_move_event const & e) override;
 
     void apply_layout_to_children() override = 0;
 

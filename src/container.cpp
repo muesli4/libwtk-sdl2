@@ -27,6 +27,14 @@ void container::on_mouse_up_event(mouse_up_event const & me)
     }
 }
 
+void container::on_mouse_move_event(mouse_move_event const & e)
+{
+    for (auto c : get_children())
+    {
+        c->on_mouse_move_event(e);
+    }
+}
+
 void container::init_children()
 {
     // can't provide this as constructor

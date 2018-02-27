@@ -12,6 +12,8 @@ struct mouse_tracker
     void mouse_down(point p);
     mouse_up_event mouse_up(point p);
 
+    mouse_move_event mouse_move(point p);
+
     // TODO add mouse movement path
 
     private:

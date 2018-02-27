@@ -50,6 +50,10 @@ void widget_context::process_event(SDL_Event const & ev)
     {
         _main_widget.on_mouse_up_event(_mt.mouse_up({ ev.button.x, ev.button.y }));
     }
+    else if (ev.type == SDL_MOUSEMOTION)
+    {
+        _main_widget.on_mouse_move_event(_mt.mouse_move({ ev.motion.x, ev.motion.y }));
+    }
     else if (ev.type == SDL_KEYDOWN)
     {
         auto const & keysym = ev.key.keysym;
