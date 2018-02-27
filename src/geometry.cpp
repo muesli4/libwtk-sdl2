@@ -7,7 +7,13 @@ int square(int i)
 
 bool within_rect(point p, SDL_Rect const & r)
 {
-    return p.x >= r.x && p.x < r.x + r.w && p.y >= r.y && p.y < r.y + r.h;
+    return within_bound(p.x, r.x, r.w) && within_bound(p.y, r.y, r.h);
+    //return p.x >= r.x && p.x < r.x + r.w && p.y >= r.y && p.y < r.y + r.h;
+}
+
+bool within_bound(int val, int lower, int length)
+{
+    return val >= lower && val < lower + length;
 }
 
 point rect_center(SDL_Rect const & r)
