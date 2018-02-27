@@ -10,8 +10,18 @@ struct slider : selectable
     /**
      * Create a slider that selects an integer interval with \ref num_step steps
      * starting with intervals from \ref start up or down to \ref end.
+     *
+     * Be careful when specifying \ref num_steps, as it uses integer division,
+     * so the result might not work properly. E.g., when choosing \ref start as
+     * 0 and \ref end as 10 the correct number of steps is 11.
      */
     slider(int start, int end, int num_steps, std::function<void(int)> value_callback);
+
+    /**
+     * Create a slider that selects an integer interval with \ref num_step steps
+     * starting with intervals from \ref start up or down to \ref end. This
+     * constructor will always construct intervals with length 1.
+     */
     slider(int start, int end, std::function<void(int)> value_callback);
     ~slider() override;
 
