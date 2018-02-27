@@ -5,14 +5,19 @@
 
 #include "container.hpp"
 
+/**
+ * Container to arrange widgets in a horizontal or vertical layout.
+ */
 struct box : container
 {
     struct child
     {
-        // Determines whether this child gets additional space when available.
-        // Additional space will be distributed when every widget has reached
-        // its natural size, otherwise natural size is distributed equally among
-        // all widgets.
+        /**
+         * Determines whether this child gets additional space when available.
+         * Additional space will be distributed when every widget has reached
+         * its natural size, otherwise natural size is distributed equally among
+         * all widgets.
+         */
         bool expand;
         widget_ptr wptr;
     };

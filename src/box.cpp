@@ -5,12 +5,12 @@
 
 // TODO default setting singleton
 box::box(orientation o, box::children_type children)
-    : box(o, children, 5, true)
+    : box(o, children, 5, false)
 {
 }
 
 box::box(orientation o, box::children_type children, int children_spacing)
-    : box(o, children, children_spacing, true)
+    : box(o, children, children_spacing, false)
 {
 }
 
