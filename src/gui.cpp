@@ -82,6 +82,13 @@ widget_ptr num_button()
     return std::make_shared<button>(std::string("Button #") + std::to_string(n), [=](){ std::cout << "click" << n << std::endl; });
 }
 
+widget_ptr labeled_slider(int start, int end, int num_steps)
+{
+    auto l = std::make_shared<label>(std::to_string(start));
+    auto s = std::make_shared<slider>(start, end, num_steps, [l](int i){ l->set_text(std::to_string(i)); });
+    return hbox({ { false, l }, { true, s } }, 2);
+}
+
 void event_loop(SDL_Renderer * renderer)
 {
     std::vector<std::string> test_values{"a", "b", "c", "d", "testwdfkosadjflkajskdfjlaskdjflkasdjdfklajsdlkfjasldkdfjflkasddjflkdsjlfkjdsalkkfjdkk", "test1", "test2", "a very long string this is indeed", "foo", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a"};
@@ -98,36 +105,40 @@ void event_loop(SDL_Renderer * renderer)
 
     std::shared_ptr<list_view> lv = std::make_shared<list_view>(test_values, 0, [&lv](std::size_t p){ std::cout << "press list_view at " << p << std::endl; lv->set_highlight_position(p); });
 
+    auto col1 = vbox({ { true, lv }, { false, nb_indicator }, { true, nb }, { false, nb_controls } }, 20);
+    auto col2 = vbox({ { true, cw() }, { false, std::make_shared<texture_view>(load_texture_from_image(renderer, PKGDATA"/test.jpeg")) }, { true, cw() } }, 20);
+    std::vector<table::entry> table_entries
+        { { { 0, 0, 2, 2 }, num_button() }
+        , { { 0, 2, 1, 1 }, num_button() }
+        , { { 1, 2, 1, 1 }, num_button() }
+        , { { 2, 0, 1, 3 }, num_button() }
+        , { { 0, 3, 3, 1 }, num_button() }
+        , { { 3, 0, 1, 1 }, num_button() }
+        , { { 3, 1, 1, 3 }, num_button() }
+        };
+    auto col3 = vbox( { { false, num_button() }
+                      , { false, cw() }
+                      , { false, std::make_shared<label>("This text should hopefully produce a linebreak. Otherwise something is not working correctly.\n\nYou may use Tab and Shift+Tab to focus widgets or use Shift and the corresponding arrow key for a 2-dimensional direction.") }
+                      , { true, std::make_shared<table, vec>({ 4, 4 }, table_entries, 20) }
+                      , { false, std::make_shared<label>(std::vector<paragraph>{paragraph("Text 1, Paragraph 1."), paragraph("Text 1, Paragraph 2.")}) }
+                      , { true, cw() }
+                      , { true, std::make_shared<label>(std::vector<paragraph>{paragraph("Text 2, Paragraph 1.")}) }
+                      , { false, labeled_slider(-50, -100, 11) }
+                      , { false, labeled_slider(0, 30, 31) }
+                      }, 20);
+    auto col4 = vbox( { { false, num_button() }
+                      , { true, std::make_shared<empty>() }
+                      , { false, std::make_shared<label>(std::vector<paragraph>{ paragraph("This is a bigger font.", 0, 1) }) }
+                      , { true, std::make_shared<empty>() }
+                      , { false, std::make_shared<button>("Quit", [](){ SDL_Event ev { .type = SDL_QUIT }; SDL_PushEvent(&ev); })}
+                      }
+                    , 20);
     padding main_widget(20, hbox(
-        { { true, vbox({ { true, lv }, { false, nb_indicator }, { true, nb }, { false, nb_controls } }, 20, false) }
-        , { false, vbox({ { true, cw() }, { false, std::make_shared<texture_view>(load_texture_from_image(renderer, PKGDATA"/test.jpeg")) }, { true, cw() } }, 20, false) }
-        , { true, vbox( { { false, num_button() }
-                         , { false, cw() }
-                         , { false, std::make_shared<label>("This text should hopefully produce a linebreak. Otherwise something is not working correctly.\n\nYou may use Tab and Shift+Tab to focus widgets or use Shift and the corresponding arrow key for a 2-dimensional direction.") }
-                         , { true, std::make_shared<table, vec, std::vector<table::entry>>({ 4, 4 },
-                                 { { { 0, 0, 2, 2 }, num_button() }
-                                 , { { 0, 2, 1, 1 }, num_button() }
-                                 , { { 1, 2, 1, 1 }, num_button() }
-                                 , { { 2, 0, 1, 3 }, num_button() }
-                                 , { { 0, 3, 3, 1 }, num_button() }
-                                 , { { 3, 0, 1, 1 }, num_button() }
-                                 , { { 3, 1, 1, 3 }, num_button() }
-                                 }, 20) }
-
-                         , { false, std::make_shared<label>(std::vector<paragraph>{paragraph("Text 1, Paragraph 1."), paragraph("Text 1, Paragraph 2.")}) }
-                         , { true, cw() }
-                         , { true, std::make_shared<label>(std::vector<paragraph>{paragraph("Text 2, Paragraph 1.")}) }
-                         , { false, std::make_shared<slider>(0, 20, 2) }
-                         , { false, std::make_shared<slider>(0, 100) }
-                         }, 20, false) }
-        , { false, vbox( { { false, num_button() }
-                         , { true, std::make_shared<empty>() }
-                         , { false, std::make_shared<label>(std::vector<paragraph>{ paragraph("This is a bigger font.", 0, 1) }) }
-                         , { true, std::make_shared<empty>() }
-                         , { false, std::make_shared<button>("Quit", [](){ SDL_Event ev { .type = SDL_QUIT }; SDL_PushEvent(&ev); })}
-                         }
-                       , 20, false) }
-        }, 20, false));
+        { { true, col1 }
+        , { false, col2  }
+        , { true, col3 }
+        , { false, col4 }
+        }, 20));
 
     /*
     padding main_widget(20, vbox({ { false, std::make_shared<label>("This text should hopefully produce a linebreak. Otherwise something is not working correctly.\n\nYou may use Tab and Shift+Tab to focus widgets or use Shift and the corresponding arrow key for a 2-dimensional direction.")}, { false, cw()} , { false, num_button() }, { false, num_button() } }, 20, false));

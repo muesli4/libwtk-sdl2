@@ -1,17 +1,18 @@
 #ifndef LIBWTK_SDL2_SLIDER_HPP
 #define LIBWTK_SDL2_SLIDER_HPP
 
+#include <functional>
+
 #include "selectable.hpp"
 
 struct slider : selectable
 {
     /**
-     * Create a slider that selects an integer interval with length \ref step
+     * Create a slider that selects an integer interval with \ref num_step steps
      * starting with intervals from \ref start up or down to \ref end.
-     *
-     * For a \ref step of 1 the intervals become equal to integers.
      */
-    slider(int start, int end, int step = 1);
+    slider(int start, int end, int num_steps, std::function<void(int)> value_callback);
+    slider(int start, int end, std::function<void(int)> value_callback);
     ~slider() override;
 
     void on_draw(draw_context & dc, selection_context const & sc) const override;
@@ -43,6 +44,7 @@ struct slider : selectable
     void refresh_knob_box();
     int get_step_with_abs_pos(int abs_pos);
     void set_step(int step);
+    void emit_value_callback(int step);
 
     int _start;
     int _end;
@@ -52,11 +54,13 @@ struct slider : selectable
 
     int _current_step;
 
-    bool _pressed;
+    int _pressed_step;
 
     SDL_Rect _knob_box;
     int _step_width;
     int _step_width_rems;
+
+    std::function<void(int)> _value_callback;
 };
 
 #endif
