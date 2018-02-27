@@ -39,23 +39,35 @@ void box::apply_layout_to_children()
             if (_o == orientation::HORIZONTAL)
             {
                 // evenly split box
-                int const child_width = (get_box().w - (n - 1) * _children_spacing) / n;
+                int const avail_width = get_box().w - (n - 1) * _children_spacing;
+                int const child_width_div = avail_width / n;
+                int const child_width_rem = avail_width % n;
+
                 int xoffset = get_box().x;
 
-                for (auto c : _children)
+                for (std::size_t k = 0; k < n; ++k)
                 {
-                    c.wptr->apply_layout({ xoffset, get_box().y, child_width, get_box().h });
+                    int const extra_width = k >= (n - child_width_rem) ? 1 : 0;
+                    int const child_width = child_width_div + extra_width;
+
+                    _children[k].wptr->apply_layout({ xoffset, get_box().y, child_width, get_box().h });
                     xoffset += child_width + _children_spacing;
                 }
             }
             else
             {
-                int const child_height = (get_box().h - (n - 1) * _children_spacing) / n;
+                int const avail_height = get_box().h - (n - 1) * _children_spacing;
+                int const child_height_div = avail_height / n;
+                int const child_height_rem = avail_height % n;
+
                 int yoffset = get_box().y;
 
-                for (auto c : _children)
+                for (std::size_t k = 0; k < n; ++k)
                 {
-                    c.wptr->apply_layout({ get_box().x, yoffset, get_box().w, child_height });
+                    int const extra_height = k >= (n - child_height_rem) ? 1 : 0;
+                    int const child_height = child_height_div + extra_height;
+
+                    _children[k].wptr->apply_layout({ get_box().x, yoffset, get_box().w, child_height });
                     yoffset += child_height + _children_spacing;
                 }
             }
@@ -197,11 +209,12 @@ void box::apply_layout_to_children()
                     else
                     {
                         // allocate otherwise remaining
-                        int const extra_space = remaining_space / diff_heap.size();
-                        // TODO allocate int remainder
-                        for (auto const & p : diff_heap)
+                        int const extra_space_div = remaining_space / diff_heap.size();
+                        int const extra_space_rem = remaining_space % diff_heap.size();
+
+                        for (std::size_t k = 0; k < diff_heap.size(); ++k)
                         {
-                            tmp_partial_nat_size_incs[get<1>(p)] += extra_space;
+                            tmp_partial_nat_size_incs[get<1>(diff_heap[k])] += extra_space_div + (k >= diff_heap.size() - extra_space_rem ? 1 : 0);
                         }
                         break;
                     }
@@ -224,7 +237,7 @@ void box::apply_layout_to_children()
                 // TODO evenly distribute remainder?
                 // The space expanding widgets receive after every widget is
                 // able to get its natural size.
-                int const expand_width = c.expand ? extra_length + (extra_length_rem < k ? 1 : 0) : 0;
+                int const expand_width = c.expand ? extra_length + (k >= (n - extra_length_rem) ? 1 : 0) : 0;
 
 
                 vec const nat_expand = use_natural_size
