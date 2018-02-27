@@ -16,7 +16,7 @@ notebook::~notebook()
 void notebook::on_child_dirty(widget * w)
 {
     if (w == get_shown_widget())
-        mark_dirty();
+        mark_child_dirty(w);
 }
 
 std::vector<widget *> notebook::get_visible_children()
