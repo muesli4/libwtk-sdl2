@@ -5,23 +5,19 @@
 
 #include "widget.hpp"
 
-// Embeds a widget without sharing details of the concrete type to the outside
-// while forwarding its widget interface.
+/**
+ * Embeds a widget without sharing details of the concrete type to the outside
+ * while forwarding its widget interface.
+ */
 template <typename BaseWidget>
 struct embedded_widget : widget
 {
-    // TODO fix this
-    /*
+    /**
+     * Construct the embedded widget by forwarding the given argument to it.
+     */
     template <typename... Args>
     embedded_widget(Args &&... args)
-        : _embedded_widget(std::forward(args)...)
-    {
-    }
-    */
-
-    template <typename... Args>
-    embedded_widget(Args... args)
-        : _embedded_widget(args...)
+        : _embedded_widget(std::forward<Args>(args)...)
     {
         _embedded_widget.set_parent(this);
     }
