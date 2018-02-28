@@ -28,6 +28,7 @@ enum class dirty_type
     DIRTY
 };
 
+
 // This will choose the maximum dirty_type that is necessary such that a widget
 // tree will be properly drawn.
 dirty_type combine(dirty_type a, dirty_type b);
@@ -46,6 +47,11 @@ struct widget
     widget();
     widget(widget const &) = delete;
     widget & operator=(widget const &) = delete;
+
+    /**
+     * @name  Drawing and dirty-checking
+     * @{
+     */
 
     /**
      * This is called when a child is marked as dirty. The widget may then
@@ -93,6 +99,14 @@ struct widget
      *  Draw the widget. No children should be drawn here.
      */ 
     virtual void on_draw(draw_context & dc, selection_context const & sc) const = 0;
+
+    /** @} */
+
+    /**
+     * @name Input event handlers
+     * @{
+     */
+
     virtual void on_mouse_up_event(mouse_up_event const & e);
     virtual void on_mouse_down_event(mouse_down_event const & e);
     virtual void on_mouse_move_event(mouse_move_event const & e);
@@ -103,6 +117,8 @@ struct widget
      *  return key).
      */
     virtual void on_activate();
+
+    /** @} */
 
     /**
      * Get the widget's assigned bounding box.
@@ -134,6 +150,11 @@ struct widget
     virtual std::vector<widget const *> get_children() const;
 
     /**
+     * @name Layout
+     * @{
+     */
+
+    /**
      * In the simplest case this just sets the bounding box but may involve more
      * complex calculations with containers.
      */
@@ -144,6 +165,39 @@ struct widget
      * does not have box already. Otherwise no space is allocated.
      */
     virtual void apply_layout_to_children();
+
+
+    /**
+     * This should return the best possible approximation of the size the widget
+     * will require in its minimal state. Any containers are responsible to
+     * follow these constraints as best as possible. It is however in no way
+     * guaranteed.
+     */
+    virtual vec min_size_hint() const = 0;
+
+
+    /**
+     * This should give the additional size necessary to get the natural width
+     * of a widget. This is the preferred size of the widget where it looks
+     * especially good and is easily usable.
+     */
+    virtual vec nat_size_inc_hint() const;
+
+    /**
+     * A widget may better estimate its size with a given width. For example,
+     * when text is used it is much easier to estimate its size.
+     *
+     * Containers that know their width should prefer this to test children.
+     *
+     * Returns a negative value when not supported by the widget.
+     */
+    virtual int height_for_width_hint(int width) const;
+
+    /** @} */
+
+    /**
+     * @name Selection navigation
+     */
 
     /**
      * Should return the first selectable widget according to the navigation
@@ -180,31 +234,7 @@ struct widget
     virtual void on_select();
     virtual void on_unselect();
 
-    /**
-     * This should return the best possible approximation of the size the widget
-     * will require in its minimal state. Any containers are responsible to
-     * follow these constraints as best as possible. It is however in no way
-     * guaranteed.
-     */
-    virtual vec min_size_hint() const = 0;
-
-
-    /**
-     * This should give the additional size necessary to get the natural width
-     * of a widget. This is the preferred size of the widget where it looks
-     * especially good and is easily usable.
-     */
-    virtual vec nat_size_inc_hint() const;
-
-    /**
-     * A widget may better estimate its size with a given width. For example,
-     * when text is used it is much easier to estimate its size.
-     *
-     * Containers that know their width should prefer this to test children.
-     *
-     * Returns a negative value when not supported by the widget.
-     */
-    virtual int height_for_width_hint(int width) const;
+    /** @} */
 
     virtual ~widget();
 
@@ -213,6 +243,11 @@ struct widget
     dirty_type _dirty;
 
     protected:
+
+    /**
+     * @name Helpers for custom widget implementations
+     * @{
+     */
 
     /**
      * Helper to implement widgets that support swipes. Uses the default values
@@ -225,6 +260,8 @@ struct widget
      * exhausted.
      */
     widget * navigate_selectable_parent(navigation_type nt, point center);
+
+    /** @} */
 
     widget * _parent;
 

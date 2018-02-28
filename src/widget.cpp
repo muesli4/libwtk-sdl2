@@ -149,6 +149,18 @@ void widget::apply_layout_to_children()
 {
 }
 
+vec widget::nat_size_inc_hint() const
+{
+    // Default implemtation: The widgets minimal size is its natural size.
+    return { 0, 0 };
+}
+
+int widget::height_for_width_hint(int width) const
+{
+    // Default implementation: Not supported.
+    return -1;
+}
+
 widget * widget::find_selectable(navigation_type nt, point center)
 {
     // Default implementation: Widgets are not selectable by default.
@@ -166,18 +178,6 @@ widget * widget::navigate_selectable_from_children(navigation_type nt, widget * 
     // Default implementation: Has no child widgets, therefore this will never
     // be called from a child.
     return nullptr;
-}
-
-vec widget::nat_size_inc_hint() const
-{
-    // Default implemtation: The widgets minimal size is its natural size.
-    return { 0, 0 };
-}
-
-int widget::height_for_width_hint(int width) const
-{
-    // Default implementation: Not supported.
-    return -1;
 }
 
 widget::~widget()
