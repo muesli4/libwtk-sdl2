@@ -39,20 +39,12 @@ void texture_view::apply_layout_to_children()
         refresh_target();
 }
 
-vec texture_view::min_size_hint() const
+size_hint texture_view::get_size_hint(int width, int height) const
 {
-    return fit_to_width(_min_width);
-}
+    int min_width = opt_min(width, _min_width);
+    int nat_width = opt_min(width, _nat_width);
 
-vec texture_view::nat_size_inc_hint() const
-{
-    return fit_to_width(_nat_width);
-}
-
-int texture_view::height_for_width_hint(int width) const
-{
-    // Fit upwards to available width as long as it is below natural width.
-    return fit_to_width(std::min(_nat_width, width)).h;
+    return size_hint(fit_to_width(min_width), fit_to_width(nat_width));
 }
 
 void texture_view::set_texture(unique_texture_ptr p, int min_width, int nat_width)
@@ -82,6 +74,11 @@ void texture_view::set_texture(unique_texture_ptr p, int min_width, int nat_widt
 void texture_view::refresh_target()
 {
     std::tie(_target, std::ignore, std::ignore) = scale_preserve_ar(_size, get_box());
+    vec min_size = get_size_hint(-1, -1).minimal;
+    //_target.x = get_box().x;
+    //_target.y = get_box().y;
+    _target.w = std::max(_target.w, min_size.w);
+    _target.h = std::max(_target.h, min_size.h);
 }
 
 vec texture_view::fit_to_width(int width) const

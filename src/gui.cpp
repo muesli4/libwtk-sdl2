@@ -85,6 +85,7 @@ widget_ptr num_button()
 widget_ptr labeled_slider(int start, int end, int num_steps)
 {
     auto l = std::make_shared<label>(std::to_string(start));
+    l->set_minimum_width(40);
     auto s = std::make_shared<slider>(start, end, num_steps, [l](int i){ l->set_text(std::to_string(i)); });
     return hbox({ { false, l }, { true, s } }, 2);
 }
@@ -99,6 +100,7 @@ void event_loop(SDL_Renderer * renderer)
         });
 
     auto nb_indicator = std::make_shared<label>("Active Notebook Widget: Color");
+    nb_indicator->set_wrap(true);
     auto nb_controls = hbox({ { false, std::make_shared<button>("Color", [nb, nb_indicator](){ nb->set_page(0); nb_indicator->set_text("Active Notebook Widget: Color"); })}
                             , { false, std::make_shared<button>("Swipe", [nb, nb_indicator](){ nb->set_page(1); nb_indicator->set_text("Active Notebook Widget: Swipe"); })}
                             }, 20, true);
@@ -116,9 +118,16 @@ void event_loop(SDL_Renderer * renderer)
         , { { 3, 0, 1, 1 }, num_button() }
         , { { 3, 1, 1, 3 }, num_button() }
         };
+    auto l1 = std::make_shared<label>("This text should hopefully produce a linebreak. Otherwise something is not working correctly.\n\nYou may use Tab and Shift+Tab to focus widgets or use Shift and the corresponding arrow key for a 2-dimensional direction.");
+    l1->set_wrap(true);
+    l1->set_maximum_width(500);
+
+    auto l2 = std::make_shared<label>(std::vector<paragraph>{ paragraph("This is a bigger font.", 0, 1) });
+    l1->set_wrap(true);
+
     auto col3 = vbox( { { false, num_button() }
                       , { false, cw() }
-                      , { false, std::make_shared<label>("This text should hopefully produce a linebreak. Otherwise something is not working correctly.\n\nYou may use Tab and Shift+Tab to focus widgets or use Shift and the corresponding arrow key for a 2-dimensional direction.") }
+                      , { false, l1 }
                       , { true, std::make_shared<table, vec>({ 4, 4 }, table_entries, 20) }
                       , { false, std::make_shared<label>(std::vector<paragraph>{paragraph("Text 1, Paragraph 1."), paragraph("Text 1, Paragraph 2.")}) }
                       , { true, cw() }
@@ -128,7 +137,7 @@ void event_loop(SDL_Renderer * renderer)
                       }, 20);
     auto col4 = vbox( { { false, num_button() }
                       , { true, std::make_shared<empty>() }
-                      , { false, std::make_shared<label>(std::vector<paragraph>{ paragraph("This is a bigger font.", 0, 1) }) }
+                      , { false, l2 }
                       , { true, std::make_shared<empty>() }
                       , { false, std::make_shared<button>("Quit", [](){ SDL_Event ev { .type = SDL_QUIT }; SDL_PushEvent(&ev); })}
                       }
@@ -139,6 +148,7 @@ void event_loop(SDL_Renderer * renderer)
         , { true, col3 }
         , { false, col4 }
         }, 20));
+    //widget & main_widget = *col3.get();
 
     /*
     padding main_widget(20, vbox({ { false, std::make_shared<label>("This text should hopefully produce a linebreak. Otherwise something is not working correctly.\n\nYou may use Tab and Shift+Tab to focus widgets or use Shift and the corresponding arrow key for a 2-dimensional direction.")}, { false, cw()} , { false, num_button() }, { false, num_button() } }, 20, false));

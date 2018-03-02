@@ -131,9 +131,9 @@ void draw_context::draw_entry_text(std::string text, SDL_Rect abs_rect, int text
     }
 }
 
-int draw_context::draw_label_text(SDL_Rect box, std::string text, int font_idx)
+int draw_context::draw_label_text(SDL_Rect box, std::string text, bool wrap, int font_idx)
 {
-    auto result = _fm.text(text, box.w, font_idx);
+    auto result = _fm.text(text, wrap ? box.w : -1, font_idx);
     vec const & size = std::get<0>(result);
 
     point origin { box.x, box.y };

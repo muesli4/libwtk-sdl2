@@ -33,8 +33,7 @@ struct slider : selectable
 
     void apply_layout_to_children() override;
 
-    vec min_size_hint() const override;
-    vec nat_size_inc_hint() const override;
+    size_hint get_size_hint(int width, int height) const override;
 
     // slider interface
 

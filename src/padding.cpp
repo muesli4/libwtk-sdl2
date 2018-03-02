@@ -32,14 +32,19 @@ void padding::apply_layout_to_children()
         });
 }
 
-vec padding::min_size_hint() const
+size_hint padding::get_size_hint(int width, int height) const
 {
-    vec v = _child->min_size_hint();
+    int const hpad = _pad_left + _pad_right;
+    int const vpad = _pad_top + _pad_bottom;
 
-    v.w += _pad_left + _pad_right;
-    v.h += _pad_top + _pad_bottom;
+    auto sh = _child->get_size_hint(opt_change(width, width - hpad), opt_change(height, height - vpad));
 
-    return v;
+    sh.minimal.w += hpad;
+    sh.minimal.h += vpad;
+    sh.natural.w += hpad;
+    sh.natural.h += vpad;
+
+    return sh;
 }
 
 void padding::set_pad_left(int pad_left)

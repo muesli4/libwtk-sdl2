@@ -50,20 +50,16 @@ void button::on_activate()
     _callback();
 }
 
-vec button::min_size_hint() const
+size_hint button::get_size_hint(int width, int height) const
 {
+    vec const text_size = get_context_info().text_size(_text);
     // TODO get border dimensions from context info
-    vec size = get_context_info().text_size(_text);
+    vec const minimal = text_size + vec{ 2, 2 };
 
-    return { size.w + 2, size.h + 2 };
+    int const h_spacing = get_context_info().font_line_skip();
+    vec const natural = minimal + vec{ h_spacing - 1, h_spacing - 1 };
+    return size_hint(minimal, natural);
 }
-
-vec button::nat_size_inc_hint() const
-{
-    int h_spacing = get_context_info().font_line_skip();
-    return { h_spacing - 1, h_spacing - 1 };
-}
-
 
 button::~button()
 {

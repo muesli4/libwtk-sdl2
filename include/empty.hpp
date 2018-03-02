@@ -9,7 +9,7 @@ struct empty : widget
     ~empty() override;
 
     void on_draw(draw_context & dc, selection_context const & sc) const override;
-    vec min_size_hint() const override;
+    size_hint get_size_hint(int width, int height) const override;
 };
 
 #endif

@@ -304,13 +304,13 @@ widget * table::navigate_selectable_from_children(navigation_type nt, widget * w
     return navigate_selectable_parent(nt, center);
 }
 
-vec table::min_size_hint() const
+size_hint table::get_size_hint(int width, int height) const
 {
     std::vector<int> min_widths(_size.w, 0);
     std::vector<int> min_heights(_size.h, 0);
     min_cell_dimensions(min_widths.data(), min_heights.data());
 
-    return { length_with_spacing(min_widths), length_with_spacing(min_heights) };
+    return size_hint({ length_with_spacing(min_widths), length_with_spacing(min_heights) });
 }
 
 int table::length_with_spacing(std::vector<int> const & lengths) const
@@ -326,7 +326,7 @@ void table::min_cell_dimensions(int * min_widths, int * min_heights) const
     vec min_sizes[_entries.size()];
     for (std::size_t k = 0; k < _entries.size(); ++k)
     {
-        min_sizes[k] = _entries[k].wptr->min_size_hint();
+        min_sizes[k] = _entries[k].wptr->get_size_hint().minimal;
     }
 
     // Determine the minimum width for each column and row in one go.

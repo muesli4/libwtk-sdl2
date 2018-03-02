@@ -28,10 +28,18 @@ enum class dirty_type
     DIRTY
 };
 
-
 // This will choose the maximum dirty_type that is necessary such that a widget
 // tree will be properly drawn.
 dirty_type combine(dirty_type a, dirty_type b);
+
+struct size_hint
+{
+    size_hint(vec min, vec nat);
+    size_hint(vec min);
+
+    vec minimal;
+    vec natural;
+};
 
 /**
  * Abstract base class for widgets. A derived class will have to implement at
@@ -47,6 +55,7 @@ struct widget
     widget();
     widget(widget const &) = delete;
     widget & operator=(widget const &) = delete;
+    virtual ~widget();
 
     /**
      * @name  Drawing and dirty-checking
@@ -162,36 +171,29 @@ struct widget
 
     /**
      * Refresh layout with existing box. This should not be called if the widget
-     * does not have box already. Otherwise no space is allocated.
+     * does not have a box already. Otherwise no space is allocated.
      */
     virtual void apply_layout_to_children();
 
-
+    // TODO change encoding: none(), height(int), width(int)
     /**
-     * This should return the best possible approximation of the size the widget
-     * will require in its minimal state. Any containers are responsible to
-     * follow these constraints as best as possible. It is however in no way
-     * guaranteed.
+     * Computes the widgets preferred minimal and natural size. When given a
+     * specific width or height the widget might use that to give a more
+     * accurate size.
      */
-    virtual vec min_size_hint() const = 0;
-
-
-    /**
-     * This should give the additional size necessary to get the natural width
-     * of a widget. This is the preferred size of the widget where it looks
-     * especially good and is easily usable.
-     */
-    virtual vec nat_size_inc_hint() const;
+    virtual size_hint get_size_hint(int width = -1, int height = -1) const = 0;
 
     /**
-     * A widget may better estimate its size with a given width. For example,
-     * when text is used it is much easier to estimate its size.
+     * Whether a widget is able to use an intermediate value between minimal and
+     * natural size (e.g., assigning more width or height). This might change
+     * the aspect ratio of the widget.
      *
-     * Containers that know their width should prefer this to test children.
-     *
-     * Returns a negative value when not supported by the widget.
+     * Whenever a widget does not fit with natural but more than minimal, some
+     * widgets profit from using additional space. For example, an image in
+     * aspect ratio or a list view. A label in general can't profit from extra
+     * space and would only look awkward.
      */
-    virtual int height_for_width_hint(int width) const;
+    virtual bool can_use_intermediate_size() const;
 
     /** @} */
 
@@ -236,8 +238,6 @@ struct widget
 
     /** @} */
 
-    virtual ~widget();
-
     private:
 
     dirty_type _dirty;
@@ -274,6 +274,11 @@ struct widget
 
     context_info const * _context_info;
 };
+
+int opt_min(int opt_length, int length);
+int opt_max(int opt_length, int length);
+int opt_or_value(int opt_length, int length);
+int opt_change(int opt_length, int length);
 
 #endif
 

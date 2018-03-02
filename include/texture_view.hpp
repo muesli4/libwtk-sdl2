@@ -19,11 +19,7 @@ struct texture_view : widget
     void on_draw(draw_context & dc, selection_context const & sc) const override;
     void apply_layout_to_children() override;
 
-    vec min_size_hint() const override;
-    vec nat_size_inc_hint() const override;
-
-
-    int height_for_width_hint(int width) const override;
+    size_hint get_size_hint(int width, int height) const override;
 
     // texture_view interface
 

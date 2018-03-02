@@ -118,8 +118,9 @@ void slider::apply_layout_to_children()
     refresh_knob_box();
 }
 
-vec slider::min_size_hint() const
+size_hint slider::get_size_hint(int width, int height) const
 {
+    // TODO nat size
     // TODO use styling engine
 
     // knob size:
@@ -128,13 +129,8 @@ vec slider::min_size_hint() const
     // width of line:
     //     4 pixel per step + 2 pixel border width
     //     4 pixel (2 border, 2 fill)
-    return { 2 + 4 * _num_steps, get_context_info().font_line_skip() * 2 };
-}
 
-vec slider::nat_size_inc_hint() const
-{
-    // TODO
-    return { 0, 0 };
+    return size_hint({ 2 + 4 * _num_steps, get_context_info().font_line_skip() * 2 });
 }
 
 void slider::set_step_interval(int n)

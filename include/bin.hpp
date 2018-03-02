@@ -7,6 +7,7 @@
 struct bin : widget
 {
     bin(widget_ptr child);
+    ~bin() override;
 
     void on_draw(draw_context & dc, selection_context const & sc) const override;
     void on_mouse_down_event(mouse_down_event const & me) override;
@@ -20,15 +21,10 @@ struct bin : widget
 
     // Should be provided when the geometry of a child is not equal to the
     // geometry of the bin (i.e. if there is some kind of padding).
-    vec min_size_hint() const override;
-    vec nat_size_inc_hint() const override;
-
-    int height_for_width_hint(int width) const;
+    size_hint get_size_hint(int width, int height) const override;
 
     std::vector<widget *> get_children() override;
     std::vector<widget const *> get_children() const override;
-
-    ~bin() override;
 
     protected:
 

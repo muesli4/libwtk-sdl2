@@ -144,7 +144,7 @@ struct draw_context
 
     // Draws a string in the box and returns the actually used height within the
     // box.
-    int draw_label_text(SDL_Rect box, std::string text, int font_idx = 0);
+    int draw_label_text(SDL_Rect box, std::string text, bool wrap, int font_idx = 0);
 
     void draw_background(SDL_Rect box);
 

@@ -28,6 +28,7 @@ box::box(orientation o, box::children_type children, int children_spacing, bool 
     init_children();
 }
 
+#include <iostream>
 void box::apply_layout_to_children()
 {
     std::size_t const n = _children.size();
@@ -36,6 +37,7 @@ void box::apply_layout_to_children()
     {
         if (_children_homogeneous)
         {
+            // TODO use minimum width to compute minimum
             if (_o == orientation::HORIZONTAL)
             {
                 // evenly split box
@@ -88,45 +90,26 @@ void box::apply_layout_to_children()
             using namespace std;
 
             int min_sum = 0;
-            int nat_inc_sum = 0;
+            int nat_sum = 0;
             int num_expand = 0;
-            vector<vec> min_sizes;
-            vector<vec> nat_size_incs;
-            min_sizes.reserve(n);
-            nat_size_incs.reserve(n);
+            vector<size_hint> size_hints;
+            size_hints.reserve(n);
 
             for (auto & c : _children)
             {
-                vec min_size = c.wptr->min_size_hint();
-                min_sizes.push_back(min_size);
+                auto & wptr = c.wptr;
 
                 if (_o == orientation::VERTICAL)
                 {
-                    min_sum += min_size.h;
-                    int hfw = c.wptr->height_for_width_hint(get_box().w);
-
-                    if (hfw == -1)
-                    {
-                        vec nat_size_inc = c.wptr->nat_size_inc_hint();
-                        nat_size_incs.push_back(nat_size_inc);
-                        nat_inc_sum += nat_size_inc.h;
-                    }
-                    else
-                    {
-                        int const nat_height = hfw - min_size.h;
-                        nat_size_incs.push_back(
-                            { max(0, get_box().w - min_size.w)
-                            , max(0, nat_height)
-                            });
-                        nat_inc_sum += nat_height;
-                    }
+                    size_hints.push_back(wptr->get_size_hint(get_box().w, -1));
+                    min_sum += size_hints.back().minimal.h;
+                    nat_sum += size_hints.back().natural.h;
                 }
                 else
                 {
-                    min_sum += min_size.w;
-                    vec nat_size_inc = c.wptr->nat_size_inc_hint();
-                    nat_size_incs.push_back(nat_size_inc);
-                    nat_inc_sum += nat_size_inc.w;
+                    size_hints.push_back(wptr->get_size_hint(-1, get_box().h));
+                    min_sum += size_hints.back().minimal.w;
+                    nat_sum += size_hints.back().natural.w;
                 }
 
                 if (c.expand)
@@ -141,7 +124,7 @@ void box::apply_layout_to_children()
 
             int const remaining_space_with_min_size = avail_after_spacing - min_sum;
 
-            bool const use_natural_size = min_sum + nat_inc_sum <= avail_after_spacing;
+            bool const use_natural_size = nat_sum <= avail_after_spacing;
             bool const fill_to_natural = remaining_space_with_min_size > 0;
 
             // The amount that is used to partially fill the child to the
@@ -152,7 +135,7 @@ void box::apply_layout_to_children()
             if (use_natural_size)
             {
                 // every widget fits with natural size
-                int const remaining_space = avail_after_spacing - (min_sum + nat_inc_sum);
+                int const remaining_space = avail_after_spacing - nat_sum;
                 extra_length = remaining_space / num_receiving;
                 extra_length_rem = remaining_space % num_receiving;
             }
@@ -163,6 +146,8 @@ void box::apply_layout_to_children()
                 //    widgets space left:
                 //    Fill all remaining widgets equally by the minimum
                 //    difference. Subtract that from every remaining difference.
+                //    TODO add option to fill all widgets to a percentage
+                //    TODO filling wfh/hfw widgets this way is not optimal
 
                 int remaining_space = remaining_space_with_min_size;
 
@@ -175,8 +160,13 @@ void box::apply_layout_to_children()
                 diff_heap.reserve(n);
                 for (size_t k = 0; k < n; ++k)
                 {
-                    int size = _o == orientation::HORIZONTAL ? nat_size_incs[k].w : nat_size_incs[k].h;
-                    diff_heap.emplace_back(size, k);
+                    if (_children[k].wptr->can_use_intermediate_size())
+                    {
+                        auto const & sh = size_hints[k];
+                        // TODO limit to 0 ?
+                        int const nat_inc = _o == orientation::HORIZONTAL ? sh.natural.w - sh.minimal.w : sh.natural.h - sh.minimal.h;
+                        diff_heap.emplace_back(nat_inc, k);
+                    }
                 }
 
                 make_heap(begin(diff_heap), end(diff_heap), cmp_first);
@@ -238,29 +228,21 @@ void box::apply_layout_to_children()
                 // The space expanding widgets receive after every widget is
                 // able to get its natural size.
                 int const expand_width = c.expand ? extra_length + (k >= (n - extra_length_rem) ? 1 : 0) : 0;
+                int const extra_length = expand_width + (!use_natural_size && fill_to_natural ? partial_nat_size_incs[k] : 0);
 
-
-                vec const nat_expand = use_natural_size
-                                     ? nat_size_incs[k]
-                                     : ( fill_to_natural
-                                       ? (_o == orientation::HORIZONTAL
-                                         ? vec{ partial_nat_size_incs[k], 0 }
-                                         : vec{ 0, partial_nat_size_incs[k] }
-                                         )
-                                       : vec { 0, 0 });
-
-                vec const size = min_sizes[k] + nat_expand;
+                auto const & sh = size_hints[k];
+                vec const & size = use_natural_size ? sh.natural : sh.minimal;
 
                 if (_o == orientation::HORIZONTAL)
                 {
                     // TODO should both lengths be limited?
-                    int w = min(size.w + expand_width, get_box().w);
+                    int w = min(size.w + extra_length, get_box().w);
                     c.wptr->apply_layout({ offset, get_box().y, w, get_box().h });
                     offset += w + _children_spacing;
                 }
                 else
                 {
-                    int h = min(size.h + expand_width, get_box().h);
+                    int h = min(size.h + extra_length, get_box().h);
                     c.wptr->apply_layout({ get_box().x, offset, get_box().w, h });
                     offset += h + _children_spacing;
                 }
@@ -408,40 +390,49 @@ widget * box::navigate_selectable_from_children(navigation_type nt, widget * w, 
     }
 }
 
-vec box::min_size_hint() const
+size_hint box::get_size_hint(int width, int height) const
 {
     int const spacing = _children.empty() ? 0 : (_children.size() - 1) * _children_spacing;
-    vec result = { 0, 0 };
+    vec minimal = { 0, 0 };
+    vec natural = { 0, 0 };
 
-    if (_o == orientation::HORIZONTAL)
-    {
-        result.w = spacing;
-    }
-    else
-    {
-        result.h = spacing;
-    }
-
-    int homogeneous_max = 0;
+    int hom_minimal_max = 0;
+    int hom_natural_max = 0;
     for (auto & c : _children)
     {
-        vec size = c.wptr->min_size_hint();
         if (_o == orientation::HORIZONTAL)
         {
-            result.h = std::max(size.h, result.h);
-            if (_children_homogeneous)
-                homogeneous_max = std::max(size.w, homogeneous_max);
-            else
-                result.w += size.w;
+            auto sh = c.wptr->get_size_hint(-1, height);
 
+            minimal.h = std::max(sh.minimal.h, minimal.h);
+            natural.h = std::max(sh.natural.h, natural.h);
+            if (_children_homogeneous)
+            {
+                hom_minimal_max = std::max(sh.minimal.w, hom_minimal_max);
+                hom_natural_max = std::max(sh.natural.w, hom_natural_max);
+            }
+            else
+            {
+                minimal.w += sh.minimal.w;
+                natural.w += sh.natural.w;
+            }
         }
         else
         {
+            auto sh = c.wptr->get_size_hint(width, -1);
+
+            minimal.w = std::max(sh.minimal.w, minimal.w);
+            natural.w = std::max(sh.natural.w, natural.w);
             if (_children_homogeneous)
-                homogeneous_max = std::max(size.h, homogeneous_max);
+            {
+                hom_minimal_max = std::max(sh.minimal.h, hom_minimal_max);
+                hom_natural_max = std::max(sh.natural.h, hom_natural_max);
+            }
             else
-                result.h += size.h;
-            result.w = std::max(size.w, result.w);
+            {
+                minimal.h += sh.minimal.h;
+                natural.h += sh.natural.h;
+            }
         }
     }
 
@@ -449,57 +440,17 @@ vec box::min_size_hint() const
     {
         if (_o == orientation::HORIZONTAL)
         {
-            result.w += homogeneous_max * _children.size();
+            minimal.w += hom_minimal_max * _children.size() + spacing;
+            natural.w += hom_natural_max * _children.size() + spacing;
         }
         else
         {
-            result.h += homogeneous_max * _children.size();
+            minimal.h += hom_minimal_max * _children.size() + spacing;
+            natural.h += hom_natural_max * _children.size() + spacing;
         }
     }
 
-    return result;
-}
-
-vec box::nat_size_inc_hint() const
-{
-    vec result = { 0, 0 };
-
-    std::vector<std::size_t> hfw_indices;
-
-    for (std::size_t k = 0; k < _children.size(); ++k)
-    {
-        auto const & c = _children[k];
-        vec const size = c.wptr->nat_size_inc_hint();
-        if (_o == orientation::HORIZONTAL)
-        {
-            result.h = std::max(size.h, result.h);
-            result.w += size.w;
-        }
-        else
-        {
-            // TODO not optimal since we can't use it properly
-            int const hfw = c.wptr->height_for_width_hint(get_box().w);
-            if (hfw == -1)
-            {
-                result.h += size.h;
-                result.w = std::max(size.w, result.w);
-            }
-            else
-            {
-                hfw_indices.push_back(k);
-            }
-        }
-    }
-
-    // Rescale height-for-width widgets with maximum width.
-    for (auto hfw_idx : hfw_indices)
-    {
-        int const hfw = _children[hfw_idx].wptr->height_for_width_hint(result.w);
-        vec const min_size = _children[hfw_idx].wptr->min_size_hint();
-        result.h += hfw - min_size.h;
-    }
-
-    return result;
+    return size_hint(minimal, natural);
 }
 
 box::~box()

@@ -6,6 +6,10 @@ bin::bin(widget_ptr child)
     _child->set_parent(this);
 }
 
+bin::~bin()
+{
+}
+
 void bin::on_draw(draw_context & dc, selection_context const & sc) const
 {
     // we don't have to draw the background because either the parent widget
@@ -37,19 +41,9 @@ widget * bin::navigate_selectable_from_children(navigation_type nt, widget * w, 
     return navigate_selectable_parent(nt, center);
 }
 
-vec bin::min_size_hint() const
+size_hint bin::get_size_hint(int width, int height) const
 {
-    return _child->min_size_hint();
-}
-
-vec bin::nat_size_inc_hint() const
-{
-    return _child->nat_size_inc_hint();
-}
-
-int bin::height_for_width_hint(int width) const
-{
-    return _child->height_for_width_hint(width);
+    return _child->get_size_hint(width, height);
 }
 
 std::vector<widget *> bin::get_children()
@@ -60,9 +54,5 @@ std::vector<widget *> bin::get_children()
 std::vector<widget const *> bin::get_children() const
 {
     return { _child.get() };
-}
-
-bin::~bin()
-{
 }
 

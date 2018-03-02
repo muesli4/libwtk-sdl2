@@ -5,9 +5,24 @@ dirty_type combine(dirty_type a, dirty_type b)
     return std::max(a, b);
 }
 
+size_hint::size_hint(vec min, vec nat)
+    : minimal(min)
+    , natural(nat)
+{
+}
+
+size_hint::size_hint(vec min)
+    : size_hint(min, min)
+{
+}
+
 widget::widget()
     : _dirty(dirty_type::DIRTY)
     , _parent(nullptr)
+{
+}
+
+widget::~widget()
 {
 }
 
@@ -149,16 +164,9 @@ void widget::apply_layout_to_children()
 {
 }
 
-vec widget::nat_size_inc_hint() const
+bool widget::can_use_intermediate_size() const
 {
-    // Default implemtation: The widgets minimal size is its natural size.
-    return { 0, 0 };
-}
-
-int widget::height_for_width_hint(int width) const
-{
-    // Default implementation: Not supported.
-    return -1;
+    return true;
 }
 
 widget * widget::find_selectable(navigation_type nt, point center)
@@ -178,10 +186,6 @@ widget * widget::navigate_selectable_from_children(navigation_type nt, widget * 
     // Default implementation: Has no child widgets, therefore this will never
     // be called from a child.
     return nullptr;
-}
-
-widget::~widget()
-{
 }
 
 std::optional<swipe_info> widget::get_swipe_info_with_context_info(mouse_up_event const & e)
@@ -217,3 +221,24 @@ void widget::notify_parent_child_dirty()
     if (_parent != nullptr)
         _parent->on_child_dirty(this);
 }
+
+int opt_min(int opt_length, int length)
+{
+    return opt_length < 0 ? length : std::min(opt_length, length);
+}
+
+int opt_max(int opt_length, int length)
+{
+    return opt_length < 0 ? length : std::max(opt_length, length);
+}
+
+int opt_or_value(int opt_length, int length)
+{
+    return opt_length < 0 ? length : opt_length;
+}
+
+int opt_change(int opt_length, int length)
+{
+    return opt_length < 0 ? opt_length : length;
+}
+

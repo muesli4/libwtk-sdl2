@@ -159,19 +159,26 @@ void list_view::apply_layout_to_children()
     _visible_entries = (get_box().h - 2) / _row_height;
 }
 
-vec list_view::min_size_hint() const
-{
-    int const line_height = get_context_info().font_line_skip();
-    int const min_width = INDICATOR_MIN_WIDTH + 4 + 2 * line_height;
-    int const min_height = std::max(2 * INDICATOR_MIN_HEIGHT, 2 * line_height);
-    return { min_width, min_height };
-}
 
-vec list_view::nat_size_inc_hint() const
+size_hint list_view::get_size_hint(int width, int height) const
 {
     int const line_height = get_context_info().font_line_skip();
-    // TODO heuristc of width of each line, goal all text readable
-    return { 200, 2 * line_height };
+
+    int const preset_min_width = INDICATOR_MIN_WIDTH + 4 + 2 * line_height;
+    int const preset_min_height = std::max(2 * INDICATOR_MIN_HEIGHT, 2 * line_height);
+
+    int const preset_nat_width = preset_min_width + 200;
+    int const preset_nat_height = preset_min_height + 2 * line_height;
+
+    // Use all provided width, if any.
+    vec minimal { opt_or_value(width, preset_min_width)
+                , opt_or_value(height, preset_min_height)
+                };
+    vec natural { opt_or_value(width, preset_nat_width)
+                , opt_or_value(height, preset_nat_height)
+                };
+
+    return size_hint(minimal, natural);
 }
 
 void list_view::set_position(std::size_t position)

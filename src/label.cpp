@@ -60,7 +60,9 @@ label::label(std::string text)
 
 label::label(std::vector<paragraph> content)
     : _content(content)
-    , _cached_height(-1)
+    , _minimum_width(-1)
+    , _maximum_width(-1)
+    , _wrap(false)
 {
 }
 
@@ -79,11 +81,11 @@ void label::on_draw(draw_context & dc, selection_context const & sc) const
 
     for (auto const & tf : _content)
     {
-        SDL_Rect fbox { real_box.x, yoffset, real_box.w, remaining_height};
+        SDL_Rect fbox { real_box.x, yoffset, opt_min(_maximum_width, real_box.w), remaining_height};
 
         // TODO which newline height?
         int used_height
-            = dc.draw_label_text(fbox, tf.text, tf.font_idx)
+            = dc.draw_label_text(fbox, tf.text, _wrap, tf.font_idx)
             + tf.trailing_newlines * get_context_info().font_line_skip(tf.font_idx);
         if (used_height > remaining_height)
             break;
@@ -96,40 +98,42 @@ void label::on_draw(draw_context & dc, selection_context const & sc) const
 #endif
 }
 
-void label::apply_layout_to_children()
+size_hint label::get_size_hint(int width, int height) const
 {
-    _cached_height = -1;
-}
+    int wrap_param;
 
-vec label::min_size_hint() const
-{
-    // TODO temporary fix: introduce differentiation between natural and minimum
-    // width
-
-    int font_height = get_context_info().font_line_skip();
-    // TODO find a way to estimate the minimum size that works
-    /*
-    vec size { 0, 0 };
-    for (auto const & tf : _content)
+    if (_wrap)
     {
         // Assuming the average character is more than twice as high as it is
         // wide, this will allow about 45 characters on the line, which should
         // be a reasonable minimum for the width.
-        vec psize = get_context_info().text_size(tf.text, 13 * get_context_info().font_height());
+        //
+        // Does not account for different font sizes.
+        int const wrap_constant = 13 * get_context_info().font_line_skip();
 
-        size.w = std::max(psize.w, size.w);
-        size.h += psize.h;
+        // If there is no target width use the wrap constant.
+        int const targeted_width = opt_or_value(width, wrap_constant);
+
+        // Limit the width by user given value.
+        wrap_param = opt_min(_maximum_width, targeted_width);
     }
-    return vec{ font_height, font_height } + size;
-    */
-    return vec{ font_height * 6, 0 };
-}
+    else
+    {
+        wrap_param = -1;
+    }
 
-int label::height_for_width_hint(int width) const
-{
-    if (_cached_height == -1)
-        _cached_height = calculate_height_for_width(width);
-    return _cached_height;
+    vec minimal { 0, 0 };
+    for (auto const & tf : _content)
+    {
+        vec psize = get_context_info().text_size(tf.text, wrap_param, tf.font_idx);
+
+        minimal.w = std::max(psize.w, minimal.w);
+        minimal.h += psize.h + tf.trailing_newlines * get_context_info().font_line_skip(tf.font_idx);
+    }
+
+    minimal.w = std::max(_minimum_width, minimal.w);
+
+    return size_hint(minimal);
 }
 
 // label interface
@@ -156,7 +160,6 @@ std::string label::get_text() const
 void label::set_content(std::vector<paragraph> content)
 {
     _content = content;
-    _cached_height = -1;
 
     mark_dirty();
 }
@@ -176,5 +179,20 @@ int label::calculate_height_for_width(int width) const
                   + tf.trailing_newlines * get_context_info().font_line_skip(tf.font_idx);
     }
     return height;
+}
+
+void label::set_minimum_width(int width)
+{
+    _minimum_width = width;
+}
+
+void label::set_maximum_width(int width)
+{
+    _maximum_width = width;
+}
+
+void label::set_wrap(bool wrap)
+{
+    _wrap = wrap;
 }
 

@@ -98,28 +98,18 @@ std::vector<widget *> notebook::get_children()
     return res;
 }
 
-vec notebook::min_size_hint() const
+size_hint notebook::get_size_hint(int width, int height) const
 {
-    vec max_vec = { 0, 0 };
+    vec minimal = { 0, 0 };
+    vec natural = { 0, 0 };
     for (auto p : _pages)
     {
-        vec v = p->min_size_hint();
-        max_vec.w = std::max(max_vec.w, v.w);
-        max_vec.h = std::max(max_vec.h, v.h);
+        auto sh = p->get_size_hint(width, height);
+        minimal.w = std::max(minimal.w, sh.minimal.w);
+        minimal.h = std::max(minimal.h, sh.minimal.h);
+        natural.w = std::max(natural.w, sh.natural.w);
+        natural.h = std::max(natural.h, sh.natural.h);
     }
-    return max_vec;
-}
-
-vec notebook::nat_size_inc_hint() const
-{
-    // TODO refactor with notebook::min_size_hint
-    vec max_vec = { 0, 0 };
-    for (auto p : _pages)
-    {
-        vec v = p->nat_size_inc_hint();
-        max_vec.w = std::max(max_vec.w, v.w);
-        max_vec.h = std::max(max_vec.h, v.h);
-    }
-    return max_vec;
+    return size_hint(minimal, natural);
 }
 
