@@ -8,12 +8,26 @@
 #include "widget.hpp"
 #include "sdl_util.hpp"
 
-// A widget that displays a texture with the correct aspect ratio. The widget
-// takes ownership of the texture.
+/**
+ * A widget that displays a texture with the correct aspect ratio. The widget
+ * takes ownership of the texture.
+ *
+ * Currently the widget centers the texture within its box. As that behavior is
+ * inconsistent with that of other widgets it may change in the future.
+ */
 struct texture_view : widget
 {
     texture_view();
+    
+    /**
+     * Create a texture view by moving a texture pointer.
+     *
+     * One may give the minimum and natural width. The minimum width will
+     * default to half of the width of the texture. The natural width will
+     * default to the textures width.
+     */
     texture_view(unique_texture_ptr p, int min_width = -1, int nat_width = -1);
+
     ~texture_view() override;
 
     void on_draw(draw_context & dc, selection_context const & sc) const override;
@@ -26,7 +40,7 @@ struct texture_view : widget
      * @{
      */
 
-    void set_texture(unique_texture_ptr p, int min_width = 100, int nat_width = 200);
+    void set_texture(unique_texture_ptr p, int min_width = -1, int nat_width = -1);
 
     /** @} */
 
