@@ -20,7 +20,7 @@ void button::on_draw(draw_context & dc, selection_context const & sc) const
 
 void button::on_mouse_down_event(mouse_down_event const & e)
 {
-    bool hit = within_rect(e.position, get_box());
+    bool const hit = within_rect(e.position, get_box());
     if (hit != _pressed)
     {
         _pressed = hit;
@@ -32,10 +32,9 @@ void button::on_mouse_up_event(mouse_up_event const & e)
 {
     if (_pressed)
     {
-        bool hit = within_rect(e.position, get_box());
+        bool const hit = within_rect(e.position, get_box());
         if (hit)
             _callback();
-        _pressed = false;
         mark_dirty();
     }
 }
