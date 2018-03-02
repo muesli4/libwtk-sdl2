@@ -169,18 +169,6 @@ std::vector<paragraph> const & label::get_content() const
     return _content;
 }
 
-int label::calculate_height_for_width(int width) const
-{
-    int height = 0;
-    for (auto const & tf : _content)
-    {
-        // TODO which newline height?
-        height += get_context_info().text_size(tf.text, width, tf.font_idx).h
-                  + tf.trailing_newlines * get_context_info().font_line_skip(tf.font_idx);
-    }
-    return height;
-}
-
 void label::set_minimum_width(int width)
 {
     _minimum_width = width;
