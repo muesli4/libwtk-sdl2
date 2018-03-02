@@ -35,6 +35,7 @@ void button::on_mouse_up_event(mouse_up_event const & e)
         bool const hit = within_rect(e.position, get_box());
         if (hit)
             _callback();
+        _pressed = false;
         mark_dirty();
     }
 }
