@@ -211,7 +211,7 @@ vec font_word_cache::compute_text_layout(std::string t, int max_line_width, Back
             int const spacing = prev_post_left_kerning + _space_advance + get_word_right_kerning(current_wf.word);
             int const next_line_width = line_width + spacing + current_dim.w + current_pre_left_kerning + current_wf.extra_spaces * _space_advance;
 
-            if (max_line_width == -1 || next_line_width < max_line_width)
+            if (max_line_width == -1 || next_line_width <= max_line_width)
             {
                 // word does fit
 
