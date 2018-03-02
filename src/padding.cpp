@@ -22,7 +22,7 @@ padding::~padding()
 {
 }
 
-void padding::apply_layout_to_children()
+void padding::on_box_allocated()
 {
     _child->apply_layout(
         { get_box().x + _pad_left

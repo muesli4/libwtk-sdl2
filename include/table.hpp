@@ -18,7 +18,7 @@ struct table : container
 
     std::vector<widget *> get_children() override;
     std::vector<widget const *> get_children() const override;
-    void apply_layout_to_children() override;
+    void on_box_allocated() override;
     widget * find_selectable(navigation_type nt, point center) override;
     widget * navigate_selectable_from_children(navigation_type nt, widget * w, point center) override;
 

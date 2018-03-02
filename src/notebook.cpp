@@ -45,7 +45,7 @@ void notebook::on_mouse_down_event(mouse_down_event const & e)
     get_shown_widget()->on_mouse_down_event(e);
 }
 
-void notebook::apply_layout_to_children()
+void notebook::on_box_allocated()
 {
     for (auto p : _pages)
         p->apply_layout(get_box());

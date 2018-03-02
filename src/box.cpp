@@ -28,8 +28,7 @@ box::box(orientation o, box::children_type children, int children_spacing, bool 
     init_children();
 }
 
-#include <iostream>
-void box::apply_layout_to_children()
+void box::on_box_allocated()
 {
     std::size_t const n = _children.size();
 

@@ -31,11 +31,14 @@ struct slider : selectable
     void on_mouse_move_event(mouse_move_event const & e) override;
     void on_key_event(key_event const & e) override;
 
-    void apply_layout_to_children() override;
+    void on_box_allocated() override;
 
     size_hint get_size_hint(int width, int height) const override;
 
-    // slider interface
+    /**
+     * @name Slider Interface
+     * @{
+     */
 
     /**
      * Set the slider to the interval with index \ref n.
@@ -47,6 +50,8 @@ struct slider : selectable
      * Returns the starting value of the currently selected interval.
      */
     int get_value() const;
+
+    /** @} */
 
     private:
 

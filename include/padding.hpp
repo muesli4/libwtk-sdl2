@@ -11,11 +11,15 @@ struct padding : bin
 
     ~padding() override;
 
-    void apply_layout_to_children() override;
+    void on_box_allocated() override;
 
     size_hint get_size_hint(int width, int height) const override;
 
-    // padding interface
+    /**
+     * @name Padding Interface
+     * @{
+     */
+
     void set_pad_left(int pad_left);
     void set_pad_right(int pad_right);
     void set_pad_top(int pad_top);
@@ -25,6 +29,8 @@ struct padding : bin
     int get_pad_right() const;
     int get_pad_top() const;
     int get_pad_bottom() const;
+
+    /** @} */
 
     private:
 

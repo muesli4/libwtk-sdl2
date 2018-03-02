@@ -20,7 +20,7 @@ struct notebook : widget
     void on_mouse_up_event(mouse_up_event const & e) override;
     void on_mouse_down_event(mouse_down_event const & e) override;
 
-    void apply_layout_to_children() override;
+    void on_box_allocated() override;
 
     widget * find_selectable(navigation_type nt, point center) override;
     widget * navigate_selectable(navigation_type nt, point center) override;
@@ -30,9 +30,15 @@ struct notebook : widget
 
     size_hint get_size_hint(int width, int height) const override;
 
-    // notebook interface
+    /**
+     * @name Notebook Interface
+     * @{
+     */
+
     std::size_t get_page() const;
     void set_page(std::size_t index);
+
+    /** @} */
 
     private:
 

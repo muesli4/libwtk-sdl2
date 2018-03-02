@@ -18,9 +18,14 @@ struct button : selectable
 
     ~button() override;
 
-    // button interface
+    /**
+     * @name Button Interface
+     * @{
+     */
 
     void set_label(std::string text);
+
+    /** @} */
 
     private:
 

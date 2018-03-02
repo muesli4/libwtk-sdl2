@@ -157,10 +157,10 @@ void widget::apply_layout(SDL_Rect box)
     _box.w = std::max(0, _box.w);
     _box.h = std::max(0, _box.h);
 
-    apply_layout_to_children();
+    on_box_allocated();
 }
 
-void widget::apply_layout_to_children()
+void widget::on_box_allocated()
 {
 }
 

@@ -19,11 +19,14 @@ struct list_view : selectable
     void on_key_event(key_event const & e) override;
     void on_activate() override;
 
-    void apply_layout_to_children() override;
+    void on_box_allocated() override;
 
     size_hint get_size_hint(int width, int height) const override;
 
-    // list_view interface
+    /**
+     * @name List View Interface
+     * @{
+     */
 
     // Set the position of the first entry to be shown.
     void set_position(std::size_t position);
@@ -38,6 +41,7 @@ struct list_view : selectable
     void scroll_up();
     void scroll_down();
 
+    /** @} */
 
     private:
 

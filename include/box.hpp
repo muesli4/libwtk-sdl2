@@ -31,7 +31,7 @@ struct box : container
     box(orientation o, children_type children, bool children_homogeneous);
     box(orientation o, children_type children, int children_spacing, bool children_homogeneous);
 
-    void apply_layout_to_children() override;
+    void on_box_allocated() override;
 
     widget * find_selectable(navigation_type nt, point center) override;
 
@@ -44,10 +44,16 @@ struct box : container
 
     ~box() override;
 
-    // box interface
 
     std::vector<widget *> get_children() override;
     std::vector<widget const *> get_children() const override;
+
+    /**
+     * @name Box Interface
+     * @{
+     */
+
+    /** @} */
 
     private:
 

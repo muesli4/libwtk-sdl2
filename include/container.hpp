@@ -17,7 +17,7 @@ struct container : widget
 
     std::vector<widget *> get_children() override = 0;
     std::vector<widget const *> get_children() const override = 0;
-    void apply_layout_to_children() override = 0;
+    void on_box_allocated() override = 0;
     widget * find_selectable(navigation_type nt, point center) override = 0;
 
     protected:

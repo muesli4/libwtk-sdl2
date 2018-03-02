@@ -17,13 +17,18 @@ struct texture_view : widget
     ~texture_view() override;
 
     void on_draw(draw_context & dc, selection_context const & sc) const override;
-    void apply_layout_to_children() override;
+    void on_box_allocated() override;
 
     size_hint get_size_hint(int width, int height) const override;
 
-    // texture_view interface
+    /**
+     * @name Texture View Interface
+     * @{
+     */
 
     void set_texture(unique_texture_ptr p, int min_width = 100, int nat_width = 200);
+
+    /** @} */
 
     private:
 

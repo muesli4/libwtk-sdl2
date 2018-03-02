@@ -58,7 +58,7 @@ struct widget
     virtual ~widget();
 
     /**
-     * @name  Drawing and dirty-checking
+     * @name  Drawing and Dirty-Checking
      * @{
      */
 
@@ -112,7 +112,7 @@ struct widget
     /** @} */
 
     /**
-     * @name Input event handlers
+     * @name Input Event Handlers
      * @{
      */
 
@@ -173,7 +173,7 @@ struct widget
      * Refresh layout with existing box. This should not be called if the widget
      * does not have a box already. Otherwise no space is allocated.
      */
-    virtual void apply_layout_to_children();
+    virtual void on_box_allocated();
 
     // TODO change encoding: none(), height(int), width(int)
     /**
@@ -198,7 +198,7 @@ struct widget
     /** @} */
 
     /**
-     * @name Selection navigation
+     * @name Selection Navigation
      */
 
     /**

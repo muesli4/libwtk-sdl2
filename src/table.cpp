@@ -70,7 +70,7 @@ void table::compute_offsets(std::vector<int> & lengths, std::vector<int> & offse
 }
 
 // TODO support natural widths
-void table::apply_layout_to_children()
+void table::on_box_allocated()
 {
     std::vector<int> widths(_size.w, 0);
     std::vector<int> heights(_size.h, 0);

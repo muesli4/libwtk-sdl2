@@ -111,7 +111,7 @@ void slider::on_key_event(key_event const & e)
     // TODO implement keys
 }
 
-void slider::apply_layout_to_children()
+void slider::on_box_allocated()
 {
     _step_width = get_box().w / _num_steps;
     _step_width_rems = get_box().w % _num_steps;

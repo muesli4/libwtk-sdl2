@@ -33,7 +33,7 @@ void texture_view::on_draw(draw_context & dc, selection_context const & sc) cons
         dc.draw_background(get_box());
 }
 
-void texture_view::apply_layout_to_children()
+void texture_view::on_box_allocated()
 {
     if (_p)
         refresh_target();

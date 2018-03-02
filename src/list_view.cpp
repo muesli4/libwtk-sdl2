@@ -152,7 +152,7 @@ void list_view::on_activate()
         _activate_callback(_selected_position);
 }
 
-void list_view::apply_layout_to_children()
+void list_view::on_box_allocated()
 {
     // TODO code smell ?
     _row_height = get_context_info().font_line_skip();

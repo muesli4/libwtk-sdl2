@@ -32,7 +32,7 @@ struct embedded_widget : widget
     void on_activate() override { _embedded_widget.on_activate(); }
     std::vector<widget *> get_children() override { return { &_embedded_widget }; }
     std::vector<widget const *> get_children() const override { return { &_embedded_widget }; }
-    void apply_layout_to_children() override { _embedded_widget.apply_layout(get_box()); }
+    void on_box_allocated() override { _embedded_widget.apply_layout(get_box()); }
     widget * find_selectable(navigation_type nt, point center) override { return _embedded_widget.find_selectable(nt, center); }
     widget * navigate_selectable(navigation_type nt, point center) override { return _embedded_widget.navigate_selectable(nt, center); }
     widget * navigate_selectable_from_children(navigation_type nt, widget * w, point center) override { return navigate_selectable_parent(nt, center); }
