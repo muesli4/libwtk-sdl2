@@ -40,10 +40,14 @@ void box::on_box_allocated()
         //      currently it is filled
 
         using namespace std;
+
+        int const spacing_length = (n - 1) * _children_spacing;
+
         int min_sum = 0;
         int nat_sum = 0;
         vector<size_hint> size_hints;
         size_hints.reserve(n);
+
 
         if (_children_homogeneous)
         {
@@ -64,7 +68,6 @@ void box::on_box_allocated()
                     nat_sum += size_hints.back().natural.w;
                 }
             }
-            int const spacing_length = (n - 1) * _children_spacing;
 
             if (_o == orientation::HORIZONTAL)
             {
@@ -139,21 +142,18 @@ void box::on_box_allocated()
                     num_expand += 1;
             }
 
-            int const max_size = _o == orientation::HORIZONTAL ? get_box().w : get_box().h;
-            int const avail_after_spacing = max<int>(0, (max_size - (n - 1) * _children_spacing));
+            int const max_length = _o == orientation::HORIZONTAL ? get_box().w : get_box().h;
+            int const avail_after_spacing = max(0, max_length - spacing_length);
 
-            // the number of widgets receiving extra space
-            int const num_receiving = num_expand == 0 ? n : num_expand;
-
-            int const remaining_space_with_min_size = avail_after_spacing - min_sum;
+            int const rem_space_min_length = avail_after_spacing - min_sum;
 
             bool const use_natural_size = nat_sum <= avail_after_spacing;
-            bool const fill_to_natural = !use_natural_size && remaining_space_with_min_size > 0;
+            bool const fill_to_natural = !use_natural_size && rem_space_min_length > 0;
 
-            // The amount that is used to partially fill the child to the
+            // The amounts that are used to partially fill the children to their
             // natural size.
             vector<int> partial_nat_size_incs;
-            length_distributor ld(use_natural_size ? avail_after_spacing - nat_sum : 0, num_receiving);
+            length_distributor ld(use_natural_size ? avail_after_spacing - nat_sum : 0, num_expand);
 
             if (fill_to_natural)
             {
@@ -165,9 +165,8 @@ void box::on_box_allocated()
                 //    sizes). Subtract that from every remaining difference.
                 //
                 //    TODO add option to fill all widgets to a percentage
-                //    TODO filling wfh/hfw widgets this way is not optimal
 
-                int remaining_space = remaining_space_with_min_size;
+                int rem_space = rem_space_min_length;
 
                 // This is used to avoid subtracting from all elements of the heap.
                 int allocated = 0;
@@ -204,7 +203,7 @@ void box::on_box_allocated()
 
                     int const next_allocation = min_diff * diff_heap.size();
                     // can we allocate the current size for each?
-                    if (next_allocation <= remaining_space)
+                    if (next_allocation <= rem_space)
                     {
                         // allocate min diff for every widget (including the popped one)
                         for (auto const & p : diff_heap)
@@ -216,7 +215,7 @@ void box::on_box_allocated()
                     }
                     else
                     {
-                        length_distributor ld(remaining_space, diff_heap.size());
+                        length_distributor ld(rem_space, diff_heap.size());
 
                         for (std::size_t k = 0; k < diff_heap.size(); ++k)
                         {
@@ -225,7 +224,7 @@ void box::on_box_allocated()
                         break;
                     }
 
-                    remaining_space -= next_allocation;
+                    rem_space -= next_allocation;
                 }
                 // Protect against violated pre-conditions. E.g., when there is
                 // not enough space for the widgets.
