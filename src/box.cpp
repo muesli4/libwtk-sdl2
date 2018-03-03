@@ -91,7 +91,7 @@ void box::on_box_allocated()
             }
             else
             {
-                int const avail_height = get_box().w - spacing_length;
+                int const avail_height = get_box().h - spacing_length;
 
                 int const used_height = avail_height >= nat_sum
                                       ? avail_height
