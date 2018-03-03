@@ -2,6 +2,7 @@
 #include <iterator>
 
 #include "box.hpp"
+#include "util.hpp"
 
 // TODO default setting singleton
 box::box(orientation o, box::children_type children)
@@ -73,16 +74,13 @@ void box::on_box_allocated()
                                      ? avail_width
                                      : std::max(min_sum, avail_width);
 
-                // evenly split box
-                int const child_width_div = used_width / n;
-                int const child_width_rem = used_width % n;
+                length_distributor ld(used_width, n);
 
                 int xoffset = get_box().x;
 
                 for (std::size_t k = 0; k < n; ++k)
                 {
-                    int const extra_width = k >= (n - child_width_rem) ? 1 : 0;
-                    int const child_width = child_width_div + extra_width;
+                    int const child_width = ld.dist_end(k);
 
                     _children[k].wptr->apply_layout({ xoffset, get_box().y, child_width, get_box().h });
                     xoffset += child_width + _children_spacing;
@@ -96,15 +94,13 @@ void box::on_box_allocated()
                                       ? avail_height
                                       : std::max(min_sum, avail_height);
 
-                int const child_height_div = used_height / n;
-                int const child_height_rem = used_height % n;
+                length_distributor ld(used_height, n);
 
                 int yoffset = get_box().y;
 
                 for (std::size_t k = 0; k < n; ++k)
                 {
-                    int const extra_height = k >= (n - child_height_rem) ? 1 : 0;
-                    int const child_height = child_height_div + extra_height;
+                    int const child_height = ld.dist_end(k);
 
                     _children[k].wptr->apply_layout({ get_box().x, yoffset, get_box().w, child_height });
                     yoffset += child_height + _children_spacing;
@@ -152,21 +148,14 @@ void box::on_box_allocated()
             int const remaining_space_with_min_size = avail_after_spacing - min_sum;
 
             bool const use_natural_size = nat_sum <= avail_after_spacing;
-            bool const fill_to_natural = remaining_space_with_min_size > 0;
+            bool const fill_to_natural = !use_natural_size && remaining_space_with_min_size > 0;
 
             // The amount that is used to partially fill the child to the
             // natural size.
             vector<int> partial_nat_size_incs;
-            int extra_length_div = 0;
-            int extra_length_rem = 0;
-            if (use_natural_size)
-            {
-                // every widget fits with natural size
-                int const remaining_space = avail_after_spacing - nat_sum;
-                extra_length_div = remaining_space / num_receiving;
-                extra_length_rem = remaining_space % num_receiving;
-            }
-            else if (fill_to_natural)
+            length_distributor ld(use_natural_size ? avail_after_spacing - nat_sum : 0, num_receiving);
+
+            if (fill_to_natural)
             {
                 // 1. Sort differences between natural size (or use min heap).
                 // 2. While there is the minimum difference times the remaining
@@ -227,13 +216,11 @@ void box::on_box_allocated()
                     }
                     else
                     {
-                        // allocate otherwise remaining
-                        int const extra_space_div = remaining_space / diff_heap.size();
-                        int const extra_space_rem = remaining_space % diff_heap.size();
+                        length_distributor ld(remaining_space, diff_heap.size());
 
                         for (std::size_t k = 0; k < diff_heap.size(); ++k)
                         {
-                            tmp_partial_nat_size_incs[get<1>(diff_heap[k])] += extra_space_div + (k >= diff_heap.size() - extra_space_rem ? 1 : 0);
+                            tmp_partial_nat_size_incs[get<1>(diff_heap[k])] += ld.dist_end(k);
                         }
                         break;
                     }
@@ -254,14 +241,9 @@ void box::on_box_allocated()
                 auto & c = _children[k];
 
                 // Distribute remaining length or fill to natural size.
-                int const extra_length = !use_natural_size && fill_to_natural
+                int const extra_length = fill_to_natural
                                        ? partial_nat_size_incs[k]
-                                       : ( c.expand
-                                         ? extra_length_div + ( k >= (n - extra_length_rem)
-                                                              ? 1
-                                                              : 0)
-                                         : 0
-                                         );
+                                       : (c.expand ? ld.dist_end(k) : 0);
 
                 auto const & sh = size_hints[k];
                 vec const & size = use_natural_size ? sh.natural : sh.minimal;

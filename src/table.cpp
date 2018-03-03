@@ -1,7 +1,8 @@
-#include "table.hpp"
-
 #include <algorithm>
 #include <numeric>
+
+#include "table.hpp"
+#include "util.hpp"
 
 table::table(vec size, std::vector<entry> entries, int spacing)
     : _entries(entries)
@@ -53,12 +54,11 @@ void table::compute_offsets(std::vector<int> & lengths, std::vector<int> & offse
     // TODO distribute to empty cells?
     int const min_length = length_with_spacing(lengths);
     int const avail_length = box_length - min_length;
-    int const bonus_length_div = avail_length / n;
-    int const bonus_length_rem = avail_length % n;
-    for (std::size_t k = 0; k < n; ++k)
+
+    length_distributor ld(avail_length, n);
+    for (int k = 0; k < n; ++k)
     {
-        int const bonus_length = bonus_length_div + (k >= (n - bonus_length_rem) ? 1 : 0);
-        lengths[k] += bonus_length;
+        lengths[k] += ld.dist_end(k);
     }
 
     offsets[0] = box_start;

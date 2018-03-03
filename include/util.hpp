@@ -13,5 +13,23 @@ unsigned int inc_ensure_upper(unsigned int new_pos, unsigned int old_pos, unsign
 // check underflow and ensure at least lower_bound
 unsigned int dec_ensure_lower(unsigned int new_pos, unsigned int old_pos, unsigned int lower_bound);
 
+/**
+ * A helper to properly distribute space via integer division. \ref dist_end
+ * should be preferred over \ref dist_start.
+ */
+struct length_distributor
+{
+    length_distributor(int const length, int const n);
+
+    int dist_end(int const k) const;
+    int dist_start(int const k) const;
+
+    private:
+
+    int const _n;
+    int const _extra_length_div;
+    int const _extra_length_rem;
+};
+
 #endif
 
