@@ -34,15 +34,48 @@ void box::on_box_allocated()
 
     if (n > 0)
     {
+
+        // TODO properly handle orthogonal size (e.g., center, align, etc.)
+        //      currently it is filled
+
+        using namespace std;
+        int min_sum = 0;
+        int nat_sum = 0;
+        vector<size_hint> size_hints;
+        size_hints.reserve(n);
+
         if (_children_homogeneous)
         {
-            // TODO use minimum width to compute minimum
+            for (auto const & c : _children)
+            {
+                auto & wptr = c.wptr;
+
+                if (_o == orientation::VERTICAL)
+                {
+                    size_hints.push_back(wptr->get_size_hint(get_box().w, -1));
+                    min_sum += size_hints.back().minimal.h;
+                    nat_sum += size_hints.back().natural.h;
+                }
+                else
+                {
+                    size_hints.push_back(wptr->get_size_hint(-1, get_box().h));
+                    min_sum += size_hints.back().minimal.w;
+                    nat_sum += size_hints.back().natural.w;
+                }
+            }
+            int const spacing_length = (n - 1) * _children_spacing;
+
             if (_o == orientation::HORIZONTAL)
             {
+                int const avail_width = get_box().w - spacing_length;
+
+                int const used_width = avail_width >= nat_sum
+                                     ? avail_width
+                                     : std::max(min_sum, avail_width);
+
                 // evenly split box
-                int const avail_width = get_box().w - (n - 1) * _children_spacing;
-                int const child_width_div = avail_width / n;
-                int const child_width_rem = avail_width % n;
+                int const child_width_div = used_width / n;
+                int const child_width_rem = used_width % n;
 
                 int xoffset = get_box().x;
 
@@ -57,9 +90,14 @@ void box::on_box_allocated()
             }
             else
             {
-                int const avail_height = get_box().h - (n - 1) * _children_spacing;
-                int const child_height_div = avail_height / n;
-                int const child_height_rem = avail_height % n;
+                int const avail_height = get_box().w - spacing_length;
+
+                int const used_height = avail_height >= nat_sum
+                                      ? avail_height
+                                      : std::max(min_sum, avail_height);
+
+                int const child_height_div = used_height / n;
+                int const child_height_rem = used_height % n;
 
                 int yoffset = get_box().y;
 
@@ -75,28 +113,18 @@ void box::on_box_allocated()
         }
         else
         {
-            // Considerations:
-            // - height-for-width is similar to the natural size of the widget.
-
             // Algorithm outline:
             // 1. Ask for minimum and natural size of each widget
-            //    (height-for-width instead of natural size if supported).
             // 2. Calculate difference with available space for both minimal and
             //    natural size.
             // 3. If natural size will fit for every widget use natural size,
             //    otherwise use minimum size.
             // 4. Distribute left-over space to widgets with expand property.
-            using namespace std;
-
-            int min_sum = 0;
-            int nat_sum = 0;
             int num_expand = 0;
-            vector<size_hint> size_hints;
-            size_hints.reserve(n);
 
-            for (auto & c : _children)
+            for (auto const & c : _children)
             {
-                auto & wptr = c.wptr;
+                auto const & wptr = c.wptr;
 
                 if (_o == orientation::VERTICAL)
                 {
@@ -129,13 +157,13 @@ void box::on_box_allocated()
             // The amount that is used to partially fill the child to the
             // natural size.
             vector<int> partial_nat_size_incs;
-            int extra_length = 0;
+            int extra_length_div = 0;
             int extra_length_rem = 0;
             if (use_natural_size)
             {
                 // every widget fits with natural size
                 int const remaining_space = avail_after_spacing - nat_sum;
-                extra_length = remaining_space / num_receiving;
+                extra_length_div = remaining_space / num_receiving;
                 extra_length_rem = remaining_space % num_receiving;
             }
             else if (fill_to_natural)
@@ -144,7 +172,9 @@ void box::on_box_allocated()
                 // 2. While there is the minimum difference times the remaining
                 //    widgets space left:
                 //    Fill all remaining widgets equally by the minimum
-                //    difference. Subtract that from every remaining difference.
+                //    difference (only for widgets that support intermediate
+                //    sizes). Subtract that from every remaining difference.
+                //
                 //    TODO add option to fill all widgets to a percentage
                 //    TODO filling wfh/hfw widgets this way is not optimal
 
@@ -223,11 +253,15 @@ void box::on_box_allocated()
             {
                 auto & c = _children[k];
 
-                // TODO evenly distribute remainder?
-                // The space expanding widgets receive after every widget is
-                // able to get its natural size.
-                int const expand_width = c.expand ? extra_length + (k >= (n - extra_length_rem) ? 1 : 0) : 0;
-                int const extra_length = expand_width + (!use_natural_size && fill_to_natural ? partial_nat_size_incs[k] : 0);
+                // Distribute remaining length or fill to natural size.
+                int const extra_length = !use_natural_size && fill_to_natural
+                                       ? partial_nat_size_incs[k]
+                                       : ( c.expand
+                                         ? extra_length_div + ( k >= (n - extra_length_rem)
+                                                              ? 1
+                                                              : 0)
+                                         : 0
+                                         );
 
                 auto const & sh = size_hints[k];
                 vec const & size = use_natural_size ? sh.natural : sh.minimal;
