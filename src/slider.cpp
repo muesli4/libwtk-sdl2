@@ -170,7 +170,6 @@ int slider::get_step_with_abs_pos(int abs_pos)
     int index;
     if (offset < rem_point)
     {
-
         index = offset / (_step_width + 1);
     }
     else
