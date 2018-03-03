@@ -1,10 +1,10 @@
 #include <algorithm>
 #include <numeric>
 
-#include "table.hpp"
+#include "grid.hpp"
 #include "util.hpp"
 
-table::table(vec size, std::vector<entry> entries, int spacing)
+grid::grid(vec size, std::vector<entry> entries, int spacing)
     : _entries(entries)
     , _size(size)
     , _grid(size.w, std::vector<int>(size.h, -1))
@@ -28,11 +28,11 @@ table::table(vec size, std::vector<entry> entries, int spacing)
     }
 }
 
-table::~table()
+grid::~grid()
 {
 }
 
-std::vector<widget *> table::get_children()
+std::vector<widget *> grid::get_children()
 {
     std::vector<widget *> result;
     for (auto & e : _entries)
@@ -40,7 +40,7 @@ std::vector<widget *> table::get_children()
     return result;
 }
 
-std::vector<widget const *> table::get_children() const
+std::vector<widget const *> grid::get_children() const
 {
     std::vector<widget const *> result;
     for (auto const & e : _entries)
@@ -48,7 +48,7 @@ std::vector<widget const *> table::get_children() const
     return result;
 }
 
-void table::compute_offsets(std::vector<int> & lengths, std::vector<int> & offsets, int n, int box_length, int box_start)
+void grid::compute_offsets(std::vector<int> & lengths, std::vector<int> & offsets, int n, int box_length, int box_start)
 {
     // TODO consider height-for-width (how?)
     // TODO distribute to empty cells?
@@ -70,7 +70,7 @@ void table::compute_offsets(std::vector<int> & lengths, std::vector<int> & offse
 }
 
 // TODO support natural widths
-void table::on_box_allocated()
+void grid::on_box_allocated()
 {
     std::vector<int> widths(_size.w, 0);
     std::vector<int> heights(_size.h, 0);
@@ -108,7 +108,7 @@ int find_x_index(It first, It last, point center, vec size)
     return std::min(size.w - 1, static_cast<int>(std::distance(first, it_x)) - 1);
 }
 
-widget * table::find_selectable(navigation_type nt, point center)
+widget * grid::find_selectable(navigation_type nt, point center)
 {
     if (_entries.empty())
         return nullptr;
@@ -202,7 +202,7 @@ widget * navigate_natural_order(It first, It last, navigation_type nt, widget * 
     return nullptr;
 }
 
-widget * table::navigate_selectable_from_children(navigation_type nt, widget * w, point center)
+widget * grid::navigate_selectable_from_children(navigation_type nt, widget * w, point center)
 {
     // TODO consistent behavior with box
 
@@ -304,7 +304,7 @@ widget * table::navigate_selectable_from_children(navigation_type nt, widget * w
     return navigate_selectable_parent(nt, center);
 }
 
-size_hint table::get_size_hint(int width, int height) const
+size_hint grid::get_size_hint(int width, int height) const
 {
     std::vector<int> min_widths(_size.w, 0);
     std::vector<int> min_heights(_size.h, 0);
@@ -313,13 +313,13 @@ size_hint table::get_size_hint(int width, int height) const
     return size_hint({ length_with_spacing(min_widths), length_with_spacing(min_heights) });
 }
 
-int table::length_with_spacing(std::vector<int> const & lengths) const
+int grid::length_with_spacing(std::vector<int> const & lengths) const
 {
     int const init = std::max(0, static_cast<int>(lengths.size()) - 1) * _spacing;
     return std::accumulate(std::cbegin(lengths), std::cend(lengths), init);
 }
 
-void table::min_cell_dimensions(int * min_widths, int * min_heights) const
+void grid::min_cell_dimensions(int * min_widths, int * min_heights) const
 {
     // Assumption: min_widths and min_heights are zero-initialized.
 

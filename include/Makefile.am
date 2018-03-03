@@ -13,6 +13,7 @@ pkginclude_HEADERS =    \
 	font_manager.hpp      \
 	font_word_cache.hpp   \
 	geometry.hpp          \
+	grid.hpp              \
 	key_event.hpp         \
 	label.hpp             \
 	list_view.hpp         \
@@ -27,7 +28,6 @@ pkginclude_HEADERS =    \
 	slider.hpp            \
 	swipe.hpp             \
 	swipe_area.hpp        \
-	table.hpp             \
 	texture_view.hpp      \
 	utf8.hpp              \
 	util.hpp              \

@@ -5,7 +5,7 @@
 
 #include <vector>
 
-struct table : container
+struct grid : container
 {
     struct entry
     {
@@ -13,8 +13,8 @@ struct table : container
         widget_ptr wptr;
     };
 
-    table(vec size, std::vector<entry> entries, int padding);
-    ~table() override;
+    grid(vec size, std::vector<entry> entries, int padding);
+    ~grid() override;
 
     std::vector<widget *> get_children() override;
     std::vector<widget const *> get_children() const override;

@@ -64,7 +64,7 @@
 #include "sdl_util.hpp"
 #include "slider.hpp"
 #include "swipe_area.hpp"
-#include "table.hpp"
+#include "grid.hpp"
 #include "texture_view.hpp"
 #include "widget.hpp"
 #include "widget_context.hpp"
@@ -109,7 +109,7 @@ void event_loop(SDL_Renderer * renderer)
 
     auto col1 = vbox({ { true, lv }, { false, nb_indicator }, { true, nb }, { false, nb_controls } }, 20);
     auto col2 = vbox({ { true, cw() }, { false, std::make_shared<texture_view>(load_texture_from_image(renderer, PKGDATA"/test.jpeg")) }, { true, cw() } }, 20);
-    std::vector<table::entry> table_entries
+    std::vector<grid::entry> grid_entries
         { { { 0, 0, 2, 2 }, num_button() }
         , { { 0, 2, 1, 1 }, num_button() }
         , { { 1, 2, 1, 1 }, num_button() }
@@ -123,12 +123,12 @@ void event_loop(SDL_Renderer * renderer)
     l1->set_maximum_width(500);
 
     auto l2 = std::make_shared<label>(std::vector<paragraph>{ paragraph("This is a bigger font.", 0, 1) });
-    l1->set_wrap(true);
+    l2->set_wrap(true);
 
     auto col3 = vbox( { { false, num_button() }
                       , { false, cw() }
                       , { false, l1 }
-                      , { true, std::make_shared<table, vec>({ 4, 4 }, table_entries, 20) }
+                      , { true, std::make_shared<grid, vec>({ 4, 4 }, grid_entries, 20) }
                       , { false, std::make_shared<label>(std::vector<paragraph>{paragraph("Text 1, Paragraph 1."), paragraph("Text 1, Paragraph 2.")}) }
                       , { true, cw() }
                       , { true, std::make_shared<label>(std::vector<paragraph>{paragraph("Text 2, Paragraph 1.")}) }
@@ -142,13 +142,15 @@ void event_loop(SDL_Renderer * renderer)
                       , { false, std::make_shared<button>("Quit", [](){ SDL_Event ev { .type = SDL_QUIT }; SDL_PushEvent(&ev); })}
                       }
                     , 20);
+    ///*
     padding main_widget(20, hbox(
         { { true, col1 }
         , { false, col2  }
         , { true, col3 }
         , { false, col4 }
         }, 20));
-    //widget & main_widget = *col3.get();
+    //*/
+    //widget & main_widget = *col4.get();
 
     /*
     padding main_widget(20, vbox({ { false, std::make_shared<label>("This text should hopefully produce a linebreak. Otherwise something is not working correctly.\n\nYou may use Tab and Shift+Tab to focus widgets or use Shift and the corresponding arrow key for a 2-dimensional direction.")}, { false, cw()} , { false, num_button() }, { false, num_button() } }, 20, false));

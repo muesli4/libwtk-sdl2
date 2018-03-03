@@ -21,6 +21,7 @@ libwtk_sdl2_la_SOURCES = \
 	font_manager.cpp       \
 	font_word_cache.cpp    \
 	geometry.cpp           \
+	grid.cpp               \
 	label.cpp              \
 	list_view.cpp          \
 	mouse_event.cpp        \
@@ -33,7 +34,6 @@ libwtk_sdl2_la_SOURCES = \
 	slider.cpp             \
 	swipe.cpp              \
 	swipe_area.cpp         \
-	table.cpp              \
 	texture_view.cpp       \
 	utf8.cpp               \
 	util.cpp               \
