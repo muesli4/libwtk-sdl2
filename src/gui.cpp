@@ -135,19 +135,23 @@ void event_loop(SDL_Renderer * renderer)
                       , { false, labeled_slider(-50, -100, 11) }
                       , { false, labeled_slider(0, 30, 31) }
                       }, 20);
-    auto col4 = vbox( { { false, num_button() }
+    auto col5 = vbox( { { false, num_button() }
                       , { true, std::make_shared<empty>() }
                       , { false, l2 }
                       , { true, std::make_shared<empty>() }
                       , { false, std::make_shared<button>("Quit", [](){ SDL_Event ev { .type = SDL_QUIT }; SDL_PushEvent(&ev); })}
                       }
                     , 20);
+
+    //auto col4 = vbox({ { true, num_button() }, { true, num_button() }, { true, num_button() } }, 20, true);
+
     ///*
     padding main_widget(20, hbox(
         { { true, col1 }
         , { false, col2  }
         , { true, col3 }
-        , { false, col4 }
+        //, { false, col4 }
+        , { false, col5 }
         }, 20));
     //*/
     //widget & main_widget = *col4.get();
