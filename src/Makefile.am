@@ -28,6 +28,7 @@ libwtk_sdl2_la_SOURCES = \
 	mouse_tracker.cpp      \
 	notebook.cpp           \
 	padding.cpp            \
+	region.cpp             \
 	sdl_util.cpp           \
 	selectable.cpp         \
 	selection_context.cpp  \

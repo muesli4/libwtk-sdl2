@@ -11,6 +11,7 @@
 #include "key_event.hpp"
 #include "mouse_event.hpp"
 #include "navigation_type.hpp"
+#include "region.hpp"
 #include "selection_context.hpp"
 #include "swipe.hpp"
 
@@ -32,15 +33,6 @@ enum class dirty_type
 // tree will be properly drawn.
 dirty_type combine(dirty_type a, dirty_type b);
 
-struct size_hint
-{
-    size_hint(vec min, vec nat);
-    size_hint(vec min);
-
-    vec minimal;
-    vec natural;
-};
-
 /**
  * Abstract base class for widgets. A derived class will have to implement at
  * least \ref on_draw() and \ref min_size_hint(). There exist useful default
@@ -49,7 +41,7 @@ struct size_hint
  *
  * Widgets are usually created as \ref widget_ptr to provide easy usage.
  */
-struct widget
+struct widget : region
 {
 
     widget();
@@ -130,11 +122,6 @@ struct widget
     /** @} */
 
     /**
-     * Get the widget's assigned bounding box.
-     */
-    SDL_Rect const & get_box() const;
-
-    /**
      * Get the \ref context_info associated with the widgets context. This is
      * meant for font settings or available area to help with widget layout and
      * drawing.
@@ -157,45 +144,6 @@ struct widget
      */
     virtual std::vector<widget *> get_children();
     virtual std::vector<widget const *> get_children() const;
-
-    /**
-     * @name Layout
-     * @{
-     */
-
-    /**
-     * In the simplest case this just sets the bounding box but may involve more
-     * complex calculations with containers.
-     */
-    void apply_layout(SDL_Rect box);
-
-    /**
-     * Refresh layout with existing box. This should not be called if the widget
-     * does not have a box already. Otherwise no space is allocated.
-     */
-    virtual void on_box_allocated();
-
-    // TODO change encoding: none(), height(int), width(int)
-    /**
-     * Computes the widgets preferred minimal and natural size. When given a
-     * specific width or height the widget might use that to give a more
-     * accurate size.
-     */
-    virtual size_hint get_size_hint(int width = -1, int height = -1) const = 0;
-
-    /**
-     * Whether a widget is able to use an intermediate value between minimal and
-     * natural size (e.g., assigning more width or height). This might change
-     * the aspect ratio of the widget.
-     *
-     * Whenever a widget does not fit with natural but more than minimal, some
-     * widgets profit from using additional space. For example, an image in
-     * aspect ratio or a list view. A label in general can't profit from extra
-     * space and would only look awkward.
-     */
-    virtual bool can_use_intermediate_size() const;
-
-    /** @} */
 
     /**
      * @name Selection Navigation
@@ -268,9 +216,6 @@ struct widget
     private:
 
     void notify_parent_child_dirty();
-
-    // cached for efficiency, may be replaced by just width and height
-    SDL_Rect _box;
 
     context_info const * _context_info;
 };
