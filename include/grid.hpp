@@ -5,6 +5,13 @@
 
 #include <vector>
 
+/**
+ * Use a grid to attach several widgets with a position to it. \ref grid::entry
+ * is used for that purpose and allows the widget to span over a rectangular
+ * area.
+ *
+ * Note that unused rows and columns will still use the given spacing.
+ */
 struct grid : container
 {
     struct entry
