@@ -19,7 +19,7 @@
 struct texture_view : widget
 {
     texture_view();
-    
+
     /**
      * Create a texture view by moving a texture pointer.
      *

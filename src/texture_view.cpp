@@ -4,7 +4,7 @@
 
 texture_view::texture_view()
     : _p()
-    , _size { 1, 1 }
+    , _size { 0, 0 }
     , _min_width(0)
     , _nat_width(0)
     , _target { 0, 0, 0, 0 }
@@ -87,7 +87,7 @@ void texture_view::refresh_target()
 
 vec texture_view::fit_to_width(int width) const
 {
-    double ratio = static_cast<double>(width) / _size.w;
+    double ratio = static_cast<double>(width) / std::max(1, _size.w);
     return { width, static_cast<int>(_size.h * ratio) };
 }
 
