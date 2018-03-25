@@ -2,6 +2,17 @@
 
 #include "region.hpp"
 
+size_hint::size_hint(vec min, vec nat)
+    : minimal(min)
+    , natural(nat)
+{
+}
+
+size_hint::size_hint(vec min)
+    : size_hint(min, min)
+{
+}
+
 void region::apply_layout(rect box)
 {
     _box = box;

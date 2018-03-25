@@ -5,17 +5,6 @@ dirty_type combine(dirty_type a, dirty_type b)
     return std::max(a, b);
 }
 
-size_hint::size_hint(vec min, vec nat)
-    : minimal(min)
-    , natural(nat)
-{
-}
-
-size_hint::size_hint(vec min)
-    : size_hint(min, min)
-{
-}
-
 widget::widget()
     : _dirty(dirty_type::DIRTY)
     , _parent(nullptr)
