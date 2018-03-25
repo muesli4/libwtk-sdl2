@@ -36,7 +36,9 @@ void texture_view::on_draw(draw_context & dc, selection_context const & sc) cons
 void texture_view::on_box_allocated()
 {
     if (_p)
+    {
         refresh_target();
+    }
 }
 
 size_hint texture_view::get_size_hint(int width, int height) const
@@ -75,8 +77,10 @@ void texture_view::refresh_target()
 {
     std::tie(_target, std::ignore, std::ignore) = scale_preserve_ar(_size, get_box());
     vec min_size = get_size_hint(-1, -1).minimal;
-    //_target.x = get_box().x;
-    //_target.y = get_box().y;
+
+    // TODO find out why the box of a widget might scale down below its minimum
+    // size (probably related to box), then we can remove this as a ugly
+    // workaround
     _target.w = std::max(_target.w, min_size.w);
     _target.h = std::max(_target.h, min_size.h);
 }
