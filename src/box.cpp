@@ -54,18 +54,19 @@ void box::on_box_allocated()
             for (auto const & c : _children)
             {
                 auto & wptr = c.wptr;
-
                 if (_o == orientation::VERTICAL)
                 {
                     size_hints.push_back(wptr->get_size_hint(get_box().w, -1));
-                    min_sum += size_hints.back().minimal.h;
-                    nat_sum += size_hints.back().natural.h;
+                    auto const & sh = size_hints.back();
+                    min_sum += sh.minimal.h;
+                    nat_sum += sh.natural.h;
                 }
                 else
                 {
                     size_hints.push_back(wptr->get_size_hint(-1, get_box().h));
-                    min_sum += size_hints.back().minimal.w;
-                    nat_sum += size_hints.back().natural.w;
+                    auto const & sh = size_hints.back();
+                    min_sum += sh.minimal.w;
+                    nat_sum += sh.natural.w;
                 }
             }
 
@@ -73,7 +74,8 @@ void box::on_box_allocated()
             {
                 int const avail_width = get_box().w - spacing_length;
 
-                int const used_width = avail_width >= nat_sum
+                bool const use_natural_width = avail_width >= nat_sum;
+                int const used_width = use_natural_width
                                      ? avail_width
                                      : std::max(min_sum, avail_width);
 
@@ -93,7 +95,8 @@ void box::on_box_allocated()
             {
                 int const avail_height = get_box().h - spacing_length;
 
-                int const used_height = avail_height >= nat_sum
+                bool const use_natural_height = avail_height >= nat_sum;
+                int const used_height = use_natural_height
                                       ? avail_height
                                       : std::max(min_sum, avail_height);
 
