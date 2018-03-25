@@ -1,10 +1,9 @@
 #ifndef LIBWTK_SDL2_SELECTION_CONTEXT_HPP
 #define LIBWTK_SDL2_SELECTION_CONTEXT_HPP
 
-#include <SDL2/SDL_rect.h>
-
 #include "geometry.hpp"
 #include "key_event.hpp"
+
 enum class navigation_type;
 struct widget;
 
@@ -17,7 +16,7 @@ struct widget;
 // In principle this represents tabulator based widget focus.
 struct selection_context
 {
-    selection_context(SDL_Rect widget_area, widget * w = nullptr);
+    selection_context(rect widget_area, widget * w = nullptr);
 
     // Manually select a widget.
     void select_widget(widget * w);
@@ -38,7 +37,7 @@ struct selection_context
     // This is the entry point of all navigation events.
     void navigate_selection(navigation_type nt, widget * main_widget);
 
-    void change_widget_area(SDL_Rect new_box);
+    void change_widget_area(rect new_box);
 
     private:
 
@@ -47,7 +46,7 @@ struct selection_context
 
     point _selected_position;
     widget * _selected_widget;
-    SDL_Rect _widget_area;
+    rect _widget_area;
 };
 
 #endif

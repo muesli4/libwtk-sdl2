@@ -7,7 +7,7 @@ widget_context::widget_context(SDL_Renderer * renderer, std::vector<font> fonts,
 {
 }
 
-widget_context::widget_context(SDL_Renderer * renderer, std::vector<font> fonts, widget & main_widget, SDL_Rect box)
+widget_context::widget_context(SDL_Renderer * renderer, std::vector<font> fonts, widget & main_widget, rect box)
     : _box(box)
     , _renderer(renderer)
     , _fm(_renderer, fonts)
@@ -36,7 +36,7 @@ widget_context::widget_context(SDL_Renderer * renderer, std::vector<font> fonts,
     main_widget.apply_layout(box);
 }
 
-point tfinger_to_point(SDL_TouchFingerEvent const & tfinger, SDL_Rect const & box)
+point tfinger_to_point(SDL_TouchFingerEvent const & tfinger, rect const & box)
 {
     return { static_cast<int>(tfinger.x * box.w), static_cast<int>(tfinger.y * box.h) };
 }
@@ -146,7 +146,7 @@ bool widget_context::is_selected_widget(widget const & w)
     return _sc.is_selected_widget(&w);
 }
 
-void widget_context::change_widget_area(SDL_Rect new_box)
+void widget_context::change_widget_area(rect new_box)
 {
     _box = new_box;
     _main_widget.apply_layout(_box);

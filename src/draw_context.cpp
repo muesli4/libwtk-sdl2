@@ -1,5 +1,4 @@
 #include "draw_context.hpp"
-
 #include "sdl_util.hpp"
 
 color_theme::color_theme()
@@ -32,17 +31,17 @@ void draw_context::present()
     SDL_RenderPresent(_renderer);
 }
 
-void draw_context::draw_rect_filled(SDL_Rect r)
+void draw_context::draw_rect_filled(rect r)
 {
     SDL_RenderFillRect(_renderer, &r);
 }
 
-void draw_context::draw_rect(SDL_Rect r)
+void draw_context::draw_rect(rect r)
 {
     SDL_RenderDrawRect(_renderer, &r);
 }
 
-void draw_context::blit(SDL_Surface * s, const SDL_Rect * srcrect, const SDL_Rect * dstrect)
+void draw_context::blit(SDL_Surface * s, const rect * srcrect, const rect * dstrect)
 {
     // TODO inefficient
     SDL_Texture * tex = SDL_CreateTextureFromSurface(_renderer, s);
@@ -51,7 +50,7 @@ void draw_context::blit(SDL_Surface * s, const SDL_Rect * srcrect, const SDL_Rec
     SDL_DestroyTexture(tex);
 }
 
-void draw_context::draw_button_box(SDL_Rect box, bool activated, bool selected)
+void draw_context::draw_button_box(rect box, bool activated, bool selected)
 {
     set_color(activated ? _theme.button_pressed_bg_color : (selected ? _theme.button_selected_bg_color : _theme.button_bg_color));
     SDL_RenderFillRect(_renderer, &box);
@@ -75,22 +74,22 @@ void draw_context::run_copy_commands(std::vector<copy_command> const & commands,
     {
         set_texture_color_mod(c.texture, color);
         vec size = texture_dim(c.texture);
-        SDL_Rect target { origin.x + c.x_offset, origin.y + c.y_offset, size.w, size.h };
+        rect target { origin.x + c.x_offset, origin.y + c.y_offset, size.w, size.h };
         SDL_RenderCopy(_renderer, c.texture, &c.source, &target);
     }
 }
 
-void draw_context::copy_texture(SDL_Texture * t, SDL_Rect src, SDL_Rect dst)
+void draw_context::copy_texture(SDL_Texture * t, rect src, rect dst)
 {
     SDL_RenderCopy(_renderer, t, &src, &dst);
 }
 
-void draw_context::copy_texture(SDL_Texture * t, SDL_Rect dst)
+void draw_context::copy_texture(SDL_Texture * t, rect dst)
 {
     SDL_RenderCopy(_renderer, t, nullptr, &dst);
 }
 
-void draw_context::draw_button_text(std::string const & text, SDL_Rect abs_rect)
+void draw_context::draw_button_text(std::string const & text, rect abs_rect)
 {
     auto result = _fm.text(text);
     vec const & size = std::get<0>(result);
@@ -102,7 +101,7 @@ void draw_context::draw_button_text(std::string const & text, SDL_Rect abs_rect)
     run_copy_commands(std::get<1>(result), origin, _theme.button_fg_color);
 }
 
-void draw_context::draw_entry_box(SDL_Rect box, bool selected)
+void draw_context::draw_entry_box(rect box, bool selected)
 {
     set_color(_theme.entry_box_bg_color);
     SDL_RenderFillRect(_renderer, &box);
@@ -110,7 +109,7 @@ void draw_context::draw_entry_box(SDL_Rect box, bool selected)
     SDL_RenderDrawRect(_renderer, &box);
 }
 
-void draw_context::draw_entry_text(std::string text, SDL_Rect abs_rect, int texture_x_offset, int texture_y_offset)
+void draw_context::draw_entry_text(std::string text, rect abs_rect, int texture_x_offset, int texture_y_offset)
 {
     int const remaining_w = abs_rect.w - std::max(0, texture_x_offset);
     int const remaining_h = abs_rect.h - std::max(0, texture_y_offset);
@@ -131,7 +130,7 @@ void draw_context::draw_entry_text(std::string text, SDL_Rect abs_rect, int text
     }
 }
 
-int draw_context::draw_label_text(SDL_Rect box, std::string text, bool wrap, int font_idx)
+int draw_context::draw_label_text(rect box, std::string text, bool wrap, int font_idx)
 {
     auto result = _fm.text(text, wrap ? box.w : -1, font_idx);
     vec const & size = std::get<0>(result);
@@ -149,31 +148,31 @@ int draw_context::draw_label_text(SDL_Rect box, std::string text, bool wrap, int
     return size.h;
 }
 
-void draw_context::draw_background(SDL_Rect box)
+void draw_context::draw_background(rect box)
 {
     set_color(_theme.bg_color);
     SDL_RenderFillRect(_renderer, &box);
 }
 
-void draw_context::draw_entry_pressed_background(SDL_Rect box)
+void draw_context::draw_entry_pressed_background(rect box)
 {
     set_color(_theme.entry_selected_bg_color);
     SDL_RenderFillRect(_renderer, &box);
 }
 
-void draw_context::draw_entry_active_background(SDL_Rect box)
+void draw_context::draw_entry_active_background(rect box)
 {
     set_color(_theme.active_color);
     SDL_RenderFillRect(_renderer, &box);
 }
 
-void draw_context::draw_entry_hightlighted_background(SDL_Rect box)
+void draw_context::draw_entry_hightlighted_background(rect box)
 {
     set_color(_theme.entry_highlight_bg_color);
     SDL_RenderFillRect(_renderer, &box);
 }
 
-void draw_context::draw_entry_position_indicator(SDL_Rect box)
+void draw_context::draw_entry_position_indicator(rect box)
 {
     SDL_SetRenderDrawBlendMode(_renderer, SDL_BLENDMODE_BLEND);
     SDL_SetRenderDrawColor(_renderer, 150, 250, 150, 200);

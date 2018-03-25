@@ -2,7 +2,7 @@
 
 #include "region.hpp"
 
-void region::apply_layout(SDL_Rect box)
+void region::apply_layout(rect box)
 {
     _box = box;
 
@@ -22,7 +22,7 @@ bool region::can_use_intermediate_size() const
     return true;
 }
 
-SDL_Rect const & region::get_box() const
+rect const & region::get_box() const
 {
     return _box;
 }

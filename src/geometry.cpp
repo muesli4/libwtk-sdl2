@@ -5,7 +5,7 @@ int square(int i)
     return i * i;
 }
 
-bool within_rect(point p, SDL_Rect const & r)
+bool within_rect(point p, rect const & r)
 {
     return within_bound(p.x, r.x, r.w) && within_bound(p.y, r.y, r.h);
     //return p.x >= r.x && p.x < r.x + r.w && p.y >= r.y && p.y < r.y + r.h;
@@ -16,17 +16,22 @@ bool within_bound(int val, int lower, int length)
     return val >= lower && val < lower + length;
 }
 
-point rect_center(SDL_Rect const & r)
+bool fits(vec v, rect const & r)
+{
+    return v.w <= r.w && v.h <= r.h;
+}
+
+point rect_center(rect const & r)
 {
     return { r.x + r.w / 2, r.y + r.h / 2 };
 }
 
-point rect_origin(SDL_Rect const & r)
+point rect_origin(rect const & r)
 {
     return { r.x, r.y };
 }
 
-SDL_Rect rect(vec v)
+rect origin_rect(vec v)
 {
     return { 0, 0, v.w, v.h };
 }

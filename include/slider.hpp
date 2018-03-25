@@ -70,7 +70,7 @@ struct slider : selectable
 
     int _pressed_step;
 
-    SDL_Rect _knob_box;
+    rect _knob_box;
     int _step_width;
     int _step_width_rems;
 

@@ -39,11 +39,11 @@ void slider::on_draw(draw_context & dc, selection_context const & sc) const
     SDL_Color rut_used_fill { 70, 70, 70 };
 
     int rut_y_offset = get_box().y + _knob_box.h / 2 - 2;
-    SDL_Rect left_rut { get_box().x, rut_y_offset, _knob_box.x - get_box().x + 1, 4 };
+    rect left_rut { get_box().x, rut_y_offset, _knob_box.x - get_box().x + 1, 4 };
 
     // last point within the know
     int knob_end = _knob_box.x + _knob_box.w - 1;
-    SDL_Rect right_rut { knob_end, rut_y_offset, get_box().w - (knob_end - get_box().x), 4 };
+    rect right_rut { knob_end, rut_y_offset, get_box().w - (knob_end - get_box().x), 4 };
 
     dc.set_color(rut_border);
     dc.draw_rect(left_rut);

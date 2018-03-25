@@ -49,7 +49,7 @@ SDL_Rect box_from_renderer(SDL_Renderer * renderer)
     return box;
 }
 
-void print_rect(SDL_Rect const & r)
+void print_rect(rect const & r)
 {
     std::cout << r.x << " " << r.y << " on " << r.w << "x" << r.h << std::endl;
 }
@@ -65,7 +65,7 @@ SDL_Surface * create_surface(SDL_PixelFormat const * pf, int width, int height)
     return SDL_CreateRGBSurface(0, width, height, pf->BitsPerPixel, pf->Rmask, pf->Gmask, pf->Bmask, pf->Amask);
 }
 
-std::tuple<SDL_Rect, SDL_Rect, SDL_Rect> scale_preserve_ar(vec size, SDL_Rect target)
+std::tuple<rect, rect, rect> scale_preserve_ar(vec size, rect target)
 {
     int const w = target.w;
     int const h = target.h;
@@ -82,17 +82,17 @@ std::tuple<SDL_Rect, SDL_Rect, SDL_Rect> scale_preserve_ar(vec size, SDL_Rect ta
     int const pad_x = (w - rw) / 2;
     int const pad_y = (h - rh) / 2;
 
-    SDL_Rect const fitted_target = { target.x + pad_x, target.y + pad_y, rw, rh };
+    rect const fitted_target = { target.x + pad_x, target.y + pad_y, rw, rh };
     if (dest_wider)
     {
-        SDL_Rect const left = { target.x, target.y, pad_x, h };
-        SDL_Rect const right = { target.x + w - pad_x, target.y, pad_x, h };
+        rect const left = { target.x, target.y, pad_x, h };
+        rect const right = { target.x + w - pad_x, target.y, pad_x, h };
         return { fitted_target, left, right };
     }
     else
     {
-        SDL_Rect const top = { target.x, target.y, w, pad_y };
-        SDL_Rect const bottom = { target.x, target.y + h - pad_y, w, pad_y };
+        rect const top = { target.x, target.y, w, pad_y };
+        rect const bottom = { target.x, target.y + h - pad_y, w, pad_y };
         return { fitted_target, top, bottom };
     }
 }
@@ -107,7 +107,7 @@ void blit_preserve_ar(SDL_Surface * source, SDL_Surface * dest, SDL_Rect const *
     SDL_FillRect(dest, &rem2, SDL_MapRGB(dest->format, 0, 0, 0));
 }
 
-SDL_Rect pad_rect(SDL_Rect box, int padding)
+rect pad_rect(rect box, int padding)
 {
     return { box.x + padding, box.y + padding, box.w - 2 * padding, box.h - 2 * padding };
 }

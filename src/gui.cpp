@@ -29,7 +29,7 @@
 //     struct redraw_request
 //     {
 //         widget * w;
-//         SDL_Rect area;
+//         rect area;
 //     };
 //
 //     virtual void on_child_redraw(std::vector<redraw_request> redraw_requests) = 0;

@@ -5,8 +5,9 @@
 
 #include <SDL2/SDL.h>
 
-#include "widget.hpp"
+#include "geometry.hpp"
 #include "sdl_util.hpp"
+#include "widget.hpp"
 
 /**
  * A widget that displays a texture with the correct aspect ratio. The widget
@@ -55,7 +56,7 @@ struct texture_view : widget
     vec _size;
     int _min_width;
     int _nat_width;
-    SDL_Rect _target;
+    rect _target;
 };
 
 #endif

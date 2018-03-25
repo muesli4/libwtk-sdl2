@@ -1,9 +1,10 @@
 #ifndef LIBWTK_SDL2_TABLE_HPP
 #define LIBWTK_SDL2_TABLE_HPP
 
-#include "container.hpp"
-
 #include <vector>
+
+#include "container.hpp"
+#include "geometry.hpp"
 
 /**
  * Use a grid to attach several widgets with a position to it. \ref grid::entry
@@ -16,7 +17,7 @@ struct grid : container
 {
     struct entry
     {
-        SDL_Rect placement;
+        rect placement;
         widget_ptr wptr;
     };
 

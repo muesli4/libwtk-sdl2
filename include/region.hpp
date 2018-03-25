@@ -1,8 +1,6 @@
 #ifndef LIBWTK_SDL2_REGION_HPP
 #define LIBWTK_SDL2_REGION_HPP
 
-#include <SDL2/SDL_types.h>
-
 #include "geometry.hpp"
 
 struct size_hint
@@ -28,7 +26,7 @@ struct region
      * In the simplest case this just sets the bounding box but may involve more
      * complex calculations (e.g., with widget containers).
      */
-    void apply_layout(SDL_Rect box);
+    void apply_layout(rect box);
 
     /**
      * Refresh layout with existing box. This should not be called if the region
@@ -58,16 +56,68 @@ struct region
 
     /** @} */
 
+    /*
+    void redo_layout()
+    {
+        auto & rc = get_region_controller();
+        auto const t = rc.preferred_redo_layout_type();
+
+        if (redo_layout_type::FULL == t)
+        {
+            rc.queue_redo_layout();
+        }
+        else
+        {
+            auto const sh = get_size_hint(_box.w, _box.h);
+            vec const & size = redo_layout_type::TRY_LOCAL_MIN == t ? sh.minimum : sh.natural;
+            try_redo_layout_in(size);
+        }
+    }
+
+    virtual void on_redo_layout_request() = 0;
+    */
 
     /**
      * Get the region's assigned bounding box.
      */
-    SDL_Rect const & get_box() const;
+    rect const & get_box() const;
 
     private:
 
-    SDL_Rect _box;
+    /*
+    void try_redo_layout_in(vec v)
+    {
+        if (fits(v, _box))
+        {
+            apply_layout(_box);
+        }
+        else
+        {
+            on_redo_layout_request();
+        }
+    }
+    */
+
+    rect _box;
 };
+
+/*
+enum class redo_layout_type
+{
+    // Try whether the new minimum size fits the allocated box.
+    TRY_LOCAL_MIN,
+    // Try whether the new natural size fits the allocated box.
+    TRY_LOCAL_NAT,
+
+    // Redo the layout for the whole tree.
+    FULL
+};
+
+struct region_control
+{
+    virtual void queue_redo_layout() = 0;
+};
+*/
 
 #endif
 

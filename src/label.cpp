@@ -1,5 +1,4 @@
 #include "label.hpp"
-#include "sdl_util.hpp"
 #include "util.hpp"
 
 #include <sstream>
@@ -81,7 +80,7 @@ void label::on_draw(draw_context & dc, selection_context const & sc) const
 
     for (auto const & tf : _content)
     {
-        SDL_Rect fbox { real_box.x, yoffset, opt_min(_maximum_width, real_box.w), remaining_height};
+        rect fbox { real_box.x, yoffset, opt_min(_maximum_width, real_box.w), remaining_height};
 
         // TODO which newline height?
         int used_height

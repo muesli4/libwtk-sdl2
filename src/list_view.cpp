@@ -40,7 +40,7 @@ void list_view::on_draw(draw_context & dc, selection_context const & sc) const
         int const overlap = (y_offset + entry_height) - y_end;
         int const entry_height_with_overlap = entry_height - /*(overlap < 0 ? 0 : overlap + 1);*/std::max(0, overlap + 1);
 
-        SDL_Rect abs_rect { x_offset, y_offset, entry_width, entry_height_with_overlap};
+        rect abs_rect { x_offset, y_offset, entry_width, entry_height_with_overlap};
 
         // favor pressed over selected
         if (_opt_pressed_point.has_value() && within_rect(_opt_pressed_point.value(), abs_rect))
@@ -65,7 +65,7 @@ void list_view::on_draw(draw_context & dc, selection_context const & sc) const
         int const ind_w = INDICATOR_MIN_WIDTH;
 
         int const ind_y = get_box().y + 1 + ((get_box().h - 2 - ind_len) * _position) / (_values.get().size() - _visible_entries);
-        SDL_Rect ind_rect { get_box().x + get_box().w - ind_w - 1, ind_y, ind_w, ind_len};
+        rect ind_rect { get_box().x + get_box().w - ind_w - 1, ind_y, ind_w, ind_len};
         dc.draw_entry_position_indicator(ind_rect);
     }
 }

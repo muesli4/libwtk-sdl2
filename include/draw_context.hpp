@@ -2,12 +2,12 @@
 #define LIBWTK_SDL2_DRAW_CONTEXT_HPP
 
 #include <exception>
-#include <SDL2/SDL_rect.h>
 #include <SDL2/SDL_surface.h>
 #include <SDL2/SDL_render.h>
 
-#include "font_manager.hpp"
 #include "copy_command.hpp"
+#include "font_manager.hpp"
+#include "geometry.hpp"
 
 // TODO replace rendering with a virtual interface that might as well blit images
 struct color_theme
@@ -63,7 +63,7 @@ struct theme
     }
 
     virtual int box_border_width(box_type bt, state s) = 0;
-    virtual void draw_box(box_type bt, state s, SDL_Rect box) = 0;
+    virtual void draw_box(box_type bt, state s, rect box) = 0;
 };
 
 struct default_theme : theme
@@ -71,7 +71,7 @@ struct default_theme : theme
     int box_border_width(box_type bt, state s) override
     {
     }
-    void draw_box(box_type bt, state s, SDL_Rect box) override
+    void draw_box(box_type bt, state s, rect box) override
     {
     }
 
@@ -131,32 +131,32 @@ struct draw_context
     void present();
 
     // button (heightened box)
-    void draw_button_box(SDL_Rect box, bool activated, bool selected);
-    void draw_button_text(std::string const & text, SDL_Rect abs_rect);
+    void draw_button_box(rect box, bool activated, bool selected);
+    void draw_button_text(std::string const & text, rect abs_rect);
 
     // entry (lowered box)
-    void draw_entry_box(SDL_Rect box, bool selected);
-    void draw_entry_text(std::string text, SDL_Rect abs_rect, int texture_x_offset = 0, int texture_y_offset = 0);
-    void draw_entry_pressed_background(SDL_Rect box);
-    void draw_entry_active_background(SDL_Rect box);
-    void draw_entry_hightlighted_background(SDL_Rect box);
-    void draw_entry_position_indicator(SDL_Rect box);
+    void draw_entry_box(rect box, bool selected);
+    void draw_entry_text(std::string text, rect abs_rect, int texture_x_offset = 0, int texture_y_offset = 0);
+    void draw_entry_pressed_background(rect box);
+    void draw_entry_active_background(rect box);
+    void draw_entry_hightlighted_background(rect box);
+    void draw_entry_position_indicator(rect box);
 
     // Draws a string in the box and returns the actually used height within the
     // box.
-    int draw_label_text(SDL_Rect box, std::string text, bool wrap, int font_idx = 0);
+    int draw_label_text(rect box, std::string text, bool wrap, int font_idx = 0);
 
-    void draw_background(SDL_Rect box);
+    void draw_background(rect box);
 
     // low-level drawing TODO move or refactor
     void set_color(SDL_Color c);
     void set_color_alpha(SDL_Color c);
-    void draw_rect_filled(SDL_Rect r);
-    void draw_rect(SDL_Rect r);
-    void blit(SDL_Surface * s, const SDL_Rect * srcrect, const SDL_Rect * dstrect);
+    void draw_rect_filled(rect r);
+    void draw_rect(rect r);
+    void blit(SDL_Surface * s, const rect * srcrect, const rect * dstrect);
     void run_copy_commands(std::vector<copy_command> const & commands, point origin, SDL_Color color);
-    void copy_texture(SDL_Texture * t, SDL_Rect src, SDL_Rect dst);
-    void copy_texture(SDL_Texture * t, SDL_Rect dst);
+    void copy_texture(SDL_Texture * t, rect src, rect dst);
+    void copy_texture(SDL_Texture * t, rect dst);
 
     private:
 
@@ -164,7 +164,7 @@ struct draw_context
 
     font_manager & _fm;
 
-    //SDL_Rect _clip_box;
+    //rect _clip_box;
 
     color_theme _theme;
 };
