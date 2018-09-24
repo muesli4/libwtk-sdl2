@@ -30,6 +30,7 @@ pkginclude_HEADERS =    \
 	swipe.hpp             \
 	swipe_area.hpp        \
 	text_button.hpp       \
+	texture_button.hpp    \
 	texture_view.hpp      \
 	utf8.hpp              \
 	util.hpp              \

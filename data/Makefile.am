@@ -1,2 +1,2 @@
-pkgdata_DATA = test.jpeg
+pkgdata_DATA = test.jpeg smile.png
 

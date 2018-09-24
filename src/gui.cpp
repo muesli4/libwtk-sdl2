@@ -54,9 +54,9 @@
 #include <SDL2/SDL.h>
 
 #include "box.hpp"
-#include "text_button.hpp"
 #include "color_widget.hpp"
 #include "empty.hpp"
+#include "grid.hpp"
 #include "label.hpp"
 #include "list_view.hpp"
 #include "notebook.hpp"
@@ -64,7 +64,8 @@
 #include "sdl_util.hpp"
 #include "slider.hpp"
 #include "swipe_area.hpp"
-#include "grid.hpp"
+#include "text_button.hpp"
+#include "texture_button.hpp"
 #include "texture_view.hpp"
 #include "widget.hpp"
 #include "widget_context.hpp"
@@ -138,6 +139,8 @@ void event_loop(SDL_Renderer * renderer)
     auto col5 = vbox( { { false, num_button() }
                       , { true, std::make_shared<empty>() }
                       , { false, l2 }
+                      , { true, std::make_shared<empty>() }
+                      , { false, std::make_shared<texture_button>(load_shared_texture_from_image(renderer, PKGDATA"/smile.png"), [](){}) }
                       , { true, std::make_shared<empty>() }
                       , { false, std::make_shared<text_button>("Quit", [](){ SDL_Event ev { .type = SDL_QUIT }; SDL_PushEvent(&ev); })}
                       }
