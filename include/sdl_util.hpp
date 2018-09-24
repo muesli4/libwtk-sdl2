@@ -21,7 +21,13 @@ struct texture_destroyer
 
 typedef std::unique_ptr<SDL_Texture, texture_destroyer> unique_texture_ptr;
 
+SDL_Texture * load_raw_texture_from_image(SDL_Renderer * r, std::string filename);
+
 unique_texture_ptr load_texture_from_image(SDL_Renderer * r, std::string filename);
+
+typedef std::shared_ptr<SDL_Texture> shared_texture_ptr;
+
+shared_texture_ptr load_shared_texture_from_image(SDL_Renderer * r, std::string filename);
 
 SDL_Renderer * renderer_from_window(SDL_Window * window);
 SDL_Rect box_from_renderer(SDL_Renderer * renderer);

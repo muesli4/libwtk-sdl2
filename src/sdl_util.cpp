@@ -13,7 +13,7 @@ void texture_destroyer::operator()(SDL_Texture * t)
     SDL_DestroyTexture(t);
 }
 
-unique_texture_ptr load_texture_from_image(SDL_Renderer * r, std::string filename)
+SDL_Texture * load_raw_texture_from_image(SDL_Renderer * r, std::string filename)
 {
     SDL_Surface * s = IMG_Load(filename.c_str());
 
@@ -26,7 +26,17 @@ unique_texture_ptr load_texture_from_image(SDL_Renderer * r, std::string filenam
     if (t == nullptr)
         throw std::runtime_error(std::string("could not convert image to texture: ") + SDL_GetError());
 
-    return unique_texture_ptr(t);
+    return t;
+}
+
+unique_texture_ptr load_texture_from_image(SDL_Renderer * r, std::string filename)
+{
+    return unique_texture_ptr(load_raw_texture_from_image(r, filename));
+}
+
+shared_texture_ptr load_shared_texture_from_image(SDL_Renderer * r, std::string filename)
+{
+    return shared_texture_ptr(load_raw_texture_from_image(r, filename), texture_destroyer());
 }
 
 SDL_Renderer * renderer_from_window(SDL_Window * window)
