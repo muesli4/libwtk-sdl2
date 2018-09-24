@@ -2,9 +2,8 @@
 
 #include "geometry.hpp"
 
-button::button(std::string text, std::function<void()> callback)
+button::button(std::function<void()> callback)
     : _pressed(false)
-    , _text(text)
     , _callback(callback)
 {
 }
@@ -12,10 +11,7 @@ button::button(std::string text, std::function<void()> callback)
 void button::on_draw(draw_context & dc, selection_context const & sc) const
 {
     dc.draw_button_box(get_box(), _pressed, sc.is_selected_widget(this));
-    if (!_text.empty())
-    {
-        dc.draw_button_text(_text, get_box());
-    }
+    draw_drawable(dc, get_box());
 }
 
 void button::on_mouse_down_event(mouse_down_event const & e)
@@ -52,9 +48,9 @@ void button::on_activate()
 
 size_hint button::get_size_hint(int width, int height) const
 {
-    vec const text_size = get_context_info().text_size(_text);
+    vec const dsize = get_drawable_size();
     // TODO get border dimensions from context info
-    vec const minimal = text_size + vec{ 2, 2 };
+    vec const minimal = dsize + vec{ 2, 2 };
 
     int const h_spacing = get_context_info().font_line_skip();
     vec const natural = minimal + vec{ h_spacing - 1, h_spacing - 1 };
@@ -63,11 +59,5 @@ size_hint button::get_size_hint(int width, int height) const
 
 button::~button()
 {
-}
-
-void button::set_label(std::string text)
-{
-    _text = text;
-    mark_dirty();
 }
 

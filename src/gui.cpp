@@ -54,7 +54,7 @@
 #include <SDL2/SDL.h>
 
 #include "box.hpp"
-#include "button.hpp"
+#include "text_button.hpp"
 #include "color_widget.hpp"
 #include "empty.hpp"
 #include "label.hpp"
@@ -79,7 +79,7 @@ widget_ptr num_button()
     static int k = 0;
     k++;
     int n = k;
-    return std::make_shared<button>(std::string("Button #") + std::to_string(n), [=](){ std::cout << "click" << n << std::endl; });
+    return std::make_shared<text_button>(std::string("Button #") + std::to_string(n), [=](){ std::cout << "click" << n << std::endl; });
 }
 
 widget_ptr labeled_slider(int start, int end, int num_steps)
@@ -101,8 +101,8 @@ void event_loop(SDL_Renderer * renderer)
 
     auto nb_indicator = std::make_shared<label>("Active Notebook Widget: Color");
     nb_indicator->set_wrap(true);
-    auto nb_controls = hbox({ { false, std::make_shared<button>("Color", [nb, nb_indicator](){ nb->set_page(0); nb_indicator->set_text("Active Notebook Widget: Color"); })}
-                            , { false, std::make_shared<button>("Swipe", [nb, nb_indicator](){ nb->set_page(1); nb_indicator->set_text("Active Notebook Widget: Swipe"); })}
+    auto nb_controls = hbox({ { false, std::make_shared<text_button>("Color", [nb, nb_indicator](){ nb->set_page(0); nb_indicator->set_text("Active Notebook Widget: Color"); })}
+                            , { false, std::make_shared<text_button>("Swipe", [nb, nb_indicator](){ nb->set_page(1); nb_indicator->set_text("Active Notebook Widget: Swipe"); })}
                             }, 20, true);
 
     std::shared_ptr<list_view> lv = std::make_shared<list_view>(test_values, 0, [&lv](std::size_t p){ std::cout << "press list_view at " << p << std::endl; lv->set_highlight_position(p); });
@@ -139,7 +139,7 @@ void event_loop(SDL_Renderer * renderer)
                       , { true, std::make_shared<empty>() }
                       , { false, l2 }
                       , { true, std::make_shared<empty>() }
-                      , { false, std::make_shared<button>("Quit", [](){ SDL_Event ev { .type = SDL_QUIT }; SDL_PushEvent(&ev); })}
+                      , { false, std::make_shared<text_button>("Quit", [](){ SDL_Event ev { .type = SDL_QUIT }; SDL_PushEvent(&ev); })}
                       }
                     , 20);
 

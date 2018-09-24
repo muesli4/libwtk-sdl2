@@ -35,6 +35,7 @@ libwtk_sdl2_la_SOURCES = \
 	slider.cpp             \
 	swipe.cpp              \
 	swipe_area.cpp         \
+	text_button.cpp        \
 	texture_view.cpp       \
 	utf8.cpp               \
 	util.cpp               \

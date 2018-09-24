@@ -7,7 +7,7 @@
 
 struct button : selectable
 {
-    button(std::string text, std::function<void()> callback);
+    button(std::function<void()> callback);
 
     void on_draw(draw_context & dc, selection_context const & sc) const override;
     void on_mouse_up_event(mouse_up_event const & e) override;
@@ -18,19 +18,14 @@ struct button : selectable
 
     ~button() override;
 
-    /**
-     * @name Button Interface
-     * @{
-     */
+    protected:
 
-    void set_label(std::string text);
-
-    /** @} */
+    virtual void draw_drawable(draw_context & dc, rect box) const = 0;
+    virtual vec get_drawable_size() const = 0;
 
     private:
 
     bool _pressed;
-    std::string _text;
     std::function<void()> _callback;
 };
 
