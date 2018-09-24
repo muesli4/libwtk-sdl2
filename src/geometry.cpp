@@ -76,3 +76,11 @@ vec operator-(point p, point q)
     return { p.x - q.x, p.y - q.y };
 }
 
+rect center_vec_within_rect(vec inside, rect outside)
+{
+    return { outside.x + outside.w / 2 - inside.w / 2
+           , outside.y + outside.h / 2 - inside.h / 2
+           , inside.w
+           , inside.h
+           };
+}

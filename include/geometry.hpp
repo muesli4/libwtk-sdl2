@@ -29,7 +29,7 @@ bool fits(vec v, rect const & r);
 point rect_center(rect const & r);
 point rect_origin(rect const & r);
 
-// Create a rectangle with zero origin.
+// create a rectangle with zero origin.
 rect origin_rect(vec v);
 
 vec operator+(vec v, vec u);
@@ -43,6 +43,9 @@ vec abs(vec v);
 
 vec operator-(point p, point q);
 
+// creates a new rect by centering a box with given dimensions inside a given
+// rect
+rect center_vec_within_rect(vec inside, rect outside);
 
 #endif
 
