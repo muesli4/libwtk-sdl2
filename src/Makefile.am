@@ -27,6 +27,7 @@ libwtk_sdl2_la_SOURCES = \
 	mouse_event.cpp        \
 	mouse_tracker.cpp      \
 	notebook.cpp           \
+	navigation_type.cpp    \
 	padding.cpp            \
 	region.cpp             \
 	sdl_util.cpp           \

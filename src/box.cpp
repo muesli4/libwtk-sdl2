@@ -354,14 +354,6 @@ widget * box::find_selectable(navigation_type nt, point center)
     return nullptr;
 }
 
-bool box::is_forward(navigation_type nt)
-{
-    return
-        nt == navigation_type::NEXT
-        || nt == navigation_type::NEXT_X
-        || nt == navigation_type::NEXT_Y;
-}
-
 widget * box::navigate_selectable_from_children(navigation_type nt, widget * w, point center)
 {
     // When navigating in a linear container like box, we don't have to consider

@@ -32,14 +32,8 @@ struct box : container
     box(orientation o, children_type children, int children_spacing, bool children_homogeneous);
 
     void on_box_allocated() override;
-
     widget * find_selectable(navigation_type nt, point center) override;
-
-    static bool is_orthogonal(navigation_type nt, orientation o);
-    static bool is_forward(navigation_type nt);
-
     widget * navigate_selectable_from_children(navigation_type nt, widget * w, point center) override;
-
     size_hint get_size_hint(int width, int height) const override;
 
     ~box() override;

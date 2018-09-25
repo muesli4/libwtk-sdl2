@@ -6,5 +6,11 @@
 // context should preferably hit locally adjacent widgets.
 enum class navigation_type { NEXT_X, NEXT_Y, PREV_X, PREV_Y, NEXT, PREV };
 
+/**
+ * Checks whether navigation is forward (i.e. it picks the next element in a
+ * direction).
+ */
+bool is_forward(navigation_type nt);
+
 #endif
 
