@@ -122,10 +122,10 @@ rect pad_rect(rect box, int padding)
     return { box.x + padding, box.y + padding, box.w - 2 * padding, box.h - 2 * padding };
 }
 
-vec texture_dim(SDL_Texture * tex)
+vec texture_dim(SDL_Texture const * tex)
 {
     vec size;
-    SDL_QueryTexture(tex, nullptr, nullptr, &size.w, &size.h);
+    SDL_QueryTexture(const_cast<SDL_Texture *>(tex), nullptr, nullptr, &size.w, &size.h);
     return size;
 }
 

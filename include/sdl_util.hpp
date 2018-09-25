@@ -47,7 +47,7 @@ std::tuple<SDL_Rect, SDL_Rect, SDL_Rect> scale_preserve_ar(vec size, SDL_Rect ta
 // blit a surface to another surface while preserving aspect ratio
 void blit_preserve_ar(SDL_Surface * source, SDL_Surface * dest, SDL_Rect const * destrect);
 
-vec texture_dim(SDL_Texture * tex);
+vec texture_dim(SDL_Texture const * tex);
 
 #endif
 
