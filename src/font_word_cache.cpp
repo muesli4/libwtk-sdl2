@@ -75,9 +75,9 @@ uint32_t utf8_to_ucs4(std::deque<uint8_t> coded)
 }
 
 // get the last utf8 character from a string
-uint32_t get_last_ucs4(std::string s)
+uint32_t get_last_ucs4(std::string_view const s)
 {
-    char const * ptr = s.c_str() + s.size() - 1;
+    char const * ptr = s.data() + s.size() - 1;
     if (*ptr == 0) ptr = " ";
 
     std::deque<uint8_t> d;
@@ -90,9 +90,9 @@ uint32_t get_last_ucs4(std::string s)
     return utf8_to_ucs4(d);
 }
 
-uint32_t get_first_ucs4(std::string s)
+uint32_t get_first_ucs4(std::string_view const s)
 {
-    char const * ptr = s.c_str();
+    char const * ptr = s.data();
     if (*ptr == 0) ptr = " ";
 
     std::deque<uint8_t> d;
@@ -106,12 +106,12 @@ uint32_t get_first_ucs4(std::string s)
     return utf8_to_ucs4(d);
 }
 
-int font_word_cache::get_word_left_kerning(std::string const & word)
+int font_word_cache::get_word_left_kerning(std::string_view const word)
 {
     return TTF_GetFontKerningSizeGlyphs(_font, get_last_ucs4(word), ' ');
 }
 
-int font_word_cache::get_word_right_kerning(std::string const & word)
+int font_word_cache::get_word_right_kerning(std::string_view const word)
 {
     return TTF_GetFontKerningSizeGlyphs(_font, ' ', get_first_ucs4(word));
 }

@@ -62,8 +62,8 @@ struct font_word_cache
     template <typename BackInsertIt>
     vec compute_text_layout(std::string t, int max_line_width, BackInsertIt it);
 
-    int get_word_left_kerning(std::string const & word);
-    int get_word_right_kerning(std::string const & word);
+    int get_word_left_kerning(std::string_view const word);
+    int get_word_right_kerning(std::string_view const word);
 
     // Correctly handles dimension for a nullptr.
     vec texture_dim_nullptr(SDL_Texture * texture) const;
