@@ -56,9 +56,15 @@ struct label : widget
     std::vector<paragraph> const & get_content() const;
 
     /**
-     * Set the maximum text width in pixels.
+     * Set the minimum text width in pixels.
      */
     void set_minimum_width(int width);
+
+    /**
+     * Set the maximum text width in pixels. Before reaching that width it will
+     * either break the line or just cut off any remaining text that is not
+     * partially visible.
+     */
     void set_maximum_width(int width);
 
     /**
