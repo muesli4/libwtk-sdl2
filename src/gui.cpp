@@ -94,6 +94,10 @@ widget_ptr labeled_slider(int start, int end, int num_steps)
 void event_loop(SDL_Renderer * renderer)
 {
     std::vector<std::string> test_values{"a", "b", "c", "d", "testwdfkosadjflkajskdfjlaskdjflkasdjdfklajsdlkfjasldkdfjflkasddjflkdsjlfkjdsalkkfjdkk", "test1", "test2", "a very long string this is indeed", "foo", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a"};
+    for (int i = 0; i < 5000; ++i)
+    {
+        test_values.push_back("generic" + std::to_string(i));
+    }
 
     auto nb = std::make_shared<notebook>(std::vector<widget_ptr>
         { cw()

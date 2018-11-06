@@ -45,6 +45,8 @@ struct list_view : selectable
 
     private:
 
+    int scroll_distance(int movement_height) const;
+
     int hit_entry(int y) const;
 
     std::optional<point> _opt_pressed_point;

@@ -105,10 +105,10 @@ void list_view::on_mouse_up_event(mouse_up_event const & e)
             }
             else
             {
-                int const distance = static_cast<int>(_visible_entries) * movement.length.h / (get_box().w / 2);
+                int const distance = scroll_distance(movement.length.h);
 
                 if (distance < 0)
-                    scroll_up(distance);
+                    scroll_up(-distance);
                 else
                     scroll_down(distance);
             }
@@ -133,6 +133,43 @@ void list_view::on_mouse_up_event(mouse_up_event const & e)
     }
 
     _opt_pressed_point.reset();
+}
+
+int list_view::scroll_distance(int movement_height) const
+{
+    // intention: 10 big swipes will get you through the whole list
+    //            1  small swipe will move the view by half of the visible entries
+    //            a quadratic function is used to scale the range in between
+
+    int const sign = movement_height < 0 ? -1 : 1;
+    int const abs_h = abs(movement_height);
+
+    int const y1 = _visible_entries / 2;
+    int const x1 = 3 * _row_height;
+
+    if (abs_h <= x1)
+    {
+        return sign * y1;
+    }
+    else
+    {
+        // move (size / 11) positions at most
+        int const y2 = _values.get().size() / 11;
+        int const x2 = get_box().h;
+
+        double const slope = 0.0d;
+
+        // compute the coefficients for f(h) = a2 * h^2 + a1 * h + a0 with:
+        //     f(x1) = y1
+        //     f(x2) = y2
+        //     f'(x1) = slope
+        double const a2 = static_cast<double>(y2 - slope - y1) / (square(x2) - 2 * x1 * x2 + square(x1));
+        double const a1 = slope - 2 * a2 * x1;
+        double const a0 = y1 + a2 * square(x1) - slope * x1;
+
+        // std::cout << a2 << "x^2 + " << a1 << "x + " << a0 << " -> f(" << movement_height << ") = " << sign * (a2 * square(abs_h) + a1 * abs_h + a0) << std::endl;
+        return sign * (a2 * square(abs_h) + a1 * abs_h + a0);
+    }
 }
 
 void list_view::on_mouse_down_event(mouse_down_event const & e)
