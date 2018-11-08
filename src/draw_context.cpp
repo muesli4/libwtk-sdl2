@@ -181,6 +181,18 @@ void draw_context::draw_entry_position_indicator(rect box)
     SDL_SetRenderDrawBlendMode(_renderer, SDL_BLENDMODE_NONE);
 }
 
+void draw_context::draw_radio_box(rect box, bool active, bool selected)
+{
+    draw_entry_box(box, selected);
+    if (active)
+    {
+        int const mark_len = _fm.font_line_skip() / 2;
+        rect mark_rect = center_vec_within_rect({ mark_len, mark_len }, box);
+        set_color({0, 0, 0});
+        SDL_RenderFillRect(_renderer, &mark_rect);
+    }
+}
+
 void draw_context::set_color(SDL_Color c)
 {
     SDL_SetRenderDrawColor(_renderer, c.r, c.g, c.b, 0);

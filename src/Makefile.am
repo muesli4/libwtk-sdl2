@@ -29,6 +29,7 @@ libwtk_sdl2_la_SOURCES = \
 	notebook.cpp           \
 	navigation_type.cpp    \
 	padding.cpp            \
+	radio_button.cpp       \
 	region.cpp             \
 	sdl_util.cpp           \
 	selectable.cpp         \

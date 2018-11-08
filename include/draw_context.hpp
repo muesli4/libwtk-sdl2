@@ -142,6 +142,8 @@ struct draw_context
     void draw_entry_hightlighted_background(rect box);
     void draw_entry_position_indicator(rect box);
 
+    void draw_radio_box(rect box, bool active, bool selected);
+
     // Draws a string in the box and returns the actually used height within the
     // box.
     int draw_label_text(rect box, std::string text, bool wrap, int font_idx = 0);

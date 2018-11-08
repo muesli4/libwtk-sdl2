@@ -61,6 +61,7 @@
 #include "list_view.hpp"
 #include "notebook.hpp"
 #include "padding.hpp"
+#include "radio_button.hpp"
 #include "sdl_util.hpp"
 #include "slider.hpp"
 #include "swipe_area.hpp"
@@ -145,6 +146,7 @@ void event_loop(SDL_Renderer * renderer)
                       , { false, l2 }
                       , { true, std::make_shared<empty>() }
                       , { false, std::make_shared<texture_button>(load_shared_texture_from_image(renderer, PKGDATA"/smile.png"), [](){}) }
+                      , { false, radio_box_from_labels({"Foo", "Bar", "Baz"}, [](int i){ std::cout << "Selected option " << i << std::endl; })}
                       , { true, std::make_shared<empty>() }
                       , { false, std::make_shared<text_button>("Quit", [](){ SDL_Event ev { .type = SDL_QUIT }; SDL_PushEvent(&ev); })}
                       }

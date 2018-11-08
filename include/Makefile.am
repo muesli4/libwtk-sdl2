@@ -22,6 +22,7 @@ pkginclude_HEADERS =    \
 	navigation_type.hpp   \
 	notebook.hpp          \
 	padding.hpp           \
+	radio_button.hpp      \
 	region.hpp            \
 	sdl_util.hpp          \
 	selectable.hpp        \

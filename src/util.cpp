@@ -14,8 +14,9 @@ unsigned int dec_ensure_lower(unsigned int new_pos, unsigned int old_pos, unsign
 
 length_distributor::length_distributor(int const length, int const n)
     : _n(n)
-    , _extra_length_div(length / n)
-    , _extra_length_rem(length % n)
+    // temporary fix TODO should we check for n = 0? it won't be used most likely (but then the caller side has to check)
+    , _extra_length_div(n > 0 ? length / n : 0)
+    , _extra_length_rem(n > 0 ? length % n : 0)
 {
 }
 
