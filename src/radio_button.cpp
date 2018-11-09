@@ -89,13 +89,20 @@ void radio_button::select()
 void radio_button::on_draw(draw_context & dc, selection_context const & sc) const
 {
     // draw a radio box on the left
-
     auto box = get_box();
-    auto len = get_context_info().font_line_skip();
-    dc.draw_radio_box({ box.x, box.y, len, len }, _group->is_active(*this), sc.is_selected_widget(this));
+    auto box_len = get_context_info().font_line_skip();
+    auto box_spacing = box_len / 3;
 
+    rect radio_box_box = { box.x, box.y, box_len, box_len };
+    dc.draw_radio_entry(radio_box_box, _group->is_active(*this), sc.is_selected_widget(this));
     // draw the label on the right
-    dc.draw_label_text({ box.x + len + 5, box.y, box.w - len - 5, box.h }, _label, true);
+    // TODO make spacing depend on font size ?
+    rect text_box = { box.x + box_len + box_spacing
+                    , box.y
+                    , box.w - box_len - box_spacing
+                    , box.h
+                    };
+    dc.draw_label_text(text_box, _label, true);
 }
 
 void radio_button::on_activate()

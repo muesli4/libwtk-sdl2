@@ -32,12 +32,17 @@ point rect_origin(rect const & r);
 // create a rectangle with zero origin.
 rect origin_rect(vec v);
 
+// vector operations
 vec operator+(vec v, vec u);
-point operator+(point p, vec v);
 vec operator-(vec v);
-point operator-(point p, vec v);
 bool operator<(vec v, vec w);
+
+point operator+(point p, vec v);
+point operator-(point p, vec v);
+
+// vector scalar operations
 vec operator*(vec v, int s);
+vec operator/(vec v, int s);
 
 vec abs(vec v);
 
@@ -46,6 +51,8 @@ vec operator-(point p, point q);
 // creates a new rect by centering a box with given dimensions inside a given
 // rect
 rect center_vec_within_rect(vec inside, rect outside);
+
+vec length(rect const & r);
 
 #endif
 

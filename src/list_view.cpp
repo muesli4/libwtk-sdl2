@@ -2,6 +2,7 @@
 #include "util.hpp"
 #include <iostream>
 
+// TODO use int for selected positions that can be invalid, otherwise increasing the size of the list will make them valid
 // TODO do bounds checking on positions
 list_view::list_view(std::vector<std::string> const & values, std::size_t position, std::function<void(std::size_t)> activate_callback)
     : _opt_pressed_point{}

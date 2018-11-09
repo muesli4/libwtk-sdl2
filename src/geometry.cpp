@@ -66,6 +66,11 @@ vec operator*(vec v, int s)
     return { v.w * s, v.h * s };
 }
 
+vec operator/(vec v, int s)
+{
+    return { v.w / s, v.h / s };
+}
+
 vec abs(vec v)
 {
     return { std::abs(v.w), std::abs(v.h) };
@@ -84,3 +89,9 @@ rect center_vec_within_rect(vec inside, rect outside)
            , inside.h
            };
 }
+
+vec length(rect const & r)
+{
+    return { r.w, r.h };
+}
+
