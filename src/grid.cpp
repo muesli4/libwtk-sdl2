@@ -104,7 +104,6 @@ template <typename It>
 int find_x_index(It first, It last, point center, vec size)
 {
     auto it_x = std::find_if(first, last, [=](int bound){ return bound > center.x; });
-
     return std::min(size.w - 1, static_cast<int>(std::distance(first, it_x)) - 1);
 }
 

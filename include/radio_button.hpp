@@ -64,6 +64,8 @@ struct radio_button : selectable
     std::shared_ptr<group> _group;
 };
 
+// TODO lacks functionality to remove an option, solution: embedded_widget<box>
+// with methods to add and remove radio buttons (or ids of those)
 widget_ptr radio_box_from_labels(std::vector<std::string> labels, radio_button::callback_type callback);
 
 #endif
