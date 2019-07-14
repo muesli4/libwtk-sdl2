@@ -24,6 +24,13 @@ struct grid : container
     };
 
     grid(vec size, std::vector<entry> entries, int padding);
+
+    /**
+     * This constructor allows homogeneous layout of widgets. A homogeneous grid
+     * does not respect any sizes of its children. It will just produce a layout
+     * that distributes available space equally per unit.
+     */
+    grid(vec size, std::vector<entry> entries, int padding, bool homogeneous);
     ~grid() override;
 
     std::vector<widget *> get_children() override;
@@ -39,11 +46,13 @@ struct grid : container
     int length_with_spacing(std::vector<int> const & lengths) const;
     void min_cell_dimensions(int * min_widths, int * min_heights) const;
     void compute_offsets(std::vector<int> & lengths, std::vector<int> & offsets, int n, int box_length, int box_start);
+    void compute_homogeneous_offsets(std::vector<int> & offsets, int n, int box_length, int box_start);
 
     std::vector<entry> _entries;
     vec _size;
     std::vector<std::vector<int>> _grid;
     int _spacing;
+    bool _homogeneous;
 
     std::vector<int> _x_offsets;
     std::vector<int> _y_offsets;

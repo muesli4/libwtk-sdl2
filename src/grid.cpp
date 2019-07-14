@@ -4,11 +4,17 @@
 #include "grid.hpp"
 #include "util.hpp"
 
-grid::grid(vec size, std::vector<entry> entries, int spacing)
+grid::grid(vec size, std::vector<entry> entries, int padding)
+    : grid(size, entries, padding, false)
+{
+}
+
+grid::grid(vec size, std::vector<entry> entries, int spacing, bool homogeneous)
     : _entries(entries)
     , _size(size)
     , _grid(size.w, std::vector<int>(size.h, -1))
     , _spacing(spacing)
+    , _homogeneous(homogeneous)
     , _x_offsets(size.w + 1, 0)
     , _y_offsets(size.h + 1, 0)
 {
@@ -63,23 +69,45 @@ void grid::compute_offsets(std::vector<int> & lengths, std::vector<int> & offset
 
     offsets[0] = box_start;
 
+    // Does not write outside of bounds because length of offsets is n + 1
     for (int k = 0; k < n; ++k)
     {
         offsets[k + 1] = lengths[k] + offsets[k] + _spacing;
     }
 }
 
-// TODO support natural widths
+void grid::compute_homogeneous_offsets(std::vector<int> & offsets, int n, int box_length, int box_start)
+{
+    int avail_length = box_length - std::max(0, n - 1) * _spacing;
+    length_distributor ld(avail_length, n);
+
+    offsets[0] = box_start;
+    for (int i = 0; i < n; i++)
+    {
+        offsets[i + 1] = offsets[i] + ld.dist_end(i) + _spacing;
+    }
+}
+
 void grid::on_box_allocated()
 {
-    std::vector<int> widths(_size.w, 0);
-    std::vector<int> heights(_size.h, 0);
+    if (_homogeneous)
+    {
+        // Ignore minimum sizes and just distribute space equally.
+        compute_homogeneous_offsets(_x_offsets, _size.w, get_box().w, get_box().x);
+        compute_homogeneous_offsets(_y_offsets, _size.h, get_box().h, get_box().y);
+    }
+    else
+    {
+        std::vector<int> widths(_size.w, 0);
+        std::vector<int> heights(_size.h, 0);
 
-    min_cell_dimensions(widths.data(), heights.data());
+        min_cell_dimensions(widths.data(), heights.data());
 
-    // For the moment: Equally distribute remaining space on all rows and columns.
-    compute_offsets(widths, _x_offsets, _size.w, get_box().w, get_box().x);
-    compute_offsets(heights, _y_offsets, _size.h, get_box().h, get_box().y);
+        // TODO support natural widths
+        // For the moment: Equally distribute remaining space on all rows and columns.
+        compute_offsets(widths, _x_offsets, _size.w, get_box().w, get_box().x);
+        compute_offsets(heights, _y_offsets, _size.h, get_box().h, get_box().y);
+    }
 
     for (auto & e : _entries)
     {

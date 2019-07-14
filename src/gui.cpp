@@ -2,6 +2,10 @@
 //      screen (basically bounding box drawn in offset mode)
 // TODO consistent background drawing, best solution:
 //      draw background only when absolutely needed (let top-level widget draw it)
+//      idea:
+//      - add method that can partially draw the background (with clipping)
+//      - pass the widget that is responsible for the background
+//      problem: composed backgrounds
 
 // TODO add singleton style manager that provides global defaults for spacing and theme
 //      (only used for default parameters)
@@ -84,12 +88,32 @@ widget_ptr num_button()
     return std::make_shared<text_button>(std::string("Button #") + std::to_string(n), [=](){ std::cout << "click" << n << std::endl; });
 }
 
+widget_ptr label_print_button(std::string label)
+{
+    return std::make_shared<text_button>(std::string(label), [=](){ std::cout << "click " << label << std::endl; });
+}
+
 widget_ptr labeled_slider(int start, int end, int num_steps)
 {
     auto l = std::make_shared<label>(std::to_string(start));
     l->set_minimum_width(40);
     auto s = std::make_shared<slider>(start, end, num_steps, [l](int i){ l->set_text(std::to_string(i)); });
     return hbox({ { false, l }, { true, s } }, 2);
+}
+
+std::vector<grid::entry> hgrid_entries()
+{
+    return
+        { { { 0, 0, 1, 1 }, label_print_button("a") }
+        , { { 1, 0, 2, 1 }, label_print_button("b") }
+        , { { 0, 1, 1, 2 }, label_print_button("cc") }
+        , { { 1, 1, 2, 2 }, label_print_button("d") }
+        };
+}
+
+widget_ptr hgrid(bool homogeneous)
+{
+    return std::make_shared<grid, vec>({ 3, 3 }, hgrid_entries(), 20, homogeneous);
 }
 
 void event_loop(SDL_Renderer * renderer)
@@ -124,11 +148,16 @@ void event_loop(SDL_Renderer * renderer)
         , { { 3, 0, 1, 1 }, num_button() }
         , { { 3, 1, 1, 3 }, num_button() }
         };
-    auto l1 = std::make_shared<label>("This text should hopefully produce a linebreak. Otherwise something is not working correctly.\n\nYou may use Tab and Shift+Tab to focus widgets or use Shift and the corresponding arrow key for a 2-dimensional direction.");
+    auto l1 = std::make_shared<label>(
+        "This text should hopefully produce a linebreak."
+        "Otherwise something is not working correctly."
+        "The maximum length is 500 pixel.\n\n"
+        "You may use Tab and Shift+Tab to focus widgets or use Shift and the corresponding arrow key for a 2-dimensional direction."
+    );
     l1->set_wrap(true);
     l1->set_maximum_width(500);
 
-    auto l2 = std::make_shared<label>(std::vector<paragraph>{ paragraph("This is a bigger font.", 0, 1) });
+    auto l2 = std::make_shared<label, std::vector<paragraph>>({ paragraph("This is a bigger font.", 0, 1) });
     l2->set_wrap(true);
 
     auto col3 = vbox( { { false, num_button() }
@@ -148,6 +177,8 @@ void event_loop(SDL_Renderer * renderer)
                       , { false, std::make_shared<texture_button>(load_shared_texture_from_image(renderer, PKGDATA"/smile.png"), [](){}) }
                       , { false, radio_box_from_labels({"Foo", "Bar", "Baz"}, [](int i){ std::cout << "Selected option " << i << std::endl; })}
                       , { true, std::make_shared<empty>() }
+                      , { true, hgrid(true) }
+                      , { true, hgrid(false) }
                       , { false, std::make_shared<text_button>("Quit", [](){ SDL_Event ev { .type = SDL_QUIT }; SDL_PushEvent(&ev); })}
                       }
                     , 20);
