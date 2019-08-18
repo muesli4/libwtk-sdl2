@@ -36,6 +36,11 @@ rect origin_rect(vec v)
     return { 0, 0, v.w, v.h };
 }
 
+rect base_rect(point origin, vec size)
+{
+    return { origin.x, origin.y, size.w, size.h };
+}
+
 vec operator+(vec v, vec u)
 {
     return { v.w + u.w, v.h + u.h };

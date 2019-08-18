@@ -14,8 +14,7 @@ struct copy_command
     rect source;
 
     // The offset of the target coordinates.
-    int x_offset;
-    int y_offset;
+    vec offset;
 };
 
 #endif

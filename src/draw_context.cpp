@@ -74,7 +74,7 @@ void draw_context::run_copy_commands(std::vector<copy_command> const & commands,
     {
         set_texture_color_mod(c.texture, color);
         vec size = texture_dim(c.texture);
-        rect target { origin.x + c.x_offset, origin.y + c.y_offset, size.w, size.h };
+        rect target = base_rect(origin + c.offset, size);
         SDL_RenderCopy(_renderer, c.texture, &c.source, &target);
     }
 }
@@ -94,7 +94,7 @@ void draw_context::draw_button_text(std::string const & text, rect abs_rect)
     auto result = _fm.text(text);
     vec const & size = std::get<0>(result);
 
-    // center text in abs_rect
+    // center text in abs_rect TODO refactor computation
     point origin { abs_rect.x + (abs_rect.w - size.w) / 2, abs_rect.y + (abs_rect.h - size.h) / 2 };
 
     //blit(text_surf_ptr.get(), nullptr, &target_rect);
@@ -123,9 +123,9 @@ void draw_context::draw_entry_text(std::string text, rect abs_rect, int texture_
         // Set clipping such that nothing gets drawn outside of the specified box.
         SDL_RenderSetClipRect(_renderer, &abs_rect);
         // Use a viewport to translate relative texture coordinates to the box.
-        SDL_RenderSetViewport(_renderer, &abs_rect);
-        run_copy_commands(std::get<1>(result), { texture_x_offset, texture_y_offset }, { 0, 0, 0 });
-        SDL_RenderSetViewport(_renderer, nullptr);
+        //SDL_RenderSetViewport(_renderer, &abs_rect);
+        run_copy_commands(std::get<1>(result), rect_origin(abs_rect) + vec{ texture_x_offset, texture_y_offset }, { 0, 0, 0 });
+        //SDL_RenderSetViewport(_renderer, nullptr);
         SDL_RenderSetClipRect(_renderer, nullptr);
     }
 }

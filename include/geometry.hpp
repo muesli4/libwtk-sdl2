@@ -31,6 +31,8 @@ point rect_origin(rect const & r);
 
 // create a rectangle with zero origin.
 rect origin_rect(vec v);
+// create a rectangle out of a origin and size
+rect base_rect(point origin, vec size);
 
 // vector operations
 vec operator+(vec v, vec u);
