@@ -84,8 +84,10 @@ std::size_t notebook::get_page() const
 void notebook::set_page(std::size_t index)
 {
     if (index < _pages.size())
+    {
         _current_page_index = index;
-    mark_dirty();
+        mark_dirty();
+    }
 }
 
 std::vector<widget *> notebook::get_children()
