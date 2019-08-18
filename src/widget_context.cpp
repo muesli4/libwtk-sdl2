@@ -41,10 +41,8 @@ point tfinger_to_point(SDL_TouchFingerEvent const & tfinger, rect const & box)
     return { static_cast<int>(tfinger.x * box.w), static_cast<int>(tfinger.y * box.h) };
 }
 
-void widget_context::process_event(SDL_Event const & ev)
+bool widget_context::process_mouse_event(SDL_Event const & ev)
 {
-    // TODO hardcoded keys are probably not the best idea for reusability
-
     if (ev.type == SDL_MOUSEBUTTONDOWN)
     {
         point p { ev.button.x, ev.button.y };
@@ -73,21 +71,30 @@ void widget_context::process_event(SDL_Event const & ev)
     {
         _main_widget.on_mouse_move_event(_mt.mouse_move(tfinger_to_point(ev.tfinger, _box)));
     }
-    else if (ev.type == SDL_KEYDOWN)
+    else
+    {
+        return false;
+    }
+
+    return true;
+}
+
+bool widget_context::process_key_event(SDL_Event const & ev)
+{
+    // TODO hardcoded keys are probably not the best idea for reusability
+    if (ev.type == SDL_KEYDOWN)
     {
         auto const & keysym = ev.key.keysym;
 
-        if ((keysym.mod & KMOD_CTRL) && keysym.sym == SDLK_q)
-            return; // TODO does not belong here
-        else if (keysym.sym == SDLK_TAB)
+        if (keysym.sym == SDLK_TAB)
         {
             if (keysym.mod & KMOD_SHIFT)
             {
-                _sc.navigate_selection(navigation_type::PREV, &_main_widget);
+                navigate_selection(navigation_type::PREV);
             }
             else
             {
-                _sc.navigate_selection(navigation_type::NEXT, &_main_widget);
+                navigate_selection(navigation_type::NEXT);
             }
         }
         else if (keysym.mod & KMOD_SHIFT)
@@ -99,15 +106,24 @@ void widget_context::process_event(SDL_Event const & ev)
                 case SDLK_DOWN:  nt = navigation_type::NEXT_Y; break;
                 case SDLK_LEFT:  nt = navigation_type::PREV_X; break;
                 case SDLK_RIGHT: nt = navigation_type::NEXT_X; break;
-                default: return;
+                default: return false;
             }
-            _sc.navigate_selection(nt, &_main_widget);
+            navigate_selection(nt);
         }
+        // TODO waiting for key events being implemented
+        //_sc.dispatch_key_event(key_event());
         else if (keysym.sym == SDLK_RETURN)
-            _sc.dispatch_activation();
+            activate();
         else
-            _sc.dispatch_key_event(key_event());
+            return false;
+        return true;
     }
+    return false;
+}
+
+bool widget_context::process_event(SDL_Event const & ev)
+{
+    return process_mouse_event(ev) || process_key_event(ev);
 }
 
 void widget_context::draw(bool present)

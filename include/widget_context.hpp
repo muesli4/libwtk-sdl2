@@ -24,7 +24,23 @@ struct widget_context
     widget_context(SDL_Renderer * renderer, std::vector<font> fonts, widget & main_widget);
     widget_context(SDL_Renderer * renderer, std::vector<font> fonts, widget & main_widget, rect box);
 
-    void process_event(SDL_Event const & ev);
+    /**
+     * @name Pre-defined input event handling.
+     * @{
+     */
+
+    bool process_mouse_event(SDL_Event const & ev);
+    bool process_key_event(SDL_Event const & ev);
+
+    /**
+     * Default event handler that reacts to basic input events.
+     * @return Has the event been handled?
+     */
+    bool process_event(SDL_Event const & ev);
+
+    /**
+     * @}
+     */
 
     void draw(bool present = true);
     void draw_dirty(int dirty_redraws = 1);
@@ -35,7 +51,6 @@ struct widget_context
 
     void change_widget_area(rect new_box);
 
-    // forwarded
     void activate();
     void navigate_selection(navigation_type nt);
 
