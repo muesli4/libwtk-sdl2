@@ -31,6 +31,11 @@ point rect_origin(rect const & r)
     return { r.x, r.y };
 }
 
+vec rect_size(rect const & r)
+{
+    return { r.w, r.h };
+}
+
 rect origin_rect(vec v)
 {
     return { 0, 0, v.w, v.h };
@@ -66,6 +71,11 @@ bool operator<(vec v, vec w)
     return v.w < w.w && v.h < w.h;
 }
 
+vec operator-(vec v, vec w)
+{
+    return v + (-w);
+}
+
 vec operator*(vec v, int s)
 {
     return { v.w * s, v.h * s };
@@ -88,11 +98,12 @@ vec operator-(point p, point q)
 
 rect center_vec_within_rect(vec inside, rect outside)
 {
-    return { outside.x + outside.w / 2 - inside.w / 2
-           , outside.y + outside.h / 2 - inside.h / 2
-           , inside.w
-           , inside.h
-           };
+    return base_rect(centered_origin(inside, outside), inside);
+}
+
+point centered_origin(vec inside, rect outside)
+{
+    return rect_origin(outside) + (rect_size(outside) - inside) / 2;
 }
 
 vec length(rect const & r)

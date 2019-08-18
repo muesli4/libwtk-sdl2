@@ -94,11 +94,7 @@ void draw_context::draw_button_text(std::string const & text, rect abs_rect)
     auto result = _fm.text(text);
     vec const & size = std::get<0>(result);
 
-    // center text in abs_rect TODO refactor computation
-    point origin { abs_rect.x + (abs_rect.w - size.w) / 2, abs_rect.y + (abs_rect.h - size.h) / 2 };
-
-    //blit(text_surf_ptr.get(), nullptr, &target_rect);
-    run_copy_commands(std::get<1>(result), origin, _theme.button_fg_color);
+    run_copy_commands(std::get<1>(result), centered_origin(size, abs_rect), _theme.button_fg_color);
 }
 
 void draw_context::draw_entry_box(rect box, bool selected)
