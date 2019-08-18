@@ -215,16 +215,13 @@ void event_loop(SDL_Renderer * renderer)
     SDL_Event ev;
     while (SDL_WaitEvent(&ev))
     {
-        if (ev.type == SDL_QUIT)
-            break;
-        else if (ev.type == SDL_KEYDOWN && (ev.key.keysym.mod & KMOD_CTRL) && ev.key.keysym.sym == SDLK_q)
+        if (is_quit_event(ev))
             break;
         else if (ev.type == SDL_WINDOWEVENT)
         {
             if (ev.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
             {
                 //std::cout << ev.window.data1 << "x" << ev.window.data2 << std::endl;
-
                 ctx.change_widget_area({ 0, 0, ev.window.data1, ev.window.data2 });
                 // TODO 
                 ctx.draw();
@@ -233,14 +230,12 @@ void event_loop(SDL_Renderer * renderer)
             {
                 continue;
             }
-
         }
         else
         {
             ctx.process_event(ev);
             ctx.draw_dirty();
         }
-
     }
 }
 

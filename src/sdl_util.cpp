@@ -129,3 +129,8 @@ vec texture_dim(SDL_Texture const * tex)
     return size;
 }
 
+bool is_quit_event(SDL_Event const & ev)
+{
+    return ev.type == SDL_QUIT || (ev.type == SDL_KEYDOWN && (ev.key.keysym.mod & KMOD_CTRL) && ev.key.keysym.sym == SDLK_q);
+}
+

@@ -49,5 +49,11 @@ void blit_preserve_ar(SDL_Surface * source, SDL_Surface * dest, SDL_Rect const *
 
 vec texture_dim(SDL_Texture const * tex);
 
+/**
+ * Check if the application should quit. This is usually the case when a specific
+ * quit event is sent or control and q has been pressed.
+ */
+bool is_quit_event(SDL_Event const & ev);
+
 #endif
 
