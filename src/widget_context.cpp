@@ -43,10 +43,10 @@ point tfinger_to_point(SDL_TouchFingerEvent const & tfinger, rect const & box)
 
 bool widget_context::process_mouse_event(SDL_Event const & ev)
 {
+    // Note that unfortunately SDL produces duplicate events for touch devices.
+    // For this reason those events are caught here.
     if (ev.type == SDL_MOUSEBUTTONDOWN)
     {
-        // Unfortunately, SDL produces duplicate events for touch devices. This
-        // has to be caught.
         if (ev.button.which != SDL_TOUCH_MOUSEID)
         {
             point p { ev.button.x, ev.button.y };
@@ -56,11 +56,17 @@ bool widget_context::process_mouse_event(SDL_Event const & ev)
     }
     else if (ev.type == SDL_MOUSEBUTTONUP)
     {
-        _main_widget.on_mouse_up_event(_mt.mouse_up({ ev.button.x, ev.button.y }));
+        if (ev.button.which != SDL_TOUCH_MOUSEID)
+        {
+            _main_widget.on_mouse_up_event(_mt.mouse_up({ ev.button.x, ev.button.y }));
+        }
     }
     else if (ev.type == SDL_MOUSEMOTION)
     {
-        _main_widget.on_mouse_move_event(_mt.mouse_move({ ev.motion.x, ev.motion.y }));
+        if (ev.motion.which != SDL_TOUCH_MOUSEID)
+        {
+            _main_widget.on_mouse_move_event(_mt.mouse_move({ ev.motion.x, ev.motion.y }));
+        }
     }
     else if (ev.type == SDL_FINGERDOWN)
     {
