@@ -45,9 +45,14 @@ bool widget_context::process_mouse_event(SDL_Event const & ev)
 {
     if (ev.type == SDL_MOUSEBUTTONDOWN)
     {
-        point p { ev.button.x, ev.button.y };
-        _main_widget.on_mouse_down_event({p});
-        _mt.mouse_down(p);
+        // Unfortunately, SDL produces duplicate events for touch devices. This
+        // has to be caught.
+        if (ev.button.which != SDL_TOUCH_MOUSEID)
+        {
+            point p { ev.button.x, ev.button.y };
+            _main_widget.on_mouse_down_event({p});
+            _mt.mouse_down(p);
+        }
     }
     else if (ev.type == SDL_MOUSEBUTTONUP)
     {
