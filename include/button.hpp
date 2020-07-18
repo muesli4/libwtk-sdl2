@@ -5,6 +5,10 @@
 
 #include "selectable.hpp"
 
+/**
+ * Generic base class for buttons. This is a rectangle you can click, select and
+ * activate.
+ */
 struct button : selectable
 {
     button(std::function<void()> callback);

@@ -2,7 +2,7 @@ Provides a framework for hierarchic widgets based on SDL2. Most of the event han
 
 ## Installation
 
-Run `autoreconf -vfi` to generate the configure script. Then build as usual with `./configure`, `make, and `make install`.
+Run `autoreconf -vfi` to generate the configure script. Then build as usual with `./configure`, `make`, and `make install`.
 
 ## Features
 
@@ -18,10 +18,11 @@ I uploaded an early snapshot of the API [here](https://muesli4.github.io/annotat
 
 ## Current Shortcomings
 
-* Only a basic (dark) theme is provided.
-* No text field and keyboard keys implemented.
-* Widgets do not get a new size when their content changes.
-* Containers don't have interfaces to add or remove children.
+* Only a basic dark hard-coded theme is provided.
+* Missing widget to enter text.
+* Keyboard events are not handled by widgets.
+* Widgets do not get a new size when their content changes. There are several desirable behaviors how this could work.
+* Containers do not have interfaces to add or remove children. This would also require redoing the allocation.
 * The drawing primitives are lacking (should probably be refactored into low-level and design-based drawing).
 * The font renderer is optimized on reoccuring words. Rendering arbitrary text with it might use a lot of memory (although it will trade off with rerendering).
 * Backgrounds can not easily redrawn if a child is dirty (although no widgets need that yet).
