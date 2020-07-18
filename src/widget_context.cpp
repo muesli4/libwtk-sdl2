@@ -8,6 +8,16 @@ widget_context::widget_context(SDL_Renderer * renderer, std::vector<font> fonts,
 }
 
 widget_context::widget_context(SDL_Renderer * renderer, std::vector<font> fonts, widget & main_widget, rect box)
+    : widget_context(renderer, fonts, 0.3, main_widget, box)
+{
+}
+
+widget_context::widget_context(SDL_Renderer * renderer, std::vector<font> fonts, double dir_unambig_factor_threshold, widget & main_widget)
+    : widget_context(renderer, fonts, dir_unambig_factor_threshold, main_widget, box_from_renderer(renderer))
+{
+}
+
+widget_context::widget_context(SDL_Renderer * renderer, std::vector<font> fonts, double dir_unambig_factor_threshold, widget & main_widget, rect box)
     : _box(box)
     , _renderer(renderer)
     , _fm(_renderer, fonts)
@@ -17,7 +27,7 @@ widget_context::widget_context(SDL_Renderer * renderer, std::vector<font> fonts,
     , _main_widget(main_widget)
     , _context_info( _fm
                    , { .lower_threshold = _fm.font_line_skip() * 2
-                     , .dir_unambig_factor = 0.3
+                     , .dir_unambig_factor = dir_unambig_factor_threshold
                      }
                    )
 {
@@ -39,6 +49,12 @@ widget_context::widget_context(SDL_Renderer * renderer, std::vector<font> fonts,
 point tfinger_to_point(SDL_TouchFingerEvent const & tfinger, rect const & box)
 {
     return { static_cast<int>(tfinger.x * box.w), static_cast<int>(tfinger.y * box.h) };
+}
+
+void widget_context::reset_mouse_state()
+{
+    _mt.reset();
+    // TODO Implement a reset event and emit it here. (#4)
 }
 
 bool widget_context::process_mouse_event(SDL_Event const & ev)

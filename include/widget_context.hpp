@@ -23,13 +23,22 @@ struct widget_context
 
     widget_context(SDL_Renderer * renderer, std::vector<font> fonts, widget & main_widget);
     widget_context(SDL_Renderer * renderer, std::vector<font> fonts, widget & main_widget, rect box);
+    widget_context(SDL_Renderer * renderer, std::vector<font> fonts, double dir_unambig_factor_threshold, widget & main_widget);
+    widget_context(SDL_Renderer * renderer, std::vector<font> fonts, double dir_unambig_factor_threshold, widget & main_widget, rect box);
 
     /**
      * @name Pre-defined input event handling.
      * @{
      */
 
+    /**
+     * Process a mouse event and propagate it to the widget.
+     *
+     * @param ev The SDL event.
+     * @param Whether the event was handled by this method.
+     */
     bool process_mouse_event(SDL_Event const & ev);
+
     bool process_key_event(SDL_Event const & ev);
 
     /**
@@ -41,6 +50,13 @@ struct widget_context
     /**
      * @}
      */
+
+    /**
+     * Resets any state that is associated with mouse event handling. This
+     * might come in handy if the application decides to not propagate events
+     * for some time.
+     */
+    void reset_mouse_state();
 
     void draw(bool present = true);
     void draw_dirty(int dirty_redraws = 1);
