@@ -51,6 +51,6 @@ libwtk_sdl2_la_LIBADD = $(sdl2_LIBS) $(SDL2_ttf_LIBS) $(SDL2_image_LIBS)
 
 bin_PROGRAMS = libwtk-sdl2-test
 libwtk_sdl2_test_SOURCES = gui.cpp
-libwtk_sdl2_test_LDADD = libwtk-sdl2.la $(SDL2_image_LIBS)
+libwtk_sdl2_test_LDADD = libwtk-sdl2.la $(SDL2_ttf_LIBS) $(SDL2_image_LIBS)
 libwtk_sdl2_test_CXXFLAGS = $(flags)
 
