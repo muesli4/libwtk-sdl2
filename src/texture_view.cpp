@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Moritz Bruder <muesli4 at gmail dot com>
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
+
 #include <SDL2/SDL_image.h>
 
 #include "texture_view.hpp"

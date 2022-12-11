@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Moritz Bruder <muesli4 at gmail dot com>
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
+
 // TODO think about a way where the widget might not arbitrarily draw to the
 //      screen (basically bounding box drawn in offset mode)
 // TODO consistent background drawing, best solution:

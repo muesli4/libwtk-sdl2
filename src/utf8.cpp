@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Moritz Bruder <muesli4 at gmail dot com>
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
+
 #include "utf8.hpp"
 
 int utf8_byte_count(uint8_t start_byte)

@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: Moritz Bruder <muesli4 at gmail dot com>
+
+SPDX-License-Identifier: LGPL-3.0-or-later
+-->
+
 Provides a framework for hierarchic widgets based on SDL2. Most of the event handling and drawing is however abstracted away and should be easily replacable. The original purpose of this library is to supersede my quick and dirty *immediate GUI* implementation in my [touchscreen GUI](https://github.com/muesli4/mpd-touch-screen-gui) and at the same time provide GUI support for a remote control.
 
 ## Installation

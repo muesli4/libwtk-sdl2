@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Moritz Bruder <muesli4 at gmail dot com>
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
+
 #include "swipe_area.hpp"
 
 swipe_area::swipe_area(std::function<void(swipe_direction)> swipe_callback, std::function<void()> press_callback)

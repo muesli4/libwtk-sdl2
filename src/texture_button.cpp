@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Moritz Bruder <muesli4 at gmail dot com>
+//
+// SPDX-License-Identifier: LGPL-3.0-or-later
+
 #include "texture_button.hpp"
 
 texture_button::texture_button(shared_texture_ptr texture, std::function<void()> callback)
