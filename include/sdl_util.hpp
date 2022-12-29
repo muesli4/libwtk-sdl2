@@ -6,12 +6,12 @@
 #define LIBWTK_SDL2_UTIL
 
 #include <memory>
-#include <vector>
 #include <cstddef>
 
 #include <SDL2/SDL.h>
 
 #include "geometry.hpp"
+#include "byte_array_slice.hpp"
 
 struct surface_deleter
 {
@@ -27,13 +27,9 @@ struct texture_destroyer
 
 typedef std::unique_ptr<SDL_Texture, texture_destroyer> unique_texture_ptr;
 
-SDL_Texture * load_raw_texture_from_image(SDL_Renderer * r, std::string filename);
-
 unique_texture_ptr load_texture_from_file(SDL_Renderer * r, std::string filename);
 
-typedef std::vector<std::byte> image_data;
-
-unique_texture_ptr load_texture_from_image_data(SDL_Renderer * r, image_data const & data);
+unique_texture_ptr load_texture_from_memory(SDL_Renderer * r, byte_array_slice data);
 
 typedef std::shared_ptr<SDL_Texture> shared_texture_ptr;
 

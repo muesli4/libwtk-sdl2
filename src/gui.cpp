@@ -142,7 +142,7 @@ void event_loop(SDL_Renderer * renderer)
     std::shared_ptr<list_view> lv = std::make_shared<list_view>(test_values, 0, [&lv](std::size_t p){ std::cout << "press list_view at " << p << std::endl; lv->set_highlight_position(p); });
 
     auto col1 = vbox({ { true, lv }, { false, nb_indicator }, { true, nb }, { false, nb_controls } }, 20);
-    auto col2 = vbox({ { true, cw() }, { false, std::make_shared<texture_view>(load_texture_from_image(renderer, PKGDATA"/test.jpeg")) }, { true, cw() } }, 20);
+    auto col2 = vbox({ { true, cw() }, { false, std::make_shared<texture_view>(load_texture_from_file(renderer, PKGDATA"/test.jpeg")) }, { true, cw() } }, 20);
     std::vector<grid::entry> grid_entries
         { { { 0, 0, 2, 2 }, num_button() }
         , { { 0, 2, 1, 1 }, num_button() }

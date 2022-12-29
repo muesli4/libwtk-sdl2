@@ -6,6 +6,7 @@ pkginclude_HEADERS =    \
 	bin.hpp               \
 	box.hpp               \
 	button.hpp            \
+	byte_array_slice.hpp  \
 	color_widget.hpp      \
 	container.hpp         \
 	context_info.hpp      \

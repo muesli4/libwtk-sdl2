@@ -17,6 +17,7 @@ libwtk_sdl2_la_SOURCES = \
 	bin.cpp                \
 	box.cpp                \
 	button.cpp             \
+	byte_array_slice.cpp   \
 	color_widget.cpp       \
 	container.cpp          \
 	context_info.cpp       \

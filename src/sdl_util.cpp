@@ -22,7 +22,6 @@ static SDL_Texture * texture_from_img_load_result(SDL_Renderer * r, SDL_Surface 
     if (s == nullptr)
         throw std::runtime_error(std::string("could not load image: ") + IMG_GetError());
 
-    // TODO how to get to the renderer
     SDL_Texture * t = SDL_CreateTextureFromSurface(r, s);
 
     if (t == nullptr)
@@ -31,13 +30,13 @@ static SDL_Texture * texture_from_img_load_result(SDL_Renderer * r, SDL_Surface 
     return t;
 }
 
-SDL_Texture * load_raw_texture_from_image(SDL_Renderer * r, std::string filename)
+SDL_Texture * load_raw_texture_from_file(SDL_Renderer * r, std::string filename)
 {
     SDL_Surface * s = IMG_Load(filename.c_str());
     return texture_from_img_load_result(r, s);
 }
 
-SDL_Texture * load_raw_texture_from_image_data(SDL_Renderer * r, image_data const & data)
+static SDL_Texture * load_raw_texture_from_memory(SDL_Renderer * r, byte_array_slice data)
 {
     SDL_RWops * rwops = SDL_RWFromConstMem(data.data(), data.size());
     // rwops is freed by closing it
@@ -46,19 +45,19 @@ SDL_Texture * load_raw_texture_from_image_data(SDL_Renderer * r, image_data cons
     return texture_from_img_load_result(r, s);
 }
 
-unique_texture_ptr load_texture_from_image(SDL_Renderer * r, std::string filename)
+unique_texture_ptr load_texture_from_file(SDL_Renderer * r, std::string filename)
 {
-    return unique_texture_ptr(load_raw_texture_from_image(r, filename));
+    return unique_texture_ptr(load_raw_texture_from_file(r, filename));
 }
 
-unique_texture_ptr load_texture_from_image_data(SDL_Renderer * r, image_data const & data)
+unique_texture_ptr load_texture_from_memory(SDL_Renderer * r, byte_array_slice data)
 {
-    return unique_texture_ptr(load_raw_texture_from_image_data(r, data));
+    return unique_texture_ptr(load_raw_texture_from_memory(r, data));
 }
 
 shared_texture_ptr load_shared_texture_from_image(SDL_Renderer * r, std::string filename)
 {
-    return shared_texture_ptr(load_raw_texture_from_image(r, filename), texture_destroyer());
+    return shared_texture_ptr(load_raw_texture_from_file(r, filename), texture_destroyer());
 }
 
 SDL_Renderer * renderer_from_window(SDL_Window * window)
