@@ -4,10 +4,12 @@
 
 #ifndef LIBWTK_SDL2_UTIL
 #define LIBWTK_SDL2_UTIL
-#include <memory>
 
-#include <SDL2/SDL_rect.h>
-#include <SDL2/SDL_surface.h>
+#include <memory>
+#include <vector>
+#include <cstddef>
+
+#include <SDL2/SDL.h>
 
 #include "geometry.hpp"
 
@@ -27,7 +29,11 @@ typedef std::unique_ptr<SDL_Texture, texture_destroyer> unique_texture_ptr;
 
 SDL_Texture * load_raw_texture_from_image(SDL_Renderer * r, std::string filename);
 
-unique_texture_ptr load_texture_from_image(SDL_Renderer * r, std::string filename);
+unique_texture_ptr load_texture_from_file(SDL_Renderer * r, std::string filename);
+
+typedef std::vector<std::byte> image_data;
+
+unique_texture_ptr load_texture_from_image_data(SDL_Renderer * r, image_data const & data);
 
 typedef std::shared_ptr<SDL_Texture> shared_texture_ptr;
 

@@ -17,10 +17,8 @@ void texture_destroyer::operator()(SDL_Texture * t)
     SDL_DestroyTexture(t);
 }
 
-SDL_Texture * load_raw_texture_from_image(SDL_Renderer * r, std::string filename)
+static SDL_Texture * texture_from_img_load_result(SDL_Renderer * r, SDL_Surface * s)
 {
-    SDL_Surface * s = IMG_Load(filename.c_str());
-
     if (s == nullptr)
         throw std::runtime_error(std::string("could not load image: ") + IMG_GetError());
 
@@ -33,9 +31,29 @@ SDL_Texture * load_raw_texture_from_image(SDL_Renderer * r, std::string filename
     return t;
 }
 
+SDL_Texture * load_raw_texture_from_image(SDL_Renderer * r, std::string filename)
+{
+    SDL_Surface * s = IMG_Load(filename.c_str());
+    return texture_from_img_load_result(r, s);
+}
+
+SDL_Texture * load_raw_texture_from_image_data(SDL_Renderer * r, image_data const & data)
+{
+    SDL_RWops * rwops = SDL_RWFromConstMem(data.data(), data.size());
+    // rwops is freed by closing it
+    SDL_Surface * s = IMG_Load_RW(rwops, 1);
+
+    return texture_from_img_load_result(r, s);
+}
+
 unique_texture_ptr load_texture_from_image(SDL_Renderer * r, std::string filename)
 {
     return unique_texture_ptr(load_raw_texture_from_image(r, filename));
+}
+
+unique_texture_ptr load_texture_from_image_data(SDL_Renderer * r, image_data const & data)
+{
+    return unique_texture_ptr(load_raw_texture_from_image_data(r, data));
 }
 
 shared_texture_ptr load_shared_texture_from_image(SDL_Renderer * r, std::string filename)
