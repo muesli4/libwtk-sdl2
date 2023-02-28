@@ -155,7 +155,7 @@ std::vector<word_fragment> split_words(std::string t)
     return words;
 }
 
-vec font_word_cache::texture_dim_nullptr(SDL_Texture * texture) const
+vec font_word_cache::texture_dim_nullptr(shared_texture_ptr const & texture) const
 {
     if (texture == nullptr)
     {
@@ -163,7 +163,7 @@ vec font_word_cache::texture_dim_nullptr(SDL_Texture * texture) const
     }
     else
     {
-        return texture_dim(texture);
+        return texture_dim(texture.get());
     }
 }
 
@@ -289,7 +289,7 @@ int font_word_cache::text_minimum_width(std::string t)
     return max_width;
 }
 
-SDL_Texture * font_word_cache::word(std::string w)
+shared_texture_ptr font_word_cache::word(std::string w)
 {
     auto it = _prerendered.find(w);
     if (it == _prerendered.end())
@@ -317,7 +317,7 @@ SDL_Texture * font_word_cache::word(std::string w)
             if (SDL_SetTextureBlendMode(t, SDL_BLENDMODE_BLEND) < 0)
                 throw font_render_error(SDL_GetError());
 
-            return _prerendered[w] = t;
+            return _prerendered[w] = shared_texture_ptr(t, texture_destroyer());
         }
     }
     else
@@ -338,8 +338,6 @@ int font_word_cache::font_line_skip() const
 
 void font_word_cache::clear()
 {
-    for (auto p : _prerendered)
-        SDL_DestroyTexture(p.second);
     _prerendered.clear();
 }
 

@@ -6,13 +6,14 @@
 #define LIBWTK_SDL2_COPY_COMMAND_HPP
 
 #include "geometry.hpp"
+#include "sdl_util.hpp"
 
 struct SDL_Texture;
 
 // copy textures to the screen in a batch
 struct copy_command
 {
-    SDL_Texture * texture;
+    shared_texture_ptr texture;
 
     // The part of the texture to copy.
     rect source;

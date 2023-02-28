@@ -76,10 +76,11 @@ void draw_context::run_copy_commands(std::vector<copy_command> const & commands,
 {
     for (auto const & c : commands)
     {
-        set_texture_color_mod(c.texture, color);
-        vec size = texture_dim(c.texture);
+        SDL_Texture * texture = c.texture.get();
+        set_texture_color_mod(texture, color);
+        vec size = texture_dim(texture);
         rect target = base_rect(origin + c.offset, size);
-        SDL_RenderCopy(_renderer, c.texture, &c.source, &target);
+        SDL_RenderCopy(_renderer, texture, &c.source, &target);
     }
 }
 

@@ -70,13 +70,13 @@ struct font_word_cache
     int get_word_right_kerning(std::string_view const word);
 
     // Correctly handles dimension for a nullptr.
-    vec texture_dim_nullptr(SDL_Texture * texture) const;
+    vec texture_dim_nullptr(shared_texture_ptr const & texture) const;
 
     // May return nullptr for zero-length text.
-    SDL_Texture * word(std::string);
+    shared_texture_ptr word(std::string);
 
     SDL_Renderer * _renderer;
-    std::unordered_map<std::string, SDL_Texture *> _prerendered;
+    std::unordered_map<std::string, shared_texture_ptr> _prerendered;
     TTF_Font * _font;
     int _space_advance;
     int _space_minx;
