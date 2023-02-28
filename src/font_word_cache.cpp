@@ -252,11 +252,6 @@ vec font_word_cache::compute_text_layout(std::string t, int max_line_width, Back
 
 std::tuple<vec, std::vector<copy_command>> font_word_cache::text(std::string t, int max_line_width)
 {
-    // FIXME: temporary solution - do not use too much memory, although with words caching it's not as bad as before
-    // TODO add use count? would it cause ui lag?
-    if (_prerendered.size() > 40000)
-        clear();
-
     std::vector<copy_command> copy_commands;
     vec target_size = compute_text_layout(t, max_line_width, std::back_inserter(copy_commands));
     return std::make_tuple(target_size, copy_commands);
@@ -289,10 +284,17 @@ int font_word_cache::text_minimum_width(std::string t)
     return max_width;
 }
 
+font_word_cache_entry::font_word_cache_entry(std::string word, SDL_Texture * texture)
+    : word(word)
+    , texture_ptr(texture, texture_destroyer())
+{
+}
+
 shared_texture_ptr font_word_cache::word(std::string w)
 {
-    auto it = _prerendered.find(w);
-    if (it == _prerendered.end())
+    auto & unique_hash_index = _prerendered.get<0>();
+    auto it = unique_hash_index.find(w);
+    if (it == unique_hash_index.end())
     {
         // protect against unsupported zero length
         if (w.empty())
@@ -317,12 +319,21 @@ shared_texture_ptr font_word_cache::word(std::string w)
             if (SDL_SetTextureBlendMode(t, SDL_BLENDMODE_BLEND) < 0)
                 throw font_render_error(SDL_GetError());
 
-            return _prerendered[w] = shared_texture_ptr(t, texture_destroyer());
+            if (_prerendered.size() > 40000)
+            {
+                auto & sequence_index = _prerendered.get<1>();
+                sequence_index.pop_front();
+            }
+
+            auto const & result = _prerendered.insert(font_word_cache_entry(w, t));
+            return result.first->texture_ptr;
         }
     }
     else
     {
-        return it->second;
+        auto & sequence_index = _prerendered.get<1>();
+        sequence_index.relocate(_prerendered.project<1>(it), sequence_index.end());
+        return it->texture_ptr;
     }
 }
 

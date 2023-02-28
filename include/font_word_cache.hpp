@@ -11,6 +11,12 @@
 #include <unordered_map>
 #include <vector>
 
+
+#include <boost/multi_index_container.hpp>
+#include <boost/multi_index/hashed_index.hpp>
+#include <boost/multi_index/sequenced_index.hpp>
+#include <boost/multi_index/member.hpp>
+
 #include <SDL2/SDL_ttf.h>
 
 #include "copy_command.hpp"
@@ -32,6 +38,14 @@ struct word_fragment
 {
     std::string word;
     std::size_t extra_spaces;
+};
+
+struct font_word_cache_entry
+{
+    std::string word;
+    shared_texture_ptr texture_ptr;
+
+    font_word_cache_entry(std::string word, SDL_Texture * texture);
 };
 
 struct font_word_cache
@@ -76,11 +90,25 @@ struct font_word_cache
     shared_texture_ptr word(std::string);
 
     SDL_Renderer * _renderer;
-    std::unordered_map<std::string, shared_texture_ptr> _prerendered;
+
+    typedef boost::multi_index_container
+        < font_word_cache_entry
+        , boost::multi_index::indexed_by
+            < boost::multi_index::hashed_unique
+                < boost::multi_index::member
+                    < font_word_cache_entry
+                    , std::string
+                    , &font_word_cache_entry::word
+                    >
+                >
+            , boost::multi_index::sequenced<>
+            >
+        > word_texture_lru_cache_type;
+    word_texture_lru_cache_type _prerendered;
+
     TTF_Font * _font;
     int _space_advance;
     int _space_minx;
-
 };
 
 #endif
